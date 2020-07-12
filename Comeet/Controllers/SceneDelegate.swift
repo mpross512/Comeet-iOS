@@ -24,7 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //      let contentView = mainView()
         // } else {
         
-            let contentView = InitialView()
+            let contentView = MainView()
 
         // }
         // Use a UIHostingController as window root view controller.

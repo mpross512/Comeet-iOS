@@ -10,6 +10,9 @@ import SwiftUI
 
 struct InitialView: View {
     
+    @State var isSignInSheet: Bool = false
+    @State var isSignUpSheet: Bool = false
+    
     let yellowOrangeColor = Color(red: 0.95, green: 0.61, blue: 0.07, opacity: 1.00)
     let greenColor = Color(red: 0.15, green: 0.68, blue: 0.38, opacity: 1.00)
     let orangeColor = Color(red: 0.90, green: 0.49, blue: 0.13, opacity: 1.00)
@@ -28,11 +31,20 @@ struct InitialView: View {
                     .font(.custom("Futura", size: 50))
                     .padding(.bottom, 200)
                 
-                Button(action: {}) {
+                Button(action: {
+                    self.isSignUpSheet.toggle()
+                }) {
                     AccountButton(text: "Create Account")
+                }.sheet(isPresented: $isSignUpSheet) {
+                    SignUpView()
                 }
-                Button(action: {}) {
+                
+                Button(action: {
+                    self.isSignInSheet.toggle()
+                }) {
                     AccountButton(text: "Sign In")
+                }.sheet(isPresented: $isSignInSheet) {
+                    SignInView()
                 }
             }
         }

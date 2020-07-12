@@ -3,19 +3,22 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		4C163A4924B9087000523D05 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4824B9087000523D05 /* MainView.swift */; };
 		4C163A4D24B90A4000523D05 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4C24B90A4000523D05 /* User.swift */; };
 		4C163A4F24B913AC00523D05 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */; };
+		4C163A5124B9397100523D05 /* UserAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5024B9397100523D05 /* UserAuthenticator.swift */; };
+		4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5224B93BDA00523D05 /* SignInView.swift */; };
 		4C60113524B562B6003B425A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113424B562B6003B425A /* AppDelegate.swift */; };
 		4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113624B562B6003B425A /* SceneDelegate.swift */; };
 		4C60113924B562B6003B425A /* InitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113824B562B6003B425A /* InitialView.swift */; };
 		4C60113B24B562B8003B425A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113A24B562B8003B425A /* Assets.xcassets */; };
 		4C60113E24B562B8003B425A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113D24B562B8003B425A /* Preview Assets.xcassets */; };
 		4C60114124B562B8003B425A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113F24B562B8003B425A /* LaunchScreen.storyboard */; };
+		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
 		639C8405A84AB9349618503E /* Pods_Comeet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +27,8 @@
 		4C163A4824B9087000523D05 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		4C163A4C24B90A4000523D05 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4C163A5024B9397100523D05 /* UserAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAuthenticator.swift; sourceTree = "<group>"; };
+		4C163A5224B93BDA00523D05 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		4C60113124B562B6003B425A /* Comeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Comeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C60113424B562B6003B425A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C60113624B562B6003B425A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -32,6 +37,7 @@
 		4C60113D24B562B8003B425A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4C60114024B562B8003B425A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4C60114224B562B8003B425A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comeet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACF86EB035F318800BE47CD7 /* Pods-Comeet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comeet.release.xcconfig"; path = "Target Support Files/Pods-Comeet/Pods-Comeet.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,7 +60,6 @@
 				392139E422C0C1FB897D8F99 /* Pods-Comeet.debug.xcconfig */,
 				ACF86EB035F318800BE47CD7 /* Pods-Comeet.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -71,6 +76,8 @@
 			children = (
 				4C60113824B562B6003B425A /* InitialView.swift */,
 				4C163A4824B9087000523D05 /* MainView.swift */,
+				4C163A5224B93BDA00523D05 /* SignInView.swift */,
+				4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -88,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				4C163A4C24B90A4000523D05 /* User.swift */,
+				4C163A5024B9397100523D05 /* UserAuthenticator.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -249,8 +257,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C163A5124B9397100523D05 /* UserAuthenticator.swift in Sources */,
+				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C60113524B562B6003B425A /* AppDelegate.swift in Sources */,
 				4C163A4924B9087000523D05 /* MainView.swift in Sources */,
+				4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */,
 				4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */,
 				4C163A4D24B90A4000523D05 /* User.swift in Sources */,
 				4C60113924B562B6003B425A /* InitialView.swift in Sources */,

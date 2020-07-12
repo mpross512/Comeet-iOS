@@ -7,11 +7,44 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct MainView: View {
+        
+    @ObservedObject var authenticator = UserAuthenticator.getUserAuthenticator()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        ZStack {
+            if authenticator.isSignedIn() {
+                
+                VStack {
+                
+                    Text("Hello, World!")
+                        .padding()
+                    
+                    Button(action: {
+                        do {
+                            try Auth.auth().signOut()
+                            self.authenticator.refresh()
+                        } catch {
+                            print(error)
+                        }
+                    }) {
+                        Text("Sign Out")
+                    }
+                }
+                
+            } else {
+                
+                InitialView()
+                
+            }
+        }
+        
     }
+    
+    
 }
 
 struct MainView_Previews: PreviewProvider {
