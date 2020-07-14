@@ -9,7 +9,7 @@
 import SwiftUI
 import FirebaseAuth
 
-struct MainView: View {
+struct MasterView: View {
         
     @ObservedObject var authenticator = UserAuthenticator.getUserAuthenticator()
     
@@ -18,22 +18,7 @@ struct MainView: View {
         ZStack {
             if authenticator.isSignedIn() {
                 
-                VStack {
-                
-                    Text("Hello, World!")
-                        .padding()
-                    
-                    Button(action: {
-                        do {
-                            try Auth.auth().signOut()
-                            self.authenticator.refresh()
-                        } catch {
-                            print(error)
-                        }
-                    }) {
-                        Text("Sign Out")
-                    }
-                }
+                HomeView()
                 
             } else {
                 
@@ -49,6 +34,6 @@ struct MainView: View {
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView()
+        MasterView()
     }
 }

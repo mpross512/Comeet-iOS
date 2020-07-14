@@ -15,6 +15,10 @@ class UserAuthenticator : ObservableObject {
     
     @Published private var signedIn: Bool = false
     
+    private var profilePicReference = Constants.Database.profilePicsRef.child("\(Auth.auth().currentUser?.uid ?? "default").jpeg")
+    
+    private var imageURL: URL?
+    
     init(_ signedIn: Bool) {
         self.signedIn = signedIn
     }
@@ -30,10 +34,26 @@ class UserAuthenticator : ObservableObject {
     
     func refresh() {
         signedIn = Auth.auth().currentUser != nil
+        profilePicReference = Constants.Database.profilePicsRef.child("\(Auth.auth().currentUser?.uid ?? "default").jpeg")
+        profilePicReference.downloadURL { (url, error) in
+            if let e = error {
+                print(e)
+            } else {
+                self.imageURL = url!
+            }
+        }
+        
+        print("Refreshing.... User ID is \(Auth.auth().currentUser?.uid)")
     }
     
     func isSignedIn() -> Bool {
         return signedIn
+    }
+    
+    func getImageURL() -> URL? {
+        profilePicReference = Constants.Database.profilePicsRef.child("\(Auth.auth().currentUser?.uid ?? "default").jpeg")
+        print("Returned URL: \(imageURL)")
+        return imageURL
     }
     
 }

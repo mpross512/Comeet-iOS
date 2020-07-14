@@ -11,9 +11,6 @@ import FirebaseAuth
 
 struct SignInView: View {
     
-    let yellowOrangeColor = Color(red: 0.95, green: 0.61, blue: 0.07, opacity: 1.00)
-    let orangeColor = Color(red: 0.90, green: 0.49, blue: 0.13, opacity: 1.00)
-    
     @State var email: String = ""
     @State var password: String = ""
     @State var errorText: String = "Error"
@@ -23,7 +20,7 @@ struct SignInView: View {
         ZStack {
             
             LinearGradient(gradient: Gradient(
-            colors: [orangeColor, orangeColor, yellowOrangeColor]),
+                colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
             startPoint: .leading, endPoint: .trailing)
             .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
             

@@ -7,11 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4C163A4924B9087000523D05 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4824B9087000523D05 /* MainView.swift */; };
+		4C163A4924B9087000523D05 /* MasterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4824B9087000523D05 /* MasterView.swift */; };
 		4C163A4D24B90A4000523D05 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4C24B90A4000523D05 /* User.swift */; };
 		4C163A4F24B913AC00523D05 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */; };
 		4C163A5124B9397100523D05 /* UserAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5024B9397100523D05 /* UserAuthenticator.swift */; };
 		4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5224B93BDA00523D05 /* SignInView.swift */; };
+		4C3108E524BBC9AE003679D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E424BBC9AE003679D7 /* Constants.swift */; };
+		4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E624BBCDC6003679D7 /* HomeView.swift */; };
+		4C3108E924BBCEF0003679D7 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E824BBCEF0003679D7 /* MatchView.swift */; };
+		4C3108EB24BBCEF9003679D7 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108EA24BBCEF9003679D7 /* ProfileView.swift */; };
+		4C3108ED24BBCF00003679D7 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108EC24BBCF00003679D7 /* ChatView.swift */; };
 		4C60113524B562B6003B425A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113424B562B6003B425A /* AppDelegate.swift */; };
 		4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113624B562B6003B425A /* SceneDelegate.swift */; };
 		4C60113924B562B6003B425A /* InitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113824B562B6003B425A /* InitialView.swift */; };
@@ -24,11 +29,16 @@
 
 /* Begin PBXFileReference section */
 		392139E422C0C1FB897D8F99 /* Pods-Comeet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comeet.debug.xcconfig"; path = "Target Support Files/Pods-Comeet/Pods-Comeet.debug.xcconfig"; sourceTree = "<group>"; };
-		4C163A4824B9087000523D05 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		4C163A4824B9087000523D05 /* MasterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterView.swift; sourceTree = "<group>"; };
 		4C163A4C24B90A4000523D05 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C163A5024B9397100523D05 /* UserAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAuthenticator.swift; sourceTree = "<group>"; };
 		4C163A5224B93BDA00523D05 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		4C3108E424BBC9AE003679D7 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		4C3108E624BBCDC6003679D7 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		4C3108E824BBCEF0003679D7 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
+		4C3108EA24BBCEF9003679D7 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		4C3108EC24BBCF00003679D7 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		4C60113124B562B6003B425A /* Comeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Comeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C60113424B562B6003B425A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C60113624B562B6003B425A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -75,9 +85,13 @@
 			isa = PBXGroup;
 			children = (
 				4C60113824B562B6003B425A /* InitialView.swift */,
-				4C163A4824B9087000523D05 /* MainView.swift */,
+				4C163A4824B9087000523D05 /* MasterView.swift */,
 				4C163A5224B93BDA00523D05 /* SignInView.swift */,
 				4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */,
+				4C3108E624BBCDC6003679D7 /* HomeView.swift */,
+				4C3108E824BBCEF0003679D7 /* MatchView.swift */,
+				4C3108EA24BBCEF9003679D7 /* ProfileView.swift */,
+				4C3108EC24BBCF00003679D7 /* ChatView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -96,6 +110,7 @@
 			children = (
 				4C163A4C24B90A4000523D05 /* User.swift */,
 				4C163A5024B9397100523D05 /* UserAuthenticator.swift */,
+				4C3108E424BBC9AE003679D7 /* Constants.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -257,14 +272,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */,
 				4C163A5124B9397100523D05 /* UserAuthenticator.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C60113524B562B6003B425A /* AppDelegate.swift in Sources */,
-				4C163A4924B9087000523D05 /* MainView.swift in Sources */,
+				4C3108EB24BBCEF9003679D7 /* ProfileView.swift in Sources */,
+				4C163A4924B9087000523D05 /* MasterView.swift in Sources */,
+				4C3108ED24BBCF00003679D7 /* ChatView.swift in Sources */,
+				4C3108E924BBCEF0003679D7 /* MatchView.swift in Sources */,
 				4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */,
 				4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */,
 				4C163A4D24B90A4000523D05 /* User.swift in Sources */,
 				4C60113924B562B6003B425A /* InitialView.swift in Sources */,
+				4C3108E524BBC9AE003679D7 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +425,10 @@
 				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content Comeet/GoogleService-Info.plist";
 				DEVELOPMENT_TEAM = YVLLUWNZ5K;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = Comeet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -426,6 +450,10 @@
 				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content Comeet/GoogleService-Info.plist";
 				DEVELOPMENT_TEAM = YVLLUWNZ5K;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Comeet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

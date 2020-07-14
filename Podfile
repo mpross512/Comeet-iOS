@@ -8,5 +8,10 @@ target 'Comeet' do
   # Pods for Comeet
 
 	pod 'Firebase/Auth'
+  pod 'Firebase/Storage'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Messaging'
+  
+  pod 'SDWebImageSwiftUI'
 
 end
