@@ -29,19 +29,28 @@ struct ProfileView: View {
                 
                 ScrollView {
                 
-                    WebImage(url: UserAuthenticator.getUserAuthenticator().getImageURL())
+                    WebImage(url: UserAuthenticator.getUserAuthenticator().getImageURL(),
+                             options: [.waitStoreCache, .progressiveLoad, .queryDiskDataSync])
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 175, height: 175)
                         .clipShape(Circle())
                         .padding()
+                        
                     
-                    Text("Michael")
+                    Text("Michael, 19")
                         .font(.title)
                     
-                    SignOutButton()
+                    VStack (alignment: .leading) {
+                        Text("About")
+                            .bold()
+                            .padding(.bottom, 3)
+                        Text("Hi this is my profile I hope you like what I have to say")
+                    }.padding()
                     
+                    SignOutButton()
                 }
+                    
             }
             .navigationBarTitle("Profile", displayMode: .inline)
             .navigationBarItems(trailing:

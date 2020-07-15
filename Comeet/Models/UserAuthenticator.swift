@@ -43,7 +43,7 @@ class UserAuthenticator : ObservableObject {
             }
         }
         
-        print("Refreshing.... User ID is \(Auth.auth().currentUser?.uid)")
+        print("Refreshing.... User ID is \(Auth.auth().currentUser?.uid ?? "nil")")
     }
     
     func isSignedIn() -> Bool {
@@ -52,7 +52,7 @@ class UserAuthenticator : ObservableObject {
     
     func getImageURL() -> URL? {
         profilePicReference = Constants.Database.profilePicsRef.child("\(Auth.auth().currentUser?.uid ?? "default").jpeg")
-        print("Returned URL: \(imageURL)")
+        print("Returned URL: \(imageURL!)")
         return imageURL
     }
     

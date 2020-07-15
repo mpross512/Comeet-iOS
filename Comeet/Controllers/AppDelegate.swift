@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import SDWebImageSwiftUI
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         FirebaseApp.configure()
+        
+        let cache = SDImageCache(namespace: "cache1")
+           cache.config.maxMemoryCost = 100 * 1024 * 1024 // 100MB memory
+           cache.config.maxDiskSize = 50 * 1024 * 1024 // 50MB disk
+           SDImageCachesManager.shared.addCache(cache)
+            SDImageCachesManager.shared.storeOperationPolicy = .concurrent
+           SDWebImageManager.defaultImageCache = SDImageCachesManager.shared
         
         return true
     }
