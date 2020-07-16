@@ -1,6 +1,6 @@
-.PHONY: clean all install
+.PHONY: clean all install cleanWithoutInstall
 
-all: clean install
+all: cleanWithoutInstall install
 	
 install: 
 	sudo gem install cocoapods
@@ -9,5 +9,10 @@ install:
 clean: 
 	rm -rf "${HOME}/Library/Caches/CocoaPods"
 	rm -rf Pods/
-	rm Comeet.xcworkspace
+	rm -f Comeet.xcworkspace
 	pod install
+
+cleanWithoutInstall:
+	rm -rf "${HOME}/Library/Caches/CocoaPods"
+	rm -rf Pods/
+	rm -f Comeet.xcworkspace
