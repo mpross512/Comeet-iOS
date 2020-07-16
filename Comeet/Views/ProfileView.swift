@@ -40,13 +40,15 @@ struct ProfileView: View {
                     
                     Text("Michael, 19")
                         .font(.title)
-                    
-                    VStack (alignment: .leading) {
-                        Text("About")
-                            .bold()
-                            .padding(.bottom, 3)
-                        Text("Hi this is my profile I hope you like what I have to say")
-                    }.padding()
+                    HStack {
+                        VStack (alignment: .leading) {
+                            Text("About")
+                                .bold()
+                                .padding(.bottom, 3)
+                            Text("Hi this is my profile I hope you like what I have to say")
+                        }.padding()
+                        Spacer()
+                    }
                     
                     SignOutButton()
                 }
