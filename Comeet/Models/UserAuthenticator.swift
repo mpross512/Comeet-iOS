@@ -52,7 +52,9 @@ class UserAuthenticator : ObservableObject {
     
     func getImageURL() -> URL? {
         profilePicReference = Constants.Database.profilePicsRef.child("\(Auth.auth().currentUser?.uid ?? "default").jpeg")
-        print("Returned URL: \(imageURL!)")
+        if let imageURL = imageURL {
+            print("Returned URL: \(imageURL)")
+        }
         return imageURL
     }
     
