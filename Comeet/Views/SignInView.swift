@@ -58,7 +58,7 @@ struct SignInView: View {
                 
                 Button(action: {
                     Auth.auth().signIn(withEmail: self.email, password: self.password) { authResult, error in
-                        UserAuthenticator.getUserAuthenticator().refresh()
+                        UserHandler.getUserHandler().refreshUserData()
                         if let e = error {
                             self.showErrorText = true
                             self.errorText = e.localizedDescription

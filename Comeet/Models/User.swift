@@ -7,30 +7,49 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
-struct User {
+class User : Codable {
     
-    var graduationYear: Int
-    var name: String
+    var year: Int
+    var name: [String: String]
     var age: Int
     var major: String
+    var bio: String
     
-    mutating func setGraduationYear(year: Int) {
-        graduationYear = year
+    init() {
+        year = 0
+        name = [:]
+        age = 0
+        major = ""
+        bio = ""
     }
     
-    mutating func setName(name: String) {
-        self.name = name
+    func getName() -> String {
+        return "\(name["first"] ?? "") \(name["last"] ?? "")"
     }
     
-    mutating func setAge(age: Int) {
-        self.age = age
+    func getFirstName() -> String {
+        return name["first"] ?? ""
     }
     
-    mutating func setMajor(major: String) {
-        self.major = major
+    func getLastName() -> String {
+        return name["last"] ?? ""
     }
     
+    func getYear() -> Int {
+        return year;
+    }
     
+    func getMajor() -> String {
+        return major
+    }
     
+    func getBio() -> String {
+        return bio;
+    }
+    
+    func getAge() -> Int {
+        return age;
+    }
 }

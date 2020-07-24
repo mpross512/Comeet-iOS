@@ -11,7 +11,7 @@ import FirebaseAuth
 
 struct MasterView: View {
         
-    @ObservedObject var authenticator = UserAuthenticator.getUserAuthenticator()
+    @ObservedObject var authenticator = UserHandler.getUserHandler()
     
     var body: some View {
         

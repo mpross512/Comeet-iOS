@@ -10,7 +10,7 @@
 		4C163A4924B9087000523D05 /* MasterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4824B9087000523D05 /* MasterView.swift */; };
 		4C163A4D24B90A4000523D05 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4C24B90A4000523D05 /* User.swift */; };
 		4C163A4F24B913AC00523D05 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */; };
-		4C163A5124B9397100523D05 /* UserAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5024B9397100523D05 /* UserAuthenticator.swift */; };
+		4C163A5124B9397100523D05 /* UserHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5024B9397100523D05 /* UserHandler.swift */; };
 		4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5224B93BDA00523D05 /* SignInView.swift */; };
 		4C3108E524BBC9AE003679D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E424BBC9AE003679D7 /* Constants.swift */; };
 		4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E624BBCDC6003679D7 /* HomeView.swift */; };
@@ -32,7 +32,7 @@
 		4C163A4824B9087000523D05 /* MasterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterView.swift; sourceTree = "<group>"; };
 		4C163A4C24B90A4000523D05 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4C163A5024B9397100523D05 /* UserAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAuthenticator.swift; sourceTree = "<group>"; };
+		4C163A5024B9397100523D05 /* UserHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHandler.swift; sourceTree = "<group>"; };
 		4C163A5224B93BDA00523D05 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		4C3108E424BBC9AE003679D7 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4C3108E624BBCDC6003679D7 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -109,7 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				4C163A4C24B90A4000523D05 /* User.swift */,
-				4C163A5024B9397100523D05 /* UserAuthenticator.swift */,
+				4C163A5024B9397100523D05 /* UserHandler.swift */,
 				4C3108E424BBC9AE003679D7 /* Constants.swift */,
 			);
 			path = Models;
@@ -273,7 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */,
-				4C163A5124B9397100523D05 /* UserAuthenticator.swift in Sources */,
+				4C163A5124B9397100523D05 /* UserHandler.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C60113524B562B6003B425A /* AppDelegate.swift in Sources */,
 				4C3108EB24BBCEF9003679D7 /* ProfileView.swift in Sources */,

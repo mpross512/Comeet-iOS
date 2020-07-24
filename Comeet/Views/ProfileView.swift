@@ -9,6 +9,7 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseStorage
+import FirebaseFirestore
 import SDWebImageSwiftUI
 
 struct ProfileView: View {
@@ -16,8 +17,10 @@ struct ProfileView: View {
     @State var isInEditMode: Bool = false
     @State var profilePicURL: URL?
     
+    let userHandler = UserHandler.getUserHandler()
+        
     init() {
-        UserAuthenticator.getUserAuthenticator().refresh()
+        userHandler.refresh()
     }
     
     var body: some View {
@@ -62,7 +65,7 @@ struct SignOutButton: View {
         Button(action: {
             do {
                 try Auth.auth().signOut()
-                UserAuthenticator.getUserAuthenticator().refresh()
+                UserHandler.getUserHandler().refresh()
             } catch {
                 print(error)
             }
@@ -82,7 +85,7 @@ struct SignOutButton: View {
 
 struct ProfilePicture: View {
     var body: some View {
-        WebImage(url: UserAuthenticator.getUserAuthenticator().getImageURL(),
+        WebImage(url: UserHandler.getUserHandler().getImageURL(),
                  options: [.waitStoreCache, .progressiveLoad, .queryDiskDataSync])
             .resizable()
             .aspectRatio(contentMode: .fill)
@@ -93,13 +96,17 @@ struct ProfilePicture: View {
 }
 
 struct UserBio: View {
+    
+    @State var user: User = User()
+    
     var body: some View {
         Group {
             
             
-            Text("Michael, 19")
+            
+            Text("\(UserHandler.getUserHandler().user.getFirstName()), \(UserHandler.getUserHandler().user.getAge())")
                 .font(.title)
-            Text("Class of 2023")
+            Text("Class of \(String(UserHandler.getUserHandler().user.getYear()))")
             
             HStack {
                 Text("About")
@@ -111,7 +118,7 @@ struct UserBio: View {
             .padding(.top)
             
             HStack {
-                Text("Hi this is my profile I hope you like what I have to say")
+                Text("\(UserHandler.getUserHandler().user.getBio())")
                 Spacer()
             }
             .padding(.horizontal)
@@ -127,7 +134,7 @@ struct UserBio: View {
             .padding(.top)
             
             HStack {
-                Text("Computer Science")
+                Text("\(UserHandler.getUserHandler().user.getMajor())")
                 Spacer()
             }
             .padding(.horizontal)
