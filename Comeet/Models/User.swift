@@ -11,6 +11,7 @@ import FirebaseFirestore
 
 class User : Codable {
     
+    var uid: String
     var year: Int
     var name: [String: String]
     var age: Int
@@ -23,6 +24,7 @@ class User : Codable {
         age = 0
         major = ""
         bio = ""
+        uid = ""
     }
     
     func getName() -> String {

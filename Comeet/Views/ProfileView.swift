@@ -32,7 +32,8 @@ struct ProfileView: View {
                 
                 ScrollView {
                 
-                    ProfilePicture()
+                    ProfilePicture(width: 175, height: 175)
+                        .padding()
                     
                     UserBio()
                     
@@ -84,14 +85,17 @@ struct SignOutButton: View {
 }
 
 struct ProfilePicture: View {
+    
+    let width: CGFloat
+    let height: CGFloat
+    
     var body: some View {
         WebImage(url: UserHandler.getUserHandler().getImageURL(),
                  options: [.waitStoreCache, .progressiveLoad, .queryDiskDataSync])
             .resizable()
             .aspectRatio(contentMode: .fill)
-            .frame(width: 175, height: 175)
+            .frame(width: width, height: height)
             .clipShape(Circle())
-            .padding()
     }
 }
 

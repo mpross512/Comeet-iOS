@@ -61,6 +61,8 @@ class UserHandler : ObservableObject {
                 print("Firestore Error: \(error!)")
             }
         }
+        
+        self.user.uid = uid
     }
     
     func refresh() {
