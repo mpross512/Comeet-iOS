@@ -24,6 +24,7 @@
 		4C60113E24B562B8003B425A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113D24B562B8003B425A /* Preview Assets.xcassets */; };
 		4C60114124B562B8003B425A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113F24B562B8003B425A /* LaunchScreen.storyboard */; };
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
+		4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEBEBE8262925FB0086D788 /* EditView.swift */; };
 		639C8405A84AB9349618503E /* Pods_Comeet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +49,7 @@
 		4C60114024B562B8003B425A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4C60114224B562B8003B425A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comeet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACF86EB035F318800BE47CD7 /* Pods-Comeet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comeet.release.xcconfig"; path = "Target Support Files/Pods-Comeet/Pods-Comeet.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,6 +94,7 @@
 				4C3108E824BBCEF0003679D7 /* MatchView.swift */,
 				4C3108EA24BBCEF9003679D7 /* ProfileView.swift */,
 				4C3108EC24BBCF00003679D7 /* ChatView.swift */,
+				4CEBEBE8262925FB0086D788 /* EditView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -185,7 +188,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1150;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Ice Cream Loaf";
 				TargetAttributes = {
 					4C60113024B562B6003B425A = {
@@ -276,6 +279,7 @@
 				4C163A5124B9397100523D05 /* UserHandler.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C60113524B562B6003B425A /* AppDelegate.swift in Sources */,
+				4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */,
 				4C3108EB24BBCEF9003679D7 /* ProfileView.swift in Sources */,
 				4C163A4924B9087000523D05 /* MasterView.swift in Sources */,
 				4C3108ED24BBCF00003679D7 /* ChatView.swift in Sources */,
@@ -328,6 +332,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -352,7 +357,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -388,6 +393,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -406,7 +412,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -434,7 +440,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -459,7 +465,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

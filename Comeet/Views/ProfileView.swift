@@ -16,6 +16,7 @@ struct ProfileView: View {
     
     @State var isInEditMode: Bool = false
     @State var profilePicURL: URL?
+    @State var imageCache = SDImageCache.shared
     
     let userHandler = UserHandler.getUserHandler()
         
@@ -28,7 +29,7 @@ struct ProfileView: View {
         NavigationView {
         
             VStack {
-                NavigationLink(destination: ChatView(), isActive: $isInEditMode) { EmptyView() }
+                NavigationLink(destination: EditView(), isActive: $isInEditMode) { EmptyView() }
                 
                 ScrollView {
                 
@@ -90,8 +91,7 @@ struct ProfilePicture: View {
     let height: CGFloat
     
     var body: some View {
-        WebImage(url: UserHandler.getUserHandler().getImageURL(),
-                 options: [.waitStoreCache, .progressiveLoad, .queryDiskDataSync])
+        WebImage(url: UserHandler.getUserHandler().getImageURL())
             .resizable()
             .aspectRatio(contentMode: .fill)
             .frame(width: width, height: height)

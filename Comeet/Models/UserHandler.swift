@@ -10,6 +10,7 @@ import Foundation
 import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
+import SDWebImageSwiftUI
 
 class UserHandler : ObservableObject {
     
@@ -77,7 +78,6 @@ class UserHandler : ObservableObject {
             }
         }
         
-        print("Refreshing.... User ID is \(Auth.auth().currentUser?.uid ?? "nil")")
     }
     
     func isSignedIn() -> Bool {
@@ -85,11 +85,21 @@ class UserHandler : ObservableObject {
     }
     
     func getImageURL() -> URL? {
-        profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
-        if let imageURL = imageURL {
-            print("Returned URL: \(imageURL)")
+        if(imageURL == nil) {
+            profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
         }
         return imageURL
+    }
+    
+    func uploadNewImage(path: String) {
+        let localURL = URL(string: path)!
+        let profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
+        
+        profilePicReference.putFile(from: localURL, metadata: nil) { metadata, error in
+            if let error = error {
+                print(error)
+            }
+        }
     }
     
     func getUID() -> String {
