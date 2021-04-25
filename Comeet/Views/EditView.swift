@@ -85,25 +85,12 @@ struct ImagePicker: UIViewControllerRepresentable {
         var imageURL: NSURL?
         
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            
-            print("ran")
         
-            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-                print("One")
-                if let imageURL = info[UIImagePickerController.InfoKey.imageURL] as? NSURL {
-                    print("URL: ", imageURL.relativeString)
-                    
-                    let remoteURL = UserHandler.getUserHandler().getImageURL()!.description
-                    print("Remote URL: ", remoteURL)
-                    print("Size before: ", SDImageCache.shared.totalDiskCount())
-                    SDImageCache.shared.clearMemory()
-                    SDImageCache.shared.clearDisk(onCompletion: nil)
-                    //SDImageCache.shared.removeImage(forKey: String(remoteURL.dropFirst(8)), withCompletion: nil)
-                    UserHandler.getUserHandler().uploadNewImage(path: imageURL.relativeString)
-                    SDImageCache.shared.storeImage(toMemory: image, forKey: remoteURL)
-                    print("Size after: ", SDImageCache.shared.totalDiskCount())
-                    isShown = false
-                }
+            if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+                
+                UserHandler.getUserHandler().uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
+                isShown = false
+
             }
                        
         }

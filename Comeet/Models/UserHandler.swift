@@ -102,6 +102,16 @@ class UserHandler : ObservableObject {
         }
     }
     
+    func uploadNewImage(data: Data) {
+        let profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
+        
+        profilePicReference.putData(data, metadata: nil) { metadata, error in
+            if let error = error {
+                print(error)
+            }
+        }
+    }
+    
     func getUID() -> String {
         return uid
     }
