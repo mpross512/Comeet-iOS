@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MatchView: View {
     var body: some View {
-        Text("Home View")
+        Text("Match View")
     }
 }
 

@@ -23,6 +23,7 @@
 		4C60113B24B562B8003B425A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113A24B562B8003B425A /* Assets.xcassets */; };
 		4C60113E24B562B8003B425A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113D24B562B8003B425A /* Preview Assets.xcassets */; };
 		4C60114124B562B8003B425A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113F24B562B8003B425A /* LaunchScreen.storyboard */; };
+		4C944FB828F60A07008153EE /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944FB728F60A07008153EE /* MessageView.swift */; };
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
 		4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEBEBE8262925FB0086D788 /* EditView.swift */; };
 		639C8405A84AB9349618503E /* Pods_Comeet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */; };
@@ -48,6 +49,7 @@
 		4C60113D24B562B8003B425A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4C60114024B562B8003B425A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4C60114224B562B8003B425A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4C944FB728F60A07008153EE /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comeet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +97,7 @@
 				4C3108EA24BBCEF9003679D7 /* ProfileView.swift */,
 				4C3108EC24BBCF00003679D7 /* ChatView.swift */,
 				4CEBEBE8262925FB0086D788 /* EditView.swift */,
+				4C944FB728F60A07008153EE /* MessageView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				4C163A4924B9087000523D05 /* MasterView.swift in Sources */,
 				4C3108ED24BBCF00003679D7 /* ChatView.swift in Sources */,
 				4C3108E924BBCEF0003679D7 /* MatchView.swift in Sources */,
+				4C944FB828F60A07008153EE /* MessageView.swift in Sources */,
 				4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */,
 				4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */,
 				4C163A4D24B90A4000523D05 /* User.swift in Sources */,
@@ -440,7 +444,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
+				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -465,7 +469,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
+				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

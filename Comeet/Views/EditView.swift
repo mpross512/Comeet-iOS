@@ -13,6 +13,8 @@ struct EditView: View {
 
     @State private var isShowPhotoLibrary = false
     @State var imageCache = SDImageCache.shared
+    
+    @State var bio: String = "\(UserHandler.getUserHandler().user.getBio())"
 
     var body: some View {
         VStack {
@@ -39,6 +41,15 @@ struct EditView: View {
                 .cornerRadius(20)
                 .padding(.horizontal)
             }
+            
+            TextField("Bio", text: $bio)
+                .foregroundColor(.black)
+                .padding(.leading)
+                .frame(height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 25).fill(Color.white)
+                )
+                .padding(.horizontal)
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary)
         }
