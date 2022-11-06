@@ -14,17 +14,16 @@ struct ChatView: View {
         NavigationView {
             
             List(chats) { chat in
-                HStack{
-                    ProfilePicture(width: 50, height: 50)
-                        .padding(.vertical, 5)
-                    Text(chat.name)
-                        .padding(.leading)
+                NavigationLink(destination: MessageView()) {
+                    HStack{
+                        ProfilePicture(width: 50, height: 50)
+                            .padding(.vertical, 5)
+                        Text(chat.name)
+                            .padding(.leading)
+                    }
                 }
             }
-            
-            
-            
-            .navigationBarTitle("Chat")
+            .navigationBarTitle("Chat", displayMode: .large)
             .listStyle(GroupedListStyle())
         }
     }
@@ -39,8 +38,9 @@ struct ChatView_Previews: PreviewProvider {
 struct ChatRoom : Identifiable{
     let id: String
     let name: String
+    let uid: String
 }
 
 let chats = [
-    ChatRoom(id: "1", name: "Isabelle")
+    ChatRoom(id: "1", name: "Isabelle", uid: "")
 ]

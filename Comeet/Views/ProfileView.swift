@@ -19,9 +19,12 @@ struct ProfileView: View {
     @State var imageCache = SDImageCache.shared
     
     let userHandler = UserHandler.getUserHandler()
+    
+    var user: User = User()
         
     init() {
         userHandler.refresh()
+        user = userHandler.user
     }
     
     var body: some View {
@@ -108,9 +111,9 @@ struct UserBio: View {
             
             
             
-            Text("\(UserHandler.getUserHandler().user.getFirstName()), \(UserHandler.getUserHandler().user.getAge())")
+            Text("\(user.getFirstName()), \(user.getAge())")
                 .font(.title)
-            Text("Class of \(String(UserHandler.getUserHandler().user.getYear()))")
+            Text("Class of \(String(user.getYear()))")
             
             HStack {
                 Text("About")
@@ -122,7 +125,7 @@ struct UserBio: View {
             .padding(.top)
             
             HStack {
-                Text("\(UserHandler.getUserHandler().user.getBio())")
+                Text("\(user.getBio())")
                 Spacer()
             }
             .padding(.horizontal)
@@ -138,7 +141,7 @@ struct UserBio: View {
             .padding(.top)
             
             HStack {
-                Text("\(UserHandler.getUserHandler().user.getMajor())")
+                Text("\(user.getMajor())")
                 Spacer()
             }
             .padding(.horizontal)
