@@ -37,9 +37,34 @@ class UserHandler : ObservableObject {
         
         if singleton == nil {
             singleton = UserHandler(Auth.auth().currentUser != nil)
+            singleton?.refreshUserData()
         }
         return singleton!
         
+    }
+    
+    func getUser(uid: String) async -> User {
+        var u = User()
+        
+        do {
+            let doc = try await Firestore.firestore().collection("Users").document(uid).getDocument()
+            
+            let decoder = JSONDecoder()
+                let data = doc.data()
+                print(data)
+                 //Serialize the Dictionary into a JSON Data representation, then decode it using the Decoder().
+                 if let data = try?  JSONSerialization.data(withJSONObject: data!, options: []) {
+                    do {
+                        u = try decoder.decode(User.self, from: data)
+                        u.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
+                    } catch {
+                        print(error)
+                    }
+                }
+        } catch {
+            print(error)
+        }
+        return u
     }
     
     func refreshUserData() {
@@ -89,6 +114,15 @@ class UserHandler : ObservableObject {
             profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
         }
         return imageURL
+    }
+    
+    func getImageURL(uid: String) async -> URL? {
+        do {
+            return try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
+        } catch {
+            print(error)
+        }
+        return nil
     }
     
     func uploadNewImage(path: String) {

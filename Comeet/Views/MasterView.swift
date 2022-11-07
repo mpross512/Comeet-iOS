@@ -18,6 +18,7 @@ struct MasterView: View {
         ZStack {
             if authenticator.isSignedIn() {
                 
+                
                 HomeView()
                 
             } else {

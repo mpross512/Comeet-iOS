@@ -111,6 +111,7 @@ struct UserBio: View {
             
             
             
+            
             Text("\(user.getFirstName()), \(user.getAge())")
                 .font(.title)
             Text("Class of \(String(user.getYear()))")
@@ -149,6 +150,9 @@ struct UserBio: View {
             
             
             
+        }.onAppear {
+            user = UserHandler.getUserHandler().user
+            let _ = print("refreshed")
         }
     }
 }

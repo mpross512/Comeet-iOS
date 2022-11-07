@@ -36,7 +36,7 @@ struct EditView: View {
                         .font(.headline)
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 50)
-                .background(Color.blue)
+                .background(Constants.Colors.greenColor)
                 .foregroundColor(.white)
                 .cornerRadius(20)
                 .padding(.horizontal)

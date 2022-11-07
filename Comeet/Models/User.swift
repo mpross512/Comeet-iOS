@@ -9,7 +9,7 @@
 import Foundation
 import FirebaseFirestore
 
-class User : Codable {
+class User : Codable, Identifiable, ObservableObject {
     
     var uid: String
     var year: Int
@@ -17,6 +17,8 @@ class User : Codable {
     var age: Int
     var major: String
     var bio: String
+    var matches: [String]
+    var pictureRef: URL?
     
     init() {
         year = 0
@@ -25,6 +27,8 @@ class User : Codable {
         major = ""
         bio = ""
         uid = ""
+        matches = []
+        pictureRef = URL(string: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png")!
     }
     
     func getName() -> String {

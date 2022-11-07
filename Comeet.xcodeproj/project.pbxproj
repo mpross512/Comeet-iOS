@@ -94,16 +94,14 @@
 		4C163A4724B9085900523D05 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				4CCE1C2B29196C63008D0C4F /* Chat */,
+				4CCE1C2A29196C4F008D0C4F /* Matches */,
+				4CCE1C2929196C34008D0C4F /* Profile */,
 				4C60113824B562B6003B425A /* InitialView.swift */,
 				4C163A4824B9087000523D05 /* MasterView.swift */,
 				4C163A5224B93BDA00523D05 /* SignInView.swift */,
 				4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */,
 				4C3108E624BBCDC6003679D7 /* HomeView.swift */,
-				4C3108E824BBCEF0003679D7 /* MatchView.swift */,
-				4C3108EA24BBCEF9003679D7 /* ProfileView.swift */,
-				4C3108EC24BBCF00003679D7 /* ChatView.swift */,
-				4CEBEBE8262925FB0086D788 /* EditView.swift */,
-				4C944FB728F60A07008153EE /* MessageView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -169,6 +167,32 @@
 				4C60113D24B562B8003B425A /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		4CCE1C2929196C34008D0C4F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				4CEBEBE8262925FB0086D788 /* EditView.swift */,
+				4C3108EA24BBCEF9003679D7 /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		4CCE1C2A29196C4F008D0C4F /* Matches */ = {
+			isa = PBXGroup;
+			children = (
+				4C3108E824BBCEF0003679D7 /* MatchView.swift */,
+			);
+			path = Matches;
+			sourceTree = "<group>";
+		};
+		4CCE1C2B29196C63008D0C4F /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				4C3108EC24BBCF00003679D7 /* ChatView.swift */,
+				4C944FB728F60A07008153EE /* MessageView.swift */,
+			);
+			path = Chat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -452,6 +476,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Comeet/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -477,6 +502,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Comeet/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

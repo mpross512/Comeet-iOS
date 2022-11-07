@@ -9,16 +9,24 @@
 import SwiftUI
 
 struct MessageView: View {
+    
+    init() {
+        
+    }
+    
     var body: some View {
-        
-        
-        
-        HStack {
-            Text("Title")
-            ScrollView {
-                Text("Message View")
+
+            VStack {
+                ScrollView {
+                    Text("Message View")
+                }
+            }.toolbar{
+                ToolbarItem(placement: .principal) {
+                    Text("Isabelle").font(.title).bold()
+                }
             }
-        }
+        
+        
         
     }
 }
