@@ -12,6 +12,7 @@ import SDWebImageSwiftUI
 struct EditView: View {
 
     @State private var isShowPhotoLibrary = false
+    @State private var imageAlertShown = false
     @State var imageCache = SDImageCache.shared
     
     @State var bio: String = "\(UserHandler.getUserHandler().user.getBio())"
@@ -19,39 +20,34 @@ struct EditView: View {
     var body: some View {
         VStack {
             
-            WebImage(url: UserHandler.getUserHandler().getImageURL())
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 175, height: 175)
-                .clipShape(Circle())
-
             Button(action: {
                 self.isShowPhotoLibrary = true
+                //self.imageAlertShown = true
             }) {
-                HStack {
-                    Image(systemName: "photo")
-                        .font(.system(size: 20))
-
-                    Text("Photo library")
-                        .font(.headline)
+                ZStack {
+                    WebImage(url: UserHandler.getUserHandler().getImageURL())
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 175, height: 175)
+                        .clipShape(Circle())
+                    
+                    Image(systemName: "pencil.circle.fill").font(.system(size: 60))
+                        .foregroundColor(Constants.Colors.greenColor)
+                        .offset(x: 60, y: -60)
                 }
-                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 50)
-                .background(Constants.Colors.greenColor)
-                .foregroundColor(.white)
-                .cornerRadius(20)
-                .padding(.horizontal)
             }
             
-            TextField("Bio", text: $bio)
-                .foregroundColor(.black)
+            TextEditor(text: $bio)
+                //.foregroundColor(.black)
                 .padding(.leading)
                 .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 25).fill(Color.white)
-                )
                 .padding(.horizontal)
+                .shadow(radius: 5)
         }.sheet(isPresented: $isShowPhotoLibrary) {
-            ImagePicker(isShown: $isShowPhotoLibrary)
+            ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
+        }.alert(isPresented: $imageAlertShown) {
+            Alert(title: Text("Image Saved"),
+            message: Text("You may need to close the app for the new image to take effect"))
         }
     }
 }
@@ -66,6 +62,9 @@ struct ImagePicker: UIViewControllerRepresentable {
     
     @Binding var isShown: Bool
     
+    @Binding var alertShown: Bool
+    
+    
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
     
         let imagePicker = UIImagePickerController()
@@ -77,19 +76,19 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(isShown: $isShown)
+        Coordinator(isShown: $isShown, alertShown: $alertShown)
     }
 
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
     
-    
-    
     final class Coordinator : NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         
         @Binding var isShown: Bool
+        @Binding var alertShown: Bool
         
-        init(isShown: Binding<Bool>) {
+        init(isShown: Binding<Bool>, alertShown: Binding<Bool>) {
             _isShown = isShown
+            _alertShown = alertShown
         }
         
         var image: Image?
@@ -101,7 +100,11 @@ struct ImagePicker: UIViewControllerRepresentable {
                 
                 UserHandler.getUserHandler().uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
                 isShown = false
-
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    self.alertShown = true
+                }
+                
+                print("DEBUG: Alert shown? \(alertShown)")
             }
                        
         }

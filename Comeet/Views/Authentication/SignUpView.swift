@@ -1,18 +1,19 @@
 //
-//  LoginView.swift
+//  SignUpView.swift
 //  Comeet
 //
-//  Created by Michael Ross on 7/10/20.
+//  Created by Michael Ross on 7/11/20.
 //  Copyright © 2020 Ice Cream Loaf. All rights reserved.
 //
 
 import SwiftUI
 import FirebaseAuth
 
-struct SignInView: View {
-    
+struct SignUpView: View {
+
     @State var email: String = ""
     @State var password: String = ""
+    @State var passwordConfirm: String = ""
     @State var errorText: String = "Error"
     @State var showErrorText: Bool = false
     
@@ -25,7 +26,7 @@ struct SignInView: View {
             .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
             
             VStack {
-                Text("Welcome Back")
+                Text("Let's Get You Started")
                     .font(.custom("Futura", size: 40))
                     .foregroundColor(.white)
                     .padding(.bottom, 50)
@@ -34,7 +35,7 @@ struct SignInView: View {
                     .foregroundColor(.white)
                     .opacity(showErrorText ? 1 : 0)
                 
-                TextField("Email", text: $email)
+                TextField("Enter your NetID", text: $email)
                     .disableAutocorrection(true)
                     .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
                     .keyboardType(.emailAddress)
@@ -46,7 +47,16 @@ struct SignInView: View {
                     )
                     .padding(.horizontal)
                 
-                SecureField("Password", text: $password)
+                SecureField("Create a Password", text: $password)
+                .foregroundColor(.black)
+                .padding(.leading)
+                .frame(height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 25).fill(Color.white)
+                )
+                    .padding(.horizontal)
+                
+                SecureField("Confirm Password", text: $passwordConfirm)
                 .foregroundColor(.black)
                 .padding(.leading)
                 .frame(height: 50)
@@ -57,12 +67,17 @@ struct SignInView: View {
                 
                 
                 Button(action: {
-                    Auth.auth().signIn(withEmail: self.email, password: self.password) { authResult, error in
-                        UserHandler.getUserHandler().refreshUserData()
-                        if let e = error {
-                            self.showErrorText = true
-                            self.errorText = e.localizedDescription
+                    if(password == passwordConfirm) {
+                        Auth.auth().signIn(withEmail: "\(self.email)@utdallas.edu", password: self.password) { authResult, error in
+                            if let e = error {
+                                self.showErrorText = true
+                                self.errorText = e.localizedDescription
+                            }
                         }
+                    }
+                    else {
+                        self.showErrorText = true
+                        self.errorText = "Passwords do not match"
                     }
                 }) {
                     RoundedRectangle(cornerRadius: 25)
@@ -70,7 +85,7 @@ struct SignInView: View {
                     .frame(height: 50, alignment: .center)
                     .padding()
                     .overlay(
-                        Text("Sign In")
+                        Text("Sign Up")
                             .fontWeight(.bold)
                             .foregroundColor(Color(red: 0.15, green: 0.68, blue: 0.38, opacity: 1.00))
                     )
@@ -82,8 +97,8 @@ struct SignInView: View {
     }
 }
 
-struct LoginView_Previews: PreviewProvider {
+struct SignUpView_Previews: PreviewProvider {
     static var previews: some View {
-        SignInView()
+        SignUpView()
     }
 }

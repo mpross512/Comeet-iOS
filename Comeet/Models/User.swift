@@ -14,7 +14,7 @@ class User : Codable, Identifiable, ObservableObject {
     var uid: String
     var year: Int
     var name: [String: String]
-    var age: Int
+    var birthdate: String
     var major: String
     var bio: String
     var matches: [String]
@@ -23,7 +23,7 @@ class User : Codable, Identifiable, ObservableObject {
     init() {
         year = 0
         name = [:]
-        age = 0
+        birthdate = ""
         major = ""
         bio = ""
         uid = ""
@@ -56,6 +56,10 @@ class User : Codable, Identifiable, ObservableObject {
     }
     
     func getAge() -> Int {
-        return age;
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let newDate = dateFormatter.date(from: birthdate)
+        let ageComponents = Calendar.current.dateComponents([.year], from: newDate!, to: Date())
+        return ageComponents.year!
     }
 }

@@ -9,22 +9,25 @@
 import SwiftUI
 
 struct ChatView: View {
+    
+    @EnvironmentObject var userService: UserService
+    
     var body: some View {
         
         NavigationView {
-            
-            List(chats) { chat in
-                NavigationLink(destination: MessageView()) {
-                    HStack{
-                        ProfilePicture(width: 50, height: 50)
+            List(userService.matches) { match in
+                HStack {
+                    NavigationLink(destination: MessageView(user: match)) {
+                    
+                        ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
                             .padding(.vertical, 5)
-                        Text(chat.name)
+                        Text(match.name["first"] ?? "")
                             .padding(.leading)
                     }
                 }
             }
             .navigationBarTitle("Chat", displayMode: .large)
-            .listStyle(GroupedListStyle())
+            //.listStyle(GroupedListStyle())
         }
     }
 }

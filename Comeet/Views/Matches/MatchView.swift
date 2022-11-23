@@ -8,58 +8,42 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import SwiftUIBackports
 
 struct MatchView: View {
     
-    @StateObject var viewModel = MatchesViewModel()
+    @EnvironmentObject var userService: UserService
     
     init() {
     }
     
     var body: some View {
+        
         NavigationView {
-            List(viewModel.matches.indices, id: \.self) { index in
-                HStack {
-                    WebImage(url: viewModel.matches[index].pictureRef)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 50, height: 50)
-                        .clipShape(Circle())
-                    Text(viewModel.matches[index].name["first"] ?? "")
-                    Text(viewModel.matches[index].bio)
+            if !userService.isLoading {
+                List(userService.matches) { match in
+                    HStack {
+                        NavigationLink {
+                            UserView(user: match)
+                        } label: {
+                            HStack {
+                                ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
+                                VStack (alignment: .leading) {
+                                    Text("\(match.name["first"] ?? ""), \(match.getAge())")
+                                }
+                            }
+                        }
+                    }
                 }
+                .transition(.opacity.animation(.easeIn(duration: 5)))
+                .navigationBarTitle("Matches", displayMode: .large)
             }
-        }.navigationBarTitle("Matches")
-            .onAppear() {
-                Task {
-                    await viewModel.getMatches()
-                }
-            }
-            
+        }
     }
 }
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         MatchView()
-    }
-}
-
-@MainActor class MatchesViewModel : ObservableObject {
-    
-    @Published var matches: [User] = []
-    
-    init() {
-        Task(priority: .medium) {
-            print("Matches:", UserHandler.getUserHandler().user.matches)
-            
-            
-        }
-    }
-    
-    func getMatches() async {
-        for match in UserHandler.getUserHandler().user.matches {
-            await matches.append(UserHandler.getUserHandler().getUser(uid: match))
-        }
     }
 }

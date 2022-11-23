@@ -12,8 +12,6 @@ import FirebaseStorage
 
 struct Constants {
     
-    
-    
     struct Database {
         
         let users = "users"
@@ -25,9 +23,91 @@ struct Constants {
     struct Colors {
         
         static let yellowOrangeColor = Color(red: 0.95, green: 0.61, blue: 0.07, opacity: 1.00)
-        static let greenColor = Color(red: 0.15, green: 0.68, blue: 0.38, opacity: 1.00)
-        static let orangeColor = Color(red: 0.90, green: 0.49, blue: 0.13, opacity: 1.00)
+        static let greenColor = Color(red: 0.07, green: 0.28, blue: 0.20, opacity: 1.00)
+        static let orangeColor = Color(red: 0.91, green: 0.46, blue: 0, opacity: 1.00)
         
+    }
+    
+    struct Values {
+        static let degrees = [
+            "Accounting",
+            "Actuarial Science",
+            "American Studies",
+            "Applied Cognition and Nueroscience",
+            "Applied Sociology",
+            "Art History",
+            "Arts Technology and Emerging Communication",
+            "Audiology",
+            "Biochemistry",
+            "Bioinformatics and Computational Biology",
+            "Biology",
+            "Biomedical Engineering",
+            "Biotechnology",
+            "Business Administration",
+            "Business Analytics",
+            "Chemistry",
+            "Child Learning and Development",
+            "Cognition and Nueroscience",
+            "Cognitive Science",
+            "Computer Engineering",
+            "Computer Science",
+            "Criminology",
+            "Cyber Security, Technology and Policy",
+            "Data Science",
+            "Economics",
+            "Education",
+            "Electrical Engineering",
+            "Energy Management",
+            "Finance",
+            "Financial Technology and Analytics",
+            "Geosciences",
+            "Geospatial Information Sciences",
+            "Global Business",
+            "Healthcare Leadership and Management",
+            "Healthcare Management",
+            "Healthcare Studies",
+            "History",
+            "History of Ideas",
+            "Human Development and Early Childhood Disorders",
+            "Human Resource Management",
+            "Humanities",
+            "Information Technology and Management",
+            "Information Technology and Systems",
+            "Innovation and Entrepenuership",
+            "Interdisciplinary Studies",
+            "International Management Studies",
+            "International Political Economy",
+            "Latin American Studies",
+            "Leadership and Organizational Development",
+            "Literature",
+            "Management Science",
+            "Marketing",
+            "Materials Science and Engineering",
+            "Mathematics",
+            "Mathematics Education",
+            "Mechanical Engineering",
+            "Molecular and Cell Biology",
+            "Molecular Biology",
+            "Neuroscience",
+            "Philosophy",
+            "Physics",
+            "Political Science",
+            "Psychology",
+            "Public Affairs",
+            "Public Policy",
+            "Public Policy and Political Economy",
+            "Science Education",
+            "Social Data Analytics and Research",
+            "Sociology",
+            "Software Engineering",
+            "Speech Language and Hearing Sciences",
+            "Speech-Language Pathology",
+            "Statistics",
+            "Supply Chain Management",
+            "Systems Engineering and Management",
+            "Telecommunications Engineering",
+            "Visual and Performing Arts"
+        ]
     }
     
 }

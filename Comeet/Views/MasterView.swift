@@ -11,23 +11,24 @@ import FirebaseAuth
 
 struct MasterView: View {
         
+    @EnvironmentObject var userService: UserService
     @ObservedObject var authenticator = UserHandler.getUserHandler()
     
     var body: some View {
         
         ZStack {
-            if authenticator.isSignedIn() {
-                
-                
+            if Auth.auth().currentUser != nil  {
                 HomeView()
-                
             } else {
-                
                 InitialView()
-                
+            }
+        }.onAppear {
+            Task {
+                if Auth.auth().currentUser != nil {
+                    await userService.getUser(uid: Auth.auth().currentUser!.uid)
+                }
             }
         }
-        
     }
     
     

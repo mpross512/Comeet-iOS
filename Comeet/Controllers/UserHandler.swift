@@ -51,7 +51,7 @@ class UserHandler : ObservableObject {
             
             let decoder = JSONDecoder()
                 let data = doc.data()
-                print(data)
+                //print(data)
                  //Serialize the Dictionary into a JSON Data representation, then decode it using the Decoder().
                  if let data = try?  JSONSerialization.data(withJSONObject: data!, options: []) {
                     do {
@@ -106,6 +106,9 @@ class UserHandler : ObservableObject {
     }
     
     func isSignedIn() -> Bool {
+        if signedIn {
+            
+        }
         return signedIn
     }
     

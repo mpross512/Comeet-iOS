@@ -14,17 +14,15 @@ import SDWebImageSwiftUI
 
 struct ProfileView: View {
     
+    @EnvironmentObject var userService: UserService
+    
     @State var isInEditMode: Bool = false
     @State var profilePicURL: URL?
     @State var imageCache = SDImageCache.shared
     
-    let userHandler = UserHandler.getUserHandler()
-    
     var user: User = User()
         
     init() {
-        userHandler.refresh()
-        user = userHandler.user
     }
     
     var body: some View {
@@ -39,7 +37,7 @@ struct ProfileView: View {
                     ProfilePicture(width: 175, height: 175)
                         .padding()
                     
-                    UserBio()
+                    UserBio(user: userService.user)
                     
                     SignOutButton()
                 }
@@ -66,11 +64,13 @@ struct ProfileView_Previews: PreviewProvider {
 }
 
 struct SignOutButton: View {
+    
+    @EnvironmentObject var userService: UserService
+    
     var body: some View {
         Button(action: {
             do {
                 try Auth.auth().signOut()
-                UserHandler.getUserHandler().refresh()
             } catch {
                 print(error)
             }
@@ -90,11 +90,13 @@ struct SignOutButton: View {
 
 struct ProfilePicture: View {
     
+    var profileURL: URL?
+    
     let width: CGFloat
     let height: CGFloat
     
     var body: some View {
-        WebImage(url: UserHandler.getUserHandler().getImageURL())
+        WebImage(url: profileURL ?? UserHandler.getUserHandler().getImageURL())
             .resizable()
             .aspectRatio(contentMode: .fill)
             .frame(width: width, height: height)
@@ -109,10 +111,7 @@ struct UserBio: View {
     var body: some View {
         Group {
             
-            
-            
-            
-            Text("\(user.getFirstName()), \(user.getAge())")
+            Text("\(user.name["first"] ?? "") \(user.name["last"] ?? ""), \(user.getAge())")
                 .font(.title)
             Text("Class of \(String(user.getYear()))")
             
@@ -150,9 +149,6 @@ struct UserBio: View {
             
             
             
-        }.onAppear {
-            user = UserHandler.getUserHandler().user
-            let _ = print("refreshed")
         }
     }
 }

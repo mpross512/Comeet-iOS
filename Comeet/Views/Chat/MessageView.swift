@@ -10,9 +10,7 @@ import SwiftUI
 
 struct MessageView: View {
     
-    init() {
-        
-    }
+    @State var user: User
     
     var body: some View {
 
@@ -20,9 +18,11 @@ struct MessageView: View {
                 ScrollView {
                     Text("Message View")
                 }
+                
+                
             }.toolbar{
                 ToolbarItem(placement: .principal) {
-                    Text("Isabelle").font(.title).bold()
+                    Text("\(user.name["first"] ?? "") \(user.name["last"] ?? "")").bold()
                 }
             }
         
@@ -33,6 +33,6 @@ struct MessageView: View {
 
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageView()
+        MessageView(user: User())
     }
 }
