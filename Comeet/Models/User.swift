@@ -8,10 +8,10 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseFirestoreSwift
 
-class User : Codable, Identifiable, ObservableObject {
-    
-    var uid: String
+struct User : Identifiable, Codable {
+    @DocumentID var id: String?
     var year: Int
     var name: [String: String]
     var birthdate: String
@@ -26,7 +26,6 @@ class User : Codable, Identifiable, ObservableObject {
         birthdate = ""
         major = ""
         bio = ""
-        uid = ""
         matches = []
         pictureRef = URL(string: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png")!
     }

@@ -10,6 +10,7 @@ target 'Comeet' do
 	pod 'Firebase/Auth'
   pod 'Firebase/Storage'
   pod 'Firebase/Firestore'
+  pod 'FirebaseFirestoreSwift'
   
   pod 'SDWebImageSwiftUI'
 

@@ -17,32 +17,28 @@ struct EditView: View {
     
     @State var bio: String = "\(UserHandler.getUserHandler().user.getBio())"
 
+    var user: User
+    
     var body: some View {
         VStack {
-            
             Button(action: {
                 self.isShowPhotoLibrary = true
                 //self.imageAlertShown = true
             }) {
                 ZStack {
-                    WebImage(url: UserHandler.getUserHandler().getImageURL())
+                    WebImage(url: user.pictureRef)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: 175, height: 175)
+                        .frame(width: 125, height: 125)
                         .clipShape(Circle())
                     
-                    Image(systemName: "pencil.circle.fill").font(.system(size: 60))
+                    Image(systemName: "pencil.circle.fill").font(.system(size: 40))
                         .foregroundColor(Constants.Colors.greenColor)
-                        .offset(x: 60, y: -60)
+                        .offset(x: 50, y: -50)
                 }
             }
             
-            TextEditor(text: $bio)
-                //.foregroundColor(.black)
-                .padding(.leading)
-                .frame(height: 50)
-                .padding(.horizontal)
-                .shadow(radius: 5)
+            ProfileCreationView(user: user)
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
         }.alert(isPresented: $imageAlertShown) {
@@ -54,7 +50,7 @@ struct EditView: View {
 
 struct EditView_Previews: PreviewProvider {
     static var previews: some View {
-        EditView()
+        EditView(user: User())
     }
 }
 

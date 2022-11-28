@@ -15,6 +15,8 @@ struct MatchView: View {
     @EnvironmentObject var userService: UserService
     
     init() {
+        //print("DEBUG: Matches: ")
+        //print(userService.user.matches)
     }
     
     var body: some View {

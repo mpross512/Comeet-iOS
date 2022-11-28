@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 @MainActor
 class UserService: ObservableObject {
@@ -26,19 +27,19 @@ class UserService: ObservableObject {
         print("DEBUG: Get User called")
         isLoading = true
         do {
-            let document = try await Firestore.firestore().collection("Users").document(uid).getDocument()
-            let decoder = JSONDecoder()
-            let data = document.data()
+            self.user = try await Firestore.firestore().collection("Users").document(uid).getDocument(as: User.self)
+            await getMatches()
                 //Serialize the Dictionary into a JSON Data representation, then decode it using the Decoder().
-                if let data = try? JSONSerialization.data(withJSONObject: data!, options: []) {
-                    do {
-                        self.user = try decoder.decode(User.self, from: data)
-                        print("DEBUG: User initialized")
-                        await getMatches()
-                    } catch {
-                        print(error)
-                    }
-                }
+//                if let data = try? JSONSerialization.data(withJSONObject: data!, options: []) {
+//                    do {
+//                        print("DEBUG: Initializing user...")
+//                        self.user = try decoder.decode(User.self, from: data)
+//                        print("DEBUG: User initialized")
+//                        await getMatches()
+//                    } catch {
+//                        print(error)
+//                    }
+//                }
         }
         catch {
             print(error)
@@ -50,20 +51,20 @@ class UserService: ObservableObject {
         print("DEBUG: user.matches: ", user.matches)
         for uid in user.matches {
             do {
-                let document = try await Firestore.firestore().collection("Users").document(uid).getDocument()
-                let decoder = JSONDecoder()
-                let data = document.data()
+                var match = try await Firestore.firestore().collection("Users").document(uid).getDocument(as: User.self)
                 //Serialize the Dictionary into a JSON Data representation, then decode it using the Decoder().
-                if let data = try? JSONSerialization.data(withJSONObject: data!, options: []) {
-                    do {
-                        let match = try decoder.decode(User.self, from: data)
-                        match.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
-                        matches.append(match)
-                        print("DEBUG: Matche loaded: \(match)")
-                    } catch {
-                        print(error)
-                    }
-                }
+                match.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
+                matches.append(match)
+                
+//                if let data = try? JSONSerialization.data(withJSONObject: data!, options: []) {
+//                    do {
+//                        var match = try decoder.decode(User.self, from: data)
+//                        
+//                        print("DEBUG: Matche loaded: \(match)")
+//                    } catch {
+//                        print(error)
+//                    }
+//                }
             }
             catch {
                 print(error)

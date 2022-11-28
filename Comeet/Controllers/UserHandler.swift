@@ -30,14 +30,16 @@ class UserHandler : ObservableObject {
         uid = Auth.auth().currentUser?.uid ?? "default"
         profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
         user = User()
-        refreshUserData()
+        print("Init singleton function")
+        //refreshUserData()
     }
     
     static func getUserHandler() -> UserHandler {
         
         if singleton == nil {
             singleton = UserHandler(Auth.auth().currentUser != nil)
-            singleton?.refreshUserData()
+            print("Singleton function")
+            //singleton?.refreshUserData()
         }
         return singleton!
         
@@ -47,48 +49,25 @@ class UserHandler : ObservableObject {
         var u = User()
         
         do {
-            let doc = try await Firestore.firestore().collection("Users").document(uid).getDocument()
+            let doc = try await Firestore.firestore().collection("Users").document(uid).getDocument(as: User.self)
             
-            let decoder = JSONDecoder()
-                let data = doc.data()
-                //print(data)
-                 //Serialize the Dictionary into a JSON Data representation, then decode it using the Decoder().
-                 if let data = try?  JSONSerialization.data(withJSONObject: data!, options: []) {
-                    do {
-                        u = try decoder.decode(User.self, from: data)
-                        u.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
-                    } catch {
-                        print(error)
-                    }
-                }
+            u = doc
+            u.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
         } catch {
             print(error)
         }
         return u
     }
     
-    func refreshUserData() {
+    func refreshUserData() async {
         refresh()
-        Firestore.firestore().collection("Users").document(uid).getDocument { (document, error) in
-            if let document = document {
-                
-                let decoder = JSONDecoder()
-
-                let data = document.data()
-                 //Serialize the Dictionary into a JSON Data representation, then decode it using the Decoder().
-                 if let data = try?  JSONSerialization.data(withJSONObject: data!, options: []) {
-                    do {
-                        self.user = try decoder.decode(User.self, from: data)
-                    } catch {
-                        print(error)
-                    }
-                }
-            } else {
-                print("Firestore Error: \(error!)")
-            }
+        do {
+            self.user = try await Firestore.firestore().collection("Users").document(uid).getDocument(as: User.self)
+        } catch {
+            print(error)
         }
         
-        self.user.uid = uid
+        self.user.id = uid
     }
     
     func refresh() {

@@ -30,11 +30,11 @@ struct ProfileView: View {
         NavigationView {
         
             VStack {
-                NavigationLink(destination: EditView(), isActive: $isInEditMode) { EmptyView() }
+                NavigationLink(destination: EditView(user: userService.user), isActive: $isInEditMode) { EmptyView() }
                 
                 ScrollView {
                 
-                    ProfilePicture(width: 175, height: 175)
+                    ProfilePicture(profileURL: userService.user.pictureRef, width: 175, height: 175)
                         .padding()
                     
                     UserBio(user: userService.user)
