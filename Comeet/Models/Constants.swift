@@ -108,6 +108,15 @@ struct Constants {
             "Telecommunications Engineering",
             "Visual and Performing Arts"
         ]
+        
+        static let emojis = [
+            "religion": "🙏",
+            "children": "👶",
+            "politics": "⚖️",
+            "alcohol": "🍺",
+            "smoking": "🚬",
+            "marriage": "💍"
+        ]
     }
     
 }

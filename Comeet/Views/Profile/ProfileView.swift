@@ -19,6 +19,7 @@ struct ProfileView: View {
     @State var isInEditMode: Bool = false
     @State var profilePicURL: URL?
     @State var imageCache = SDImageCache.shared
+    @State var settingsPageShown: Bool = false
     
     var user: User = User()
         
@@ -32,6 +33,8 @@ struct ProfileView: View {
             VStack {
                 NavigationLink(destination: EditView(user: userService.user), isActive: $isInEditMode) { EmptyView() }
                 
+                NavigationLink(destination: SettingsView(), isActive: $settingsPageShown) { EmptyView() }
+                
                 ScrollView {
                 
                     ProfilePicture(profileURL: userService.user.pictureRef, width: 175, height: 175)
@@ -39,16 +42,30 @@ struct ProfileView: View {
                     
                     UserBio(user: userService.user)
                     
-                    SignOutButton()
+                    UserInterests(attributes: userService.user.attributes)
+                    
+                    Button(action: {
+                        self.isInEditMode.toggle();
+                    }) {
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(Constants.Colors.greenColor)
+                            .frame(width: 150, height: 50, alignment: .center)
+                            .padding(.horizontal)
+                            .overlay(
+                                Text("Edit Profile")
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                        )
+                    }
                 }
                     
             }
             .navigationBarTitle("Profile", displayMode: .inline)
             .navigationBarItems(trailing:
                 Button(action: {
-                    self.isInEditMode.toggle()
+                    self.settingsPageShown.toggle()
                 }) {
-                    Image(systemName: "pencil.circle")
+                    Image(systemName: "gearshape.fill")
                         .font(.title)
                         .accentColor(Constants.Colors.greenColor)
                 }

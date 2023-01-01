@@ -10,6 +10,7 @@ import SwiftUI
 import SwiftUIBackports
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import SDWebImageSwiftUI
 
 struct ProfileCreationView: View {
     
@@ -21,6 +22,9 @@ struct ProfileCreationView: View {
     @State var year: String = ""
     @State var bio: String = ""
     @State var showingAlert: Bool = false
+    @State private var isShowPhotoLibrary = false
+    @State private var imageAlertShown = false
+
     
     init(user: User) {
         print("Edit view initialized with user")
@@ -38,6 +42,31 @@ struct ProfileCreationView: View {
     
     var body: some View {
         Form {
+            
+            Section (header: Text("EDIT PROFILE PICTURE")) {
+                Button(action: {
+                    self.isShowPhotoLibrary = true
+                }) {
+                    HStack {
+                        Spacer()
+                        
+                        ZStack {
+                            WebImage(url: user.pictureRef)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 125, height: 125)
+                                .clipShape(Circle())
+                            
+                            Image(systemName: "pencil.circle.fill").font(.system(size: 40))
+                                .foregroundColor(Constants.Colors.greenColor)
+                                .offset(x: 50, y: -50)
+                        }
+                        
+                        Spacer()
+                    }
+                }
+            }
+            
             Section(header: Text("PERSONAL")) {
                 TextField("First Name", text: $firstName)
                 TextField("Last Name", text: $lastName)
@@ -50,12 +79,18 @@ struct ProfileCreationView: View {
                         Text(major)
                     }
                 }
-                TextField("Graduation Year", text: $year)
-                    .keyboardType(.decimalPad)
+                HStack {
+                    Text("Graduation Year")
+                    Spacer()
+                    TextField("", text: $year)
+                        .keyboardType(.decimalPad)
+                }
             }
             
             Section(header: Text("BIO")) {
                 TextEditor(text: $user.bio)
+                    .frame(minHeight: 40, alignment: .leading)
+                    .multilineTextAlignment(.leading)
             }
 
             Section {
@@ -81,7 +116,12 @@ struct ProfileCreationView: View {
                 }
 
             }
-        }.backport.scrollDismissesKeyboard(.immediately)
+        }.sheet(isPresented: $isShowPhotoLibrary) {
+            ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
+        }.alert(isPresented: $imageAlertShown) {
+            Alert(title: Text("Image Saved"),
+            message: Text("You may need to close the app for the new image to take effect"))
+        }
     }
 }
 

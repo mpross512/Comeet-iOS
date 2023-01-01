@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import SwiftUIBackports
 
 struct EditView: View {
 
@@ -21,24 +22,7 @@ struct EditView: View {
     
     var body: some View {
         VStack {
-            Button(action: {
-                self.isShowPhotoLibrary = true
-                //self.imageAlertShown = true
-            }) {
-                ZStack {
-                    WebImage(url: user.pictureRef)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 125, height: 125)
-                        .clipShape(Circle())
-                    
-                    Image(systemName: "pencil.circle.fill").font(.system(size: 40))
-                        .foregroundColor(Constants.Colors.greenColor)
-                        .offset(x: 50, y: -50)
-                }
-            }
-            
-            ProfileCreationView(user: user)
+                ProfileCreationView(user: user)
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
         }.alert(isPresented: $imageAlertShown) {

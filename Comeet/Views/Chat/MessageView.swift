@@ -16,7 +16,7 @@ struct MessageView: View {
 
             VStack {
                 ScrollView {
-                    Text("Message View")
+                    Text("You and \(user.name["first"] ?? "") both like each other!").italic().font(.caption).foregroundColor(.gray)
                 }
                 
                 
@@ -28,6 +28,12 @@ struct MessageView: View {
         
         
         
+    }
+}
+
+struct IndividualMessage: View {
+    var body: some View {
+        Text("Individual Message")
     }
 }
 

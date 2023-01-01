@@ -20,8 +20,8 @@ struct ChatView: View {
                     NavigationLink(destination: MessageView(user: match)) {
                     
                         ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
-                            .padding(.vertical, 5)
-                        Text(match.name["first"] ?? "")
+                            
+                        Text("\(match.name["first"] ?? ""), \(match.getAge())")
                             .padding(.leading)
                     }
                 }

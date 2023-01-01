@@ -13,15 +13,13 @@ struct UserView: View {
     
     var user: User
     
-    var userInterests = ["🙏 Christian", "⚖️ Republican", "⏰ Long Term", "👶 Wants Children"]
-    
     var body: some View {
         ScrollView {
             VStack {
                 ProfilePicture(profileURL: user.pictureRef, width: 175, height: 175)
                 UserBio(user: user)
                 
-                UserInterests(interests: userInterests)
+                UserInterests(attributes: user.attributes)
                 
                 HStack {
                     Spacer()
@@ -47,12 +45,14 @@ struct UserView: View {
 
 struct UserInterests: View {
     
-    @State var interests: [String]
+    @State var attributes: [Attribute]
     
     var body: some View {
-        WrappingHStack(interests) { interest in
-            UserInterest(text: interest)
-                .padding(5)
+        WrappingHStack(attributes) { attribute in
+            if (attribute.importance >= 3) {
+                UserInterest(text: attribute.value, emoji: attribute.name)
+                    .padding(5)
+            }
         }.padding(10)
     }
 }
@@ -60,10 +60,11 @@ struct UserInterests: View {
 struct UserInterest: View {
     
     @State var text: String
+    @State var emoji: String
     
     var body: some View {
         
-        Text(text)
+        Text("\(Constants.Values.emojis[emoji] ?? "") \(text)")
             .font(.subheadline)
             .padding(8)
             .background (
