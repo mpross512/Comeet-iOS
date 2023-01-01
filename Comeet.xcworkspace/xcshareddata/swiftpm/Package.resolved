@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "swiftuibackports",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/shaps80/SwiftUIBackports.git",
+      "state" : {
+        "revision" : "d9842f24656ff7c6116dc207b60f0b6d302a5a9a",
+        "version" : "1.9.0"
+      }
+    },
+    {
+      "identity" : "wrappinghstack",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dkk/WrappingHStack",
+      "state" : {
+        "branch" : "main",
+        "revision" : "44987fbb01112e6ec72098dc6481187dd53ad4d2"
+      }
+    }
+  ],
+  "version" : 2
+}

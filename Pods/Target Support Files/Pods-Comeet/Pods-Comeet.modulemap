@@ -1,0 +1,6 @@
+framework module Pods_Comeet {
+  umbrella header "Pods-Comeet-umbrella.h"
+
+  export *
+  module * { export * }
+}

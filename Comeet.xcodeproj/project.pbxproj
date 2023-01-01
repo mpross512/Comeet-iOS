@@ -519,11 +519,14 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Comeet/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Comeet;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -546,11 +549,14 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Comeet/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Comeet;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
