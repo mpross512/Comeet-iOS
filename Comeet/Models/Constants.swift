@@ -115,8 +115,22 @@ struct Constants {
             "politics": "⚖️",
             "alcohol": "🍺",
             "smoking": "🚬",
-            "marriage": "💍"
+            "marriage": "💍",
+            "height": "📏"
         ]
+    }
+    
+    struct SetupQuestions {
+        
+        static let questions: [Question] = [
+        
+        ]
+        
+        struct Question {
+            var category: String
+            var options: [String]
+            
+        }
     }
     
 }

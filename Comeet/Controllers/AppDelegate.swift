@@ -9,6 +9,8 @@
 import UIKit
 import Firebase
 import FirebaseCore
+import FirebaseFirestore
+import FirebaseStorage
 import SDWebImageSwiftUI
 
 @UIApplicationMain
@@ -21,12 +23,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         FirebaseApp.configure()
         
-        let cache = SDImageCache(namespace: "cache1")
-           cache.config.maxMemoryCost = 100 * 1024 * 1024 // 100MB memory
-           cache.config.maxDiskSize = 50 * 1024 * 1024 // 50MB disk
-           SDImageCachesManager.shared.addCache(cache)
-            SDImageCachesManager.shared.storeOperationPolicy = .concurrent
-           SDWebImageManager.defaultImageCache = SDImageCachesManager.shared
+        //Firestore.firestore().settings.isPersistenceEnabled = true
+        
+        
+        //let cache = SDImageCache(namespace: "cache1")
+        //cache.config.maxMemoryCost = 100 * 1024 * 1024 // 100MB memory
+        //cache.config.maxDiskSize = 50 * 1024 * 1024 // 50MB disk
+        //SDImageCachesManager.shared.addCache(cache)
+        
+        //SDWebImageManager.defaultImageCache = SDImageCachesManager.shared
+        
+        //SDWebImageManager.shared.optionsProcessor = SDWebImageOptionsProcessor() { url, options, context in
+        //    var mutableOptions = options
+        //    mutableOptions.insert(.progressiveLoad)
+        //    return SDWebImageOptionsResult(options: mutableOptions, context: context)
+        //}
         
         return true
     }
