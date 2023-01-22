@@ -78,6 +78,8 @@ struct ImagePicker: UIViewControllerRepresentable {
         
             if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
                 
+                print("DEBUG: Image loaded")
+                
                 UserHandler.getUserHandler().uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
                 isShown = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

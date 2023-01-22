@@ -116,18 +116,51 @@ struct Constants {
             "alcohol": "🍺",
             "smoking": "🚬",
             "marriage": "💍",
-            "height": "📏"
+            "exercise": "🏋️",
+            "lovelanguage": "💑",
+            "socialmedia": "📱",
+            "diet": "🍴"
         ]
     }
     
     struct SetupQuestions {
         
         static let questions: [Question] = [
-        
+            Question(category: "religion", question: "Do you identify with a religion?", options: [
+                "Agnostic", "Atheist", "Buddhist", "Catholic", "Christian", "Hindu", "Latter-day Saint", "Mormon", "Muslim", "Sikh", "Spiritual", "Zoroastrian", "Other"
+            ]),
+            Question(category: "children", question: "What are your plans for children?", options: [
+                "Want", "Don't want", "Have and want more", "Have and don't want more", "Not sure yet"
+            ]),
+            Question(category: "politics", question: "What are your political leanings?", options: [
+                "Conservative", "Liberal", "Moderate", "Don't care", "Other"
+            ]),
+            Question(category: "alcohol", question: "Do you drink?", options: [
+                "Socially", "Frequently", "Sometimes", "Rarely", "Never", "Sober"
+            ]),
+            Question(category: "smoking", question: "Do you smoke?", options: [
+                "Socially", "Frequently", "Sometimes", "Rarely", "Never", "Sober"
+            ]),
+            Question(category: "marriage", question: "What are your plans for marriage?", options: [
+                "Want", "Don't want", "Not now, but later", "Not sure yet"
+            ]),
+            Question(category: "exercise", question: "Do you exercise?", options: [
+                "Daily", "Weekly", "Monthly", "Never"
+            ]),
+            Question(category: "lovelanguage", question: "What is your love language?", options: [
+                "Gifts", "Quality Time", "Physical Touch", "Words of Affirmation", "Acts of Service"
+            ]),
+            Question(category: "socialmedia", question: "Do you use social media?", options: [
+                "Daily", "Weekly", "Monthly", "Never"
+            ]),
+            Question(category: "diet", question: "Do you have a certain diet?", options: [
+                "Kosher", "Halal", "Vegan", "Vegetarian", "Other", "None"
+            ])
         ]
         
         struct Question {
             var category: String
+            var question: String
             var options: [String]
             
         }

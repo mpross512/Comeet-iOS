@@ -29,10 +29,9 @@ class UserService: ObservableObject {
         do {
             self.user = try await Firestore.firestore().collection("Users").document(uid).getDocument(as: User.self)
             print("DEBUG: User Data Loaded")
-            //user.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
-            user.pictureRef = URL(string: "https://firebasestorage.googleapis.com:443/v0/b/comeet-ad75c.appspot.com/o/profilePictures%2F0A29hYiBn3VLzQnaOWGG14N1jIF3.jpeg?alt=media&token=d3d8ea7a-0ceb-4115-a5c5-f0f27c8d8918")
+            user.pictureRef = try await Constants.Database.profilePicsRef.child("\(uid).jpeg").downloadURL()
             print("DEBUG: Profile Pic Ref Loaded")
-            print("DEBUG: \(user.pictureRef)")
+            print("DEBUG: \(String(describing: user.pictureRef))")
             await getMatches()
         }
         catch {

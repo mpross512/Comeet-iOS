@@ -121,9 +121,10 @@ class UserHandler : ObservableObject {
     func uploadNewImage(data: Data) {
         let profilePicReference = Constants.Database.profilePicsRef.child("\(uid).jpeg")
         
+        print("DEBUG: Profile picture reference is \(profilePicReference)")
         profilePicReference.putData(data, metadata: nil) { metadata, error in
             if let error = error {
-                print(error)
+                print("DEBUG: \(error)")
             }
         }
     }

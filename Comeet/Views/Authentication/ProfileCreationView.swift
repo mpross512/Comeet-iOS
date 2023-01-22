@@ -24,6 +24,7 @@ struct ProfileCreationView: View {
     @State var showingAlert: Bool = false
     @State private var isShowPhotoLibrary = false
     @State private var imageAlertShown = false
+    @State private var isShowingQuestionsView = false
 
     
     init(user: User) {
@@ -92,6 +93,14 @@ struct ProfileCreationView: View {
                     .frame(minHeight: 40, alignment: .leading)
                     .multilineTextAlignment(.leading)
             }
+            
+            Section(header: Text("MORE")) {
+                Button {
+                    isShowingQuestionsView = true
+                } label: {
+                    Text("Personal Attributes")
+                }
+            }
 
             Section {
                 Button {
@@ -118,6 +127,8 @@ struct ProfileCreationView: View {
             }
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
+        }.sheet(isPresented: $isShowingQuestionsView){
+            QuestionsView(currentQuestion: 0, isPresented: $isShowingQuestionsView)
         }.alert(isPresented: $imageAlertShown) {
             Alert(title: Text("Image Saved"),
             message: Text("You may need to close the app for the new image to take effect"))

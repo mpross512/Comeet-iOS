@@ -45,10 +45,11 @@ struct UserView: View {
 
 struct UserInterests: View {
     
-    @State var attributes: [Attribute]
+    @State var attributes: [String: Attribute]
     
     var body: some View {
-        WrappingHStack(attributes) { attribute in
+        let values = attributes.map {$0.value}
+        WrappingHStack(values) { attribute in
             if (attribute.importance >= 3) {
                 UserInterest(text: attribute.value, emoji: attribute.name)
                     .padding(5)

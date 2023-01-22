@@ -33,6 +33,7 @@
 		4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9BD5EA2925F63100C71498 /* UserView.swift */; };
 		4CC50CF1292D5980004B495B /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 4CC50CF0292D5980004B495B /* WrappingHStack */; };
 		4CC50CF5292DEB32004B495B /* ProfileCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC50CF4292DEB32004B495B /* ProfileCreationView.swift */; };
+		4CCCB160296F47B200232FF5 /* QuestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCCB15F296F47B200232FF5 /* QuestionsView.swift */; };
 		4CDB5679292C9E6900873E65 /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 4CDB5678292C9E6900873E65 /* SwiftUIBackports */; };
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
 		4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEBEBE8262925FB0086D788 /* EditView.swift */; };
@@ -69,6 +70,7 @@
 		4C9BD5EA2925F63100C71498 /* UserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserView.swift; sourceTree = "<group>"; };
 		4CC50CF2292D7E7F004B495B /* Comeet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Comeet.entitlements; sourceTree = "<group>"; };
 		4CC50CF4292DEB32004B495B /* ProfileCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationView.swift; sourceTree = "<group>"; };
+		4CCCB15F296F47B200232FF5 /* QuestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsView.swift; sourceTree = "<group>"; };
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comeet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -202,6 +204,7 @@
 				4CEBEBE8262925FB0086D788 /* EditView.swift */,
 				4C3108EA24BBCEF9003679D7 /* ProfileView.swift */,
 				4C7A9FD0295E9AEE00A63CBD /* SettingsView.swift */,
+				4CCCB15F296F47B200232FF5 /* QuestionsView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 				4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */,
 				4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */,
 				4C37355F295D658C005709B9 /* Attribute.swift in Sources */,
+				4CCCB160296F47B200232FF5 /* QuestionsView.swift in Sources */,
 				4C163A4D24B90A4000523D05 /* User.swift in Sources */,
 				4C60113924B562B6003B425A /* InitialView.swift in Sources */,
 				4C3108E524BBC9AE003679D7 /* Constants.swift in Sources */,

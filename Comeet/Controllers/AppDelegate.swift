@@ -20,24 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        
         FirebaseApp.configure()
-        
-        //Firestore.firestore().settings.isPersistenceEnabled = true
-        
-        
-        //let cache = SDImageCache(namespace: "cache1")
-        //cache.config.maxMemoryCost = 100 * 1024 * 1024 // 100MB memory
-        //cache.config.maxDiskSize = 50 * 1024 * 1024 // 50MB disk
-        //SDImageCachesManager.shared.addCache(cache)
-        
-        //SDWebImageManager.defaultImageCache = SDImageCachesManager.shared
-        
-        //SDWebImageManager.shared.optionsProcessor = SDWebImageOptionsProcessor() { url, options, context in
-        //    var mutableOptions = options
-        //    mutableOptions.insert(.progressiveLoad)
-        //    return SDWebImageOptionsResult(options: mutableOptions, context: context)
-        //}
         
         return true
     }
