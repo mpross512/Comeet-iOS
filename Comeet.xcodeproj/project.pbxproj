@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -22,17 +22,17 @@
 		4C3108ED24BBCF00003679D7 /* ChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108EC24BBCF00003679D7 /* ChatListView.swift */; };
 		4C37355F295D658C005709B9 /* Attribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C37355E295D658C005709B9 /* Attribute.swift */; };
 		4C4DE26829232092002FC036 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4DE26729232092002FC036 /* UserService.swift */; };
-		4C60113524B562B6003B425A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113424B562B6003B425A /* AppDelegate.swift */; };
-		4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113624B562B6003B425A /* SceneDelegate.swift */; };
 		4C60113924B562B6003B425A /* InitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C60113824B562B6003B425A /* InitialView.swift */; };
 		4C60113B24B562B8003B425A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113A24B562B8003B425A /* Assets.xcassets */; };
 		4C60113E24B562B8003B425A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113D24B562B8003B425A /* Preview Assets.xcassets */; };
 		4C60114124B562B8003B425A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C60113F24B562B8003B425A /* LaunchScreen.storyboard */; };
+		4C743BBF2ADB2BE700C1D171 /* ProfileCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C743BBE2ADB2BE700C1D171 /* ProfileCreationView.swift */; };
+		4C743BC12ADB603200C1D171 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C743BC02ADB603200C1D171 /* App.swift */; };
 		4C7A9FD1295E9AEE00A63CBD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7A9FD0295E9AEE00A63CBD /* SettingsView.swift */; };
 		4C944FB828F60A07008153EE /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944FB728F60A07008153EE /* MessageView.swift */; };
 		4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9BD5EA2925F63100C71498 /* UserView.swift */; };
 		4CC50CF1292D5980004B495B /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 4CC50CF0292D5980004B495B /* WrappingHStack */; };
-		4CC50CF5292DEB32004B495B /* ProfileCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC50CF4292DEB32004B495B /* ProfileCreationView.swift */; };
+		4CC50CF5292DEB32004B495B /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC50CF4292DEB32004B495B /* ProfileEditView.swift */; };
 		4CCCB160296F47B200232FF5 /* QuestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCCB15F296F47B200232FF5 /* QuestionsView.swift */; };
 		4CDB5679292C9E6900873E65 /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 4CDB5678292C9E6900873E65 /* SwiftUIBackports */; };
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
@@ -58,18 +58,18 @@
 		4C37355E295D658C005709B9 /* Attribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attribute.swift; sourceTree = "<group>"; };
 		4C4DE26729232092002FC036 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		4C60113124B562B6003B425A /* Comeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Comeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C60113424B562B6003B425A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4C60113624B562B6003B425A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		4C60113824B562B6003B425A /* InitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialView.swift; sourceTree = "<group>"; };
 		4C60113A24B562B8003B425A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4C60113D24B562B8003B425A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4C60114024B562B8003B425A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4C60114224B562B8003B425A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4C743BBE2ADB2BE700C1D171 /* ProfileCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationView.swift; sourceTree = "<group>"; };
+		4C743BC02ADB603200C1D171 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		4C7A9FD0295E9AEE00A63CBD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4C944FB728F60A07008153EE /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		4C9BD5EA2925F63100C71498 /* UserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserView.swift; sourceTree = "<group>"; };
 		4CC50CF2292D7E7F004B495B /* Comeet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Comeet.entitlements; sourceTree = "<group>"; };
-		4CC50CF4292DEB32004B495B /* ProfileCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationView.swift; sourceTree = "<group>"; };
+		4CC50CF4292DEB32004B495B /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		4CCCB15F296F47B200232FF5 /* QuestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsView.swift; sourceTree = "<group>"; };
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
@@ -125,8 +125,6 @@
 			isa = PBXGroup;
 			children = (
 				4C163A5024B9397100523D05 /* UserHandler.swift */,
-				4C60113424B562B6003B425A /* AppDelegate.swift */,
-				4C60113624B562B6003B425A /* SceneDelegate.swift */,
 				4C087FD529176D2E005B39AB /* MessageHandler.swift */,
 				4C4DE26729232092002FC036 /* UserService.swift */,
 			);
@@ -166,6 +164,7 @@
 		4C60113324B562B6003B425A /* Comeet */ = {
 			isa = PBXGroup;
 			children = (
+				4C743BC02ADB603200C1D171 /* App.swift */,
 				4CC50CF2292D7E7F004B495B /* Comeet.entitlements */,
 				4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */,
 				4C163A4B24B90A2E00523D05 /* Models */,
@@ -193,7 +192,8 @@
 				4C60113824B562B6003B425A /* InitialView.swift */,
 				4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */,
 				4C163A5224B93BDA00523D05 /* SignInView.swift */,
-				4CC50CF4292DEB32004B495B /* ProfileCreationView.swift */,
+				4CC50CF4292DEB32004B495B /* ProfileEditView.swift */,
+				4C743BBE2ADB2BE700C1D171 /* ProfileCreationView.swift */,
 			);
 			path = Authentication;
 			sourceTree = "<group>";
@@ -259,8 +259,9 @@
 		4C60112924B562B6003B425A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = "Ice Cream Loaf";
 				TargetAttributes = {
 					4C60113024B562B6003B425A = {
@@ -356,23 +357,23 @@
 				4C163A5124B9397100523D05 /* UserHandler.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C087FD429176B1E005B39AB /* Message.swift in Sources */,
-				4C60113524B562B6003B425A /* AppDelegate.swift in Sources */,
 				4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */,
 				4C087FD229176A98005B39AB /* Chat.swift in Sources */,
 				4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */,
 				4C3108EB24BBCEF9003679D7 /* ProfileView.swift in Sources */,
-				4CC50CF5292DEB32004B495B /* ProfileCreationView.swift in Sources */,
+				4CC50CF5292DEB32004B495B /* ProfileEditView.swift in Sources */,
 				4C163A4924B9087000523D05 /* MasterView.swift in Sources */,
 				4C3108ED24BBCF00003679D7 /* ChatListView.swift in Sources */,
+				4C743BC12ADB603200C1D171 /* App.swift in Sources */,
 				4C087FD629176D2E005B39AB /* MessageHandler.swift in Sources */,
 				4C3108E924BBCEF0003679D7 /* MatchListView.swift in Sources */,
 				4C944FB828F60A07008153EE /* MessageView.swift in Sources */,
 				4C4DE26829232092002FC036 /* UserService.swift in Sources */,
 				4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */,
-				4C60113724B562B6003B425A /* SceneDelegate.swift in Sources */,
 				4C37355F295D658C005709B9 /* Attribute.swift in Sources */,
 				4CCCB160296F47B200232FF5 /* QuestionsView.swift in Sources */,
 				4C163A4D24B90A4000523D05 /* User.swift in Sources */,
+				4C743BBF2ADB2BE700C1D171 /* ProfileCreationView.swift in Sources */,
 				4C60113924B562B6003B425A /* InitialView.swift in Sources */,
 				4C3108E524BBC9AE003679D7 /* Constants.swift in Sources */,
 			);
@@ -429,6 +430,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -443,7 +445,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -490,6 +492,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -498,7 +501,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -525,7 +528,7 @@
 				INFOPLIST_FILE = Comeet/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Comeet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -555,7 +558,7 @@
 				INFOPLIST_FILE = Comeet/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Comeet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -604,7 +607,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/shaps80/SwiftUIBackports.git";
 			requirement = {
-				kind = upToNextMinorVersion;
+				kind = upToNextMajorVersion;
 				minimumVersion = 1.9.0;
 			};
 		};

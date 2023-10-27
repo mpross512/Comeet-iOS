@@ -94,7 +94,18 @@ bool CompositeFilter::Rep::Matches(const model::Document& doc) const {
 }
 
 std::string CompositeFilter::Rep::CanonicalId() const {
-  // TODO(orquery): Add special case for flat AND filters.
+  // Older SDK versions use an implicit AND operation between their filters. In
+  // the new SDK versions, the developer may use an explicit AND filter. To stay
+  // consistent with the old usages, we add a special case to ensure the
+  // canonical ID for these two are the same. For example: `col.whereEquals("a",
+  // 1).whereEquals("b", 2)` should have the same canonical ID as
+  // `col.where(and(equals("a",1), equals("b",2)))`.
+  if (IsFlatConjunction()) {
+    return absl::StrJoin(filters_, "", [](std::string* out, const Filter& f) {
+      return absl::StrAppend(out, f.CanonicalId());
+    });
+  }
+
   return util::StringFormat(
       "%s(%s)", CanonicalName(op_),
       absl::StrJoin(filters_, ",", [](std::string* out, const Filter& f) {
@@ -108,7 +119,6 @@ bool CompositeFilter::Rep::Equals(const Filter::Rep& other) const {
   // Note: This comparison requires order of filters in the list to be the same,
   // and it does not remove duplicate subfilters from each composite filter.
   // It is therefore way less expensive.
-  // TODO(orquery): Consider removing duplicates and ignoring order of filters
   // in the list.
   return op_ == other_rep.op_ && filters_ == other_rep.filters_;
 }
@@ -131,27 +141,16 @@ const FieldFilter* CompositeFilter::Rep::FindFirstMatchingFilter(
   return nullptr;
 }
 
-const model::FieldPath* CompositeFilter::Rep::GetFirstInequalityField() const {
-  CheckFunction condition = [](const FieldFilter& field_filter) {
-    return field_filter.IsInequality();
-  };
-  const FieldFilter* found = FindFirstMatchingFilter(condition);
-  if (found) {
-    return &(found->field());
-  }
-  return nullptr;
-}
-
 const std::vector<FieldFilter>& CompositeFilter::Rep::GetFlattenedFilters()
     const {
-  if (Filter::Rep::memoized_flattened_filters_.empty() && !filters().empty()) {
-    for (const auto& filter : filters()) {
+  return memoized_flattened_filters_->memoize([&]() {
+    std::vector<FieldFilter> flattened_filters;
+    for (const auto& filter : filters())
       std::copy(filter.GetFlattenedFilters().begin(),
                 filter.GetFlattenedFilters().end(),
-                std::back_inserter(Filter::Rep::memoized_flattened_filters_));
-    }
-  }
-  return Filter::Rep::memoized_flattened_filters_;
+                std::back_inserter(flattened_filters));
+    return flattened_filters;
+  });
 }
 
 }  // namespace core

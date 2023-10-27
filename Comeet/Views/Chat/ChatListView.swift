@@ -16,13 +16,15 @@ struct ChatView: View {
         
         NavigationView {
             List(userService.matches) { match in
-                HStack {
-                    NavigationLink(destination: MessageView(user: match)) {
-                    
-                        ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
+                if match.likes.contains(userService.user.id!) && userService.user.likes.contains(match.id!) {
+                    HStack {
+                        NavigationLink(destination: MessageView(user: match)) {
                             
-                        Text("\(match.name["first"] ?? ""), \(match.getAge())")
-                            .padding(.leading)
+                            ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
+                            
+                            Text("\(match.name["first"] ?? ""), \(match.getAge())")
+                                .padding(.leading)
+                        }
                     }
                 }
             }

@@ -29,7 +29,7 @@ import FirebaseAuthInterop
 /**
  * Firebase Storage is a service that supports uploading and downloading binary objects,
  * such as images, videos, and other files to Google Cloud Storage. Instances of `Storage`
- * are not thread-safe.
+ * are not thread-safe, but can be accessed from any thread.
  *
  * If you call `Storage.storage()`, the instance will initialize with the default `FirebaseApp`,
  * `FirebaseApp.app()`, and the storage location will come from the provided
@@ -122,6 +122,12 @@ import FirebaseAuthInterop
       maxOperationRetryInterval = Storage.computeRetryInterval(fromRetryTime: maxOperationRetryTime)
     }
   }
+
+  /**
+   * Specify the maximum upload chunk size. Values less than 256K (262144) will be rounded up to 256K. Values
+   * above 256K will be rounded down to the nearest 256K multiple. The default is no maximum.
+   */
+  @objc public var uploadChunkSizeBytes: Int64 = .max
 
   /**
    * A `DispatchQueue` that all developer callbacks are fired on. Defaults to the main queue.
@@ -308,13 +314,13 @@ import FirebaseAuthInterop
     (suggestedWillRetry: Bool,
      error: Error?,
      response: @escaping GTMSessionFetcherRetryResponse) in
-      var shouldRetry = suggestedWillRetry
-      // GTMSessionFetcher does not consider being offline a retryable error, but we do, so we
-      // special-case it here.
-      if !shouldRetry, error != nil {
-        shouldRetry = (error as? NSError)?.code == URLError.notConnectedToInternet.rawValue
-      }
-      response(shouldRetry)
+    var shouldRetry = suggestedWillRetry
+    // GTMSessionFetcher does not consider being offline a retryable error, but we do, so we
+    // special-case it here.
+    if !shouldRetry, error != nil {
+      shouldRetry = (error as? NSError)?.code == URLError.notConnectedToInternet.rawValue
+    }
+    response(shouldRetry)
   }
 
   private static func initFetcherServiceForApp(_ app: FirebaseApp,

@@ -27,6 +27,7 @@
 #include "Firestore/core/src/model/document_key.h"
 #include "Firestore/core/src/model/model_fwd.h"
 #include "Firestore/core/src/model/mutable_document.h"
+#include "Firestore/core/src/model/overlay.h"
 #include "Firestore/core/src/model/types.h"
 
 namespace firebase {
@@ -36,6 +37,7 @@ namespace local {
 class MemoryLruReferenceDelegate;
 class MemoryPersistence;
 class Sizer;
+class QueryContext;
 
 class MemoryRemoteDocumentCache : public RemoteDocumentCache {
  public:
@@ -51,9 +53,18 @@ class MemoryRemoteDocumentCache : public RemoteDocumentCache {
   model::MutableDocumentMap GetAll(const std::string&,
                                    const model::IndexOffset&,
                                    size_t) const override;
-  model::MutableDocumentMap GetAll(const model::ResourcePath& path,
-                                   const model::IndexOffset& offset,
-                                   absl::optional<size_t>) const override;
+  model::MutableDocumentMap GetDocumentsMatchingQuery(
+      const core::Query& query,
+      const model::IndexOffset& offset,
+      absl::optional<size_t> limit = absl::nullopt,
+      const model::OverlayByDocumentKeyMap& mutated_docs = {}) const override;
+  model::MutableDocumentMap GetDocumentsMatchingQuery(
+      const core::Query& query,
+      const model::IndexOffset& offset,
+      absl::optional<QueryContext>&,
+      absl::optional<size_t> limit = absl::nullopt,
+      const model::OverlayByDocumentKeyMap& mutated_docs = {}) const override;
+
   void SetIndexManager(IndexManager* manager) override;
 
   std::vector<model::DocumentKey> RemoveOrphanedDocuments(

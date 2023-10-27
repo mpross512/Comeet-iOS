@@ -417,6 +417,16 @@ bool LocalStore::ShouldPersistTargetData(const TargetData& new_target_data,
   int64_t time_delta = new_seconds - old_seconds;
   if (time_delta >= kResumeTokenMaxAgeSeconds) return true;
 
+  // Update the target cache if sufficient time has passed since the last
+  // LastLimboFreeSnapshotVersion
+  int64_t new_limbo_free_seconds =
+      new_target_data.last_limbo_free_snapshot_version().timestamp().seconds();
+  int64_t old_limbo_free_seconds =
+      old_target_data.last_limbo_free_snapshot_version().timestamp().seconds();
+  int64_t limbo_free_time_delta =
+      new_limbo_free_seconds - old_limbo_free_seconds;
+  if (limbo_free_time_delta >= kResumeTokenMaxAgeSeconds) return true;
+
   // Otherwise if the only thing that has changed about a target is its resume
   // token then it's not worth persisting. Note that the RemoteStore keeps an
   // in-memory view of the currently active targets which includes the current
@@ -465,6 +475,10 @@ void LocalStore::NotifyLocalViewChanges(
             target_data.WithLastLimboFreeSnapshotVersion(
                 last_limbo_free_snapshot_version);
         target_data_by_target_[target_id] = updated_target_data;
+
+        if (ShouldPersistTargetData(updated_target_data, target_data, {})) {
+          target_cache_->UpdateTarget(updated_target_data);
+        }
       }
     }
   });
@@ -683,6 +697,18 @@ void LocalStore::ConfigureFieldIndexes(
           this->index_manager_->DeleteFieldIndex(index);
         });
   });
+}
+
+void LocalStore::SetIndexAutoCreationEnabled(bool is_enabled) const {
+  query_engine_->SetIndexAutoCreationEnabled(is_enabled);
+}
+
+void LocalStore::DeleteAllFieldIndexes() const {
+  // This step is not wrapped in `persistence_->Run()`.
+  // The reason is `persistence_->Run()` always assume each operation is
+  // executed in one transaction, while `DeleteAllFieldIndexes()` might need
+  // multiple transactions to finish.
+  index_manager_->DeleteAllFieldIndexes();
 }
 
 Target LocalStore::NewUmbrellaTarget(const std::string& bundle_id) {

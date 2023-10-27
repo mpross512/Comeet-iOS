@@ -17,25 +17,24 @@ struct MasterView: View {
     var body: some View {
         
         ZStack {
-            if Auth.auth().currentUser != nil  {
+            if userService.isAuthenticated  {
                 HomeView()
             } else {
                 InitialView()
             }
         }.onAppear {
             Task {
-                if Auth.auth().currentUser != nil {
+                if userService.isAuthenticated {
                     await userService.getUser(uid: Auth.auth().currentUser!.uid)
                 }
             }
-        }
+        }.accentColor(Constants.Colors.orangeColor)
+
     }
     
     
 }
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MasterView()
-    }
+#Preview {
+    MasterView()
 }

@@ -10,7 +10,6 @@ import SwiftUI
 
 struct HomeView: View {
     
-    
     @State private var selectedTab = "home"
     
     var body: some View {
@@ -33,14 +32,11 @@ struct HomeView: View {
             }.tag("profile")
             
         }
-        .accentColor(Constants.Colors.orangeColor)
         
     }
     
 }
 
-struct TabView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-    }
+#Preview{
+    HomeView()
 }

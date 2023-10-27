@@ -24,7 +24,7 @@ struct QuestionsView: View {
             QuestionView(question: $currentQuestion, isPresented: $isPresented)
             
             
-        }
+        }.accentColor(Constants.Colors.orangeColor)
     }
 }
 
@@ -47,15 +47,39 @@ struct QuestionView: View {
     
     var body: some View {
         VStack {
-            Text(questionSet[Int(question)].question)
+            Text(questionSet[Int(question)].question).font(.headline)
             
-            List(questionSet[Int(question)].options, id: \.self) { option in
+            List {
+                Section {
+                    ForEach(questionSet[Int(question)].options, id: \.self) { option in
+                        Button {
+                            userService.user.attributes[questionSet[Int(question)].category] =
+                            Attribute(
+                                name: questionSet[Int(question)].category,
+                                importance: 5,
+                                value: option)
+                            if(Int(question) < questionSet.count - 1) {
+                                question = question + 1
+                            } else {
+                                isPresented = false
+                                do {
+                                    try Firestore.firestore().collection("Users").document(userService.user.id!).setData(from: userService.user)
+                                } catch let error {
+                                    print(error)
+                                }
+                            }
+                        } label: {
+                            Text(option)
+                        }
+                    }
+                }
+                
                 Button {
                     userService.user.attributes[questionSet[Int(question)].category] =
                         Attribute(
                             name: questionSet[Int(question)].category,
                             importance: 5,
-                            value: option)
+                            value: "")
                     if(Int(question) < questionSet.count - 1) {
                         question = question + 1
                     } else {
@@ -67,35 +91,13 @@ struct QuestionView: View {
                         }
                     }
                 } label: {
-                    Text(option)
-                }
-                
-            }
-            
-            Button {
-                if(Int(question) != questionSet.count - 1) {
-                    question = question + 1
-                } else {
-                    isPresented = false
-                    do {
-                        try Firestore.firestore().collection("Users").document(userService.user.id!).setData(from: userService.user)
-                    } catch let error {
-                        print(error)
+                    if(Int(question) != questionSet.count - 1) {
+                        Text("Skip")
+                    } else {
+                        Text("Finish")
                     }
                 }
-            } label: {
-                if(Int(question) != questionSet.count - 1) {
-                    Text("Skip")
-                } else {
-                    Text("Finish")
-                }
-                
             }
-            
-            
-                
-            
         }
     }
-    
 }

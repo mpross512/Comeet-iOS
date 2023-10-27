@@ -12,6 +12,8 @@ import WrappingHStack
 struct UserView: View {
     
     var user: User
+    @EnvironmentObject var userService: UserService
+    @State private var isPresentingConfirm: Bool = false
     
     var body: some View {
         ScrollView {
@@ -21,20 +23,29 @@ struct UserView: View {
                 
                 UserInterests(attributes: user.attributes)
                 
-                HStack {
-                    Spacer()
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "x.circle").resizable().frame(width: 50, height: 50)
+                if (userService.user.likes.contains(user.id!)) {
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Button {
+                                
+                            } label: {
+                                Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50).foregroundColor(Constants.Colors.greenColor)
+                            }
+                            Text("You liked \(user.name["first"] ?? "")!").italic().font(.caption).foregroundColor(.gray)
+                        }
+                        Spacer()
                     }
-                    Spacer()
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50)
+                } else {
+                    HStack {
+                        Spacer()
+                        Button {
+                            userService.likeUser(uid: user.id!)
+                        } label: {
+                            Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50)
+                        }
+                        Spacer()
                     }
-                    Spacer()
                 }
             }
                         
@@ -50,7 +61,7 @@ struct UserInterests: View {
     var body: some View {
         let values = attributes.map {$0.value}
         WrappingHStack(values) { attribute in
-            if (attribute.importance >= 3) {
+            if (attribute.importance >= 3  && attribute.value != "") {
                 UserInterest(text: attribute.value, emoji: attribute.name)
                     .padding(5)
             }

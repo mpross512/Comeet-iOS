@@ -9,6 +9,7 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import FirebaseAuth
 
 @MainActor
 class UserService: ObservableObject {
@@ -16,11 +17,18 @@ class UserService: ObservableObject {
     @Published var user: User
     @Published var matches: [User]
     @Published var isLoading: Bool
+    @Published var isAuthenticated: Bool
     
     init() {
         user = User()
         matches = []
         isLoading = false
+        isAuthenticated = false
+        
+        Auth.auth().addStateDidChangeListener { _, user in
+            self.isAuthenticated = user != nil
+            print("DEBUG: Authentication state changed to \(self.isAuthenticated)")
+        }
     }
     
     func getUser(uid: String) async {
@@ -54,5 +62,14 @@ class UserService: ObservableObject {
             }
         }
         isLoading = false
+    }
+    
+    func likeUser(uid: String) {
+        user.likes.append(uid)
+        do {
+            try Firestore.firestore().collection("Users").document(user.id!).setData(from: user)
+        } catch let error {
+            print(error)
+        }
     }
 }

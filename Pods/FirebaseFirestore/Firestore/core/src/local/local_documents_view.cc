@@ -64,9 +64,6 @@ using model::OverlayByDocumentKeyMap;
 using model::ResourcePath;
 using model::SnapshotVersion;
 
-using OverlayByDocumentKeyMap = std::
-    unordered_map<model::DocumentKey, model::Overlay, model::DocumentKeyHash>;
-
 Document LocalDocumentsView::GetDocument(
     const DocumentKey& key, const std::vector<MutationBatch>& batches) {
   MutableDocument document = remote_document_cache_->Get(key);
@@ -78,12 +75,20 @@ Document LocalDocumentsView::GetDocument(
 
 DocumentMap LocalDocumentsView::GetDocumentsMatchingQuery(
     const Query& query, const model::IndexOffset& offset) {
+  absl::optional<QueryContext> null_context;
+  return GetDocumentsMatchingQuery(query, offset, null_context);
+}
+
+DocumentMap LocalDocumentsView::GetDocumentsMatchingQuery(
+    const Query& query,
+    const model::IndexOffset& offset,
+    absl::optional<QueryContext>& context) {
   if (query.IsDocumentQuery()) {
     return GetDocumentsMatchingDocumentQuery(query.path());
   } else if (query.IsCollectionGroupQuery()) {
-    return GetDocumentsMatchingCollectionGroupQuery(query, offset);
+    return GetDocumentsMatchingCollectionGroupQuery(query, offset, context);
   } else {
-    return GetDocumentsMatchingCollectionQuery(query, offset);
+    return GetDocumentsMatchingCollectionQuery(query, offset, context);
   }
 }
 
@@ -99,7 +104,9 @@ DocumentMap LocalDocumentsView::GetDocumentsMatchingDocumentQuery(
 }
 
 model::DocumentMap LocalDocumentsView::GetDocumentsMatchingCollectionGroupQuery(
-    const Query& query, const IndexOffset& offset) {
+    const Query& query,
+    const IndexOffset& offset,
+    absl::optional<QueryContext>& context) {
   HARD_ASSERT(
       query.path().empty(),
       "Currently we only support collection group queries at the root.");
@@ -115,7 +122,7 @@ model::DocumentMap LocalDocumentsView::GetDocumentsMatchingCollectionGroupQuery(
     Query collection_query =
         query.AsCollectionQueryAtPath(parent.Append(collection_id));
     DocumentMap collection_results =
-        GetDocumentsMatchingCollectionQuery(collection_query, offset);
+        GetDocumentsMatchingCollectionQuery(collection_query, offset, context);
     for (const auto& kv : collection_results) {
       const DocumentKey& key = kv.first;
       results = results.insert(key, Document(kv.second));
@@ -156,12 +163,15 @@ LocalWriteResult LocalDocumentsView::GetNextDocuments(
 }
 
 DocumentMap LocalDocumentsView::GetDocumentsMatchingCollectionQuery(
-    const Query& query, const IndexOffset& offset) {
-  MutableDocumentMap remote_documents =
-      remote_document_cache_->GetAll(query.path(), offset);
-  // Get locally persisted mutation batches.
+    const Query& query,
+    const IndexOffset& offset,
+    absl::optional<QueryContext>& context) {
+  // Get locally mutated documents
   OverlayByDocumentKeyMap overlays = document_overlay_cache_->GetOverlays(
       query.path(), offset.largest_batch_id());
+  MutableDocumentMap remote_documents =
+      remote_document_cache_->GetDocumentsMatchingQuery(
+          query, offset, context, absl::nullopt, overlays);
 
   // As documents might match the query because of their overlay we need to
   // include documents for all overlays in the initial document set.
@@ -266,6 +276,9 @@ model::OverlayedDocumentMap LocalDocumentsView::ComputeViews(
           {doc->key(), overlay_it->second.mutation().field_mask()});
       overlay_it->second.mutation().ApplyToLocalView(*doc, absl::nullopt,
                                                      Timestamp::Now());
+    } else {  // No overlay for this document
+      // Using empty mask to indicate there is no overlay for the document.
+      mutated_fields.emplace(doc->key(), FieldMask{});
     }
   }
 

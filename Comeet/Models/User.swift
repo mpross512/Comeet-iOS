@@ -20,6 +20,7 @@ struct User : Identifiable, Codable {
     var matches: [String]
     var pictureRef: URL?
     var attributes: [String: Attribute]
+    var likes: [String]
     
     init() {
         year = 0
@@ -30,6 +31,7 @@ struct User : Identifiable, Codable {
         matches = []
         pictureRef = URL(string: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png")!
         attributes = [:]
+        likes = []
     }
     
     func getName() -> String {

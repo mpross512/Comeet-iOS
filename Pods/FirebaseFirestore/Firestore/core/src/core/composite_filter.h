@@ -69,7 +69,7 @@ class CompositeFilter : public Filter {
    * false otherwise.
    */
   bool IsFlatConjunction() const {
-    return IsFlat() && IsConjunction();
+    return composite_filter_rep().IsFlatConjunction();
   }
 
   /**
@@ -116,6 +116,10 @@ class CompositeFilter : public Filter {
 
     bool IsFlat() const;
 
+    bool IsFlatConjunction() const {
+      return IsFlat() && IsConjunction();
+    }
+
     bool IsACompositeFilter() const override {
       return true;
     }
@@ -135,8 +139,6 @@ class CompositeFilter : public Filter {
     }
 
     const std::vector<FieldFilter>& GetFlattenedFilters() const override;
-
-    const model::FieldPath* GetFirstInequalityField() const override;
 
     std::vector<Filter> GetFilters() const override {
       return filters();

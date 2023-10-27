@@ -11,87 +11,85 @@ import FirebaseAuth
 
 struct SignUpView: View {
 
-    @State var email: String = ""
+    @State var netID: String = ""
     @State var password: String = ""
-    @State var passwordConfirm: String = ""
     @State var errorText: String = "Error"
     @State var showErrorText: Bool = false
+    @State var createAccount: Bool = false
     
     var body: some View {
-        ZStack {
-            
-            LinearGradient(gradient: Gradient(
-                colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
-            startPoint: .leading, endPoint: .trailing)
-            .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-            
-            VStack {
-                Text("Let's Get You Started")
-                    .font(.custom("Futura", size: 40))
-                    .foregroundColor(.white)
-                    .padding(.bottom, 50)
+        NavigationStack {
+        
+            ZStack {
                 
-                Text(errorText)
-                    .foregroundColor(.white)
-                    .opacity(showErrorText ? 1 : 0)
+                LinearGradient(gradient: Gradient(
+                    colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
+                startPoint: .leading, endPoint: .trailing)
+                .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
                 
-                TextField("Enter your NetID", text: $email)
-                    .disableAutocorrection(true)
-                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
-                    .keyboardType(.emailAddress)
-                    .foregroundColor(.black)
-                    .padding(.leading)
-                    .frame(height: 50)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25).fill(Color.white)
-                    )
-                    .padding(.horizontal)
-                
-                SecureField("Create a Password", text: $password)
-                .foregroundColor(.black)
-                .padding(.leading)
-                .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 25).fill(Color.white)
-                )
-                    .padding(.horizontal)
-                
-                SecureField("Confirm Password", text: $passwordConfirm)
-                .foregroundColor(.black)
-                .padding(.leading)
-                .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 25).fill(Color.white)
-                )
-                    .padding(.horizontal)
-                
-                
-                Button(action: {
-                    if(password == passwordConfirm) {
-                        Auth.auth().signIn(withEmail: "\(self.email)@utdallas.edu", password: self.password) { authResult, error in
-                            if let e = error {
-                                self.showErrorText = true
-                                self.errorText = e.localizedDescription
-                            }
-                        }
+                VStack {
+                    Text("Let's Get You Started")
+                        .font(.custom("Futura", size: 40))
+                        .foregroundColor(.white)
+                        .padding(.bottom, 50)
+                    
+                    Text(errorText)
+                        .foregroundColor(.white)
+                        .opacity(showErrorText ? 1 : 0)
+                    
+                    TextField("Enter your NetID", text: $netID)
+                        .disableAutocorrection(true)
+                        .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
+                        .foregroundColor(.black)
+                        .padding(.leading)
+                        .frame(height: 50)
+                        .background(
+                            RoundedRectangle(cornerRadius: 25).fill(Color.white)
+                        )
+                        .padding(.horizontal)
+                    
+                    SecureField("Create a Password", text: $password)
+                        .foregroundColor(.black)
+                        .padding(.leading)
+                        .frame(height: 50)
+                        .background(
+                            RoundedRectangle(cornerRadius: 25).fill(Color.white)
+                        )
+                        .padding(.horizontal)
+                    
+                    Button(action: {
+                        createAccount = true
+//                        if(self.netID.count != 9) {
+//                            self.showErrorText = true
+//                            self.errorText = "Please enter a valid 9 character NetID"
+//                        }
+//                        else {
+//                            self.showErrorText = false
+//                            Auth.auth().createUser(withEmail: "\(self.netID)@utdallas.edu", password: self.password) { authResult, error in
+//                                if let e = error {
+//                                    self.showErrorText = true
+//                                    self.errorText = e.localizedDescription
+//                                } else if let user = authResult?.user {
+//                                    createAccount = true
+//                                    print(user)
+//                                }
+//                            }
+//                        }
+                    }) {
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(Color.white)
+                            .frame(height: 50, alignment: .center)
+                            .padding()
+                            .overlay(
+                                Text("Sign Up")
+                                    .fontWeight(.bold)
+                                    .foregroundColor(Color(red: 0.15, green: 0.68, blue: 0.38, opacity: 1.00))
+                            )
+                            .padding(.top, 20)
                     }
-                    else {
-                        self.showErrorText = true
-                        self.errorText = "Passwords do not match"
-                    }
-                }) {
-                    RoundedRectangle(cornerRadius: 25)
-                    .fill(Color.white)
-                    .frame(height: 50, alignment: .center)
-                    .padding()
-                    .overlay(
-                        Text("Sign Up")
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(red: 0.15, green: 0.68, blue: 0.38, opacity: 1.00))
-                    )
-                    .padding(.top, 20)
                 }
-                
+            }.navigationDestination(isPresented: $createAccount) {
+                ProfileCreationView().navigationBarBackButtonHidden()
             }
         }
     }

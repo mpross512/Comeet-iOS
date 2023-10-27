@@ -8,7 +8,6 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
-import SwiftUIBackports
 
 struct EditView: View {
 
@@ -22,7 +21,7 @@ struct EditView: View {
     
     var body: some View {
         VStack {
-                ProfileCreationView(user: user)
+                ProfileEditView(user: user)
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
         }.alert(isPresented: $imageAlertShown) {

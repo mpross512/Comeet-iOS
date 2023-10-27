@@ -7,3 +7,20 @@
 //
 
 import Foundation
+import SwiftUI
+import FirebaseCore
+
+@main 
+struct ComeetApp: App {
+    @StateObject private var userService = UserService()
+    
+    init() {
+        FirebaseApp.configure()
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            MasterView().environmentObject(userService)
+        }
+    }
+}

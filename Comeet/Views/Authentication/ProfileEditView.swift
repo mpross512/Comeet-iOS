@@ -1,5 +1,5 @@
 //
-//  ProfileCreationView.swift
+//  ProfileEditView.swift
 //  Comeet
 //
 //  Created by Michael Ross on 11/22/22.
@@ -136,8 +136,6 @@ struct ProfileEditView: View {
     }
 }
 
-struct ProfileCreationView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileEditView(user: User())
-    }
+#Preview {
+    ProfileEditView(user: User())
 }
