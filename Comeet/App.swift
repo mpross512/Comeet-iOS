@@ -9,6 +9,8 @@
 import Foundation
 import SwiftUI
 import FirebaseCore
+import FirebaseAuth
+import FirebaseMessaging
 
 @main 
 struct ComeetApp: App {
@@ -23,4 +25,20 @@ struct ComeetApp: App {
             MasterView().environmentObject(userService)
         }
     }
+    
+//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+//      Auth.auth().setAPNSToken(deviceToken, type: .prod)
+//    }
+//    
+//    func application(_ application: UIApplication, didReceiveRemoteNotification notification: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+//      if Auth.auth().canHandleNotification(notification) {
+//        completionHandler(.noData)
+//        return
+//      }
+//    }
+//    
+//    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+//      Messaging.messaging().apnsToken = deviceToken
+//        print("DEBUG: Successfully set apns token")
+//    }
 }

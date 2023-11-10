@@ -43,17 +43,16 @@
 		4C7A9FD1295E9AEE00A63CBD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7A9FD0295E9AEE00A63CBD /* SettingsView.swift */; };
 		4C944FB828F60A07008153EE /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944FB728F60A07008153EE /* MessageView.swift */; };
 		4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9BD5EA2925F63100C71498 /* UserView.swift */; };
+		4CA744202AF06E90002530D7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4CA7441F2AF06E90002530D7 /* SDWebImageSwiftUI */; };
 		4CC50CF1292D5980004B495B /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 4CC50CF0292D5980004B495B /* WrappingHStack */; };
 		4CC50CF5292DEB32004B495B /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC50CF4292DEB32004B495B /* ProfileEditView.swift */; };
 		4CCCB160296F47B200232FF5 /* QuestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCCB15F296F47B200232FF5 /* QuestionsView.swift */; };
 		4CDB5679292C9E6900873E65 /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 4CDB5678292C9E6900873E65 /* SwiftUIBackports */; };
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
 		4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEBEBE8262925FB0086D788 /* EditView.swift */; };
-		639C8405A84AB9349618503E /* Pods_Comeet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		392139E422C0C1FB897D8F99 /* Pods-Comeet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comeet.debug.xcconfig"; path = "Target Support Files/Pods-Comeet/Pods-Comeet.debug.xcconfig"; sourceTree = "<group>"; };
 		4C087FD129176A98005B39AB /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
 		4C087FD329176B1E005B39AB /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		4C087FD529176D2E005B39AB /* MessageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageHandler.swift; sourceTree = "<group>"; };
@@ -85,8 +84,6 @@
 		4CCCB15F296F47B200232FF5 /* QuestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsView.swift; sourceTree = "<group>"; };
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
-		85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comeet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		ACF86EB035F318800BE47CD7 /* Pods-Comeet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comeet.release.xcconfig"; path = "Target Support Files/Pods-Comeet/Pods-Comeet.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CA744202AF06E90002530D7 /* SDWebImageSwiftUI in Frameworks */,
 				1F66ED892AEF570400E4450B /* FirebaseDatabaseSwift in Frameworks */,
 				1F66ED872AEF570400E4450B /* FirebaseDatabase in Frameworks */,
 				4CDB5679292C9E6900873E65 /* SwiftUIBackports in Frameworks */,
@@ -102,7 +100,6 @@
 				4CC50CF1292D5980004B495B /* WrappingHStack in Frameworks */,
 				1F66ED932AEF570400E4450B /* FirebaseInAppMessaging-Beta in Frameworks */,
 				1F66ED9B2AEF570400E4450B /* FirebaseStorageCombine-Community in Frameworks */,
-				639C8405A84AB9349618503E /* Pods_Comeet.framework in Frameworks */,
 				1F66ED972AEF570400E4450B /* FirebaseMessaging in Frameworks */,
 				1F66ED852AEF570400E4450B /* FirebaseAuth in Frameworks */,
 				1F66ED8B2AEF570400E4450B /* FirebaseFirestore in Frameworks */,
@@ -115,23 +112,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1EE246707D42422BC5E7EB08 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				392139E422C0C1FB897D8F99 /* Pods-Comeet.debug.xcconfig */,
-				ACF86EB035F318800BE47CD7 /* Pods-Comeet.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
-		41B7270683AF3DA088820299 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				85F5F419D52D6BC8FD2E224D /* Pods_Comeet.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		4C163A4724B9085900523D05 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,8 +152,6 @@
 			children = (
 				4C60113324B562B6003B425A /* Comeet */,
 				4C60113224B562B6003B425A /* Products */,
-				1EE246707D42422BC5E7EB08 /* Pods */,
-				41B7270683AF3DA088820299 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -258,11 +236,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C60114524B562B8003B425A /* Build configuration list for PBXNativeTarget "Comeet" */;
 			buildPhases = (
-				65DBB80294C9ECC6DA6AC5B4 /* [CP] Check Pods Manifest.lock */,
 				4C60112D24B562B6003B425A /* Sources */,
 				4C60112E24B562B6003B425A /* Frameworks */,
 				4C60112F24B562B6003B425A /* Resources */,
-				9BA77ACB0F3A3349C2E0E477 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -284,6 +260,7 @@
 				1F66ED962AEF570400E4450B /* FirebaseMessaging */,
 				1F66ED982AEF570400E4450B /* FirebaseStorage */,
 				1F66ED9A2AEF570400E4450B /* FirebaseStorageCombine-Community */,
+				4CA7441F2AF06E90002530D7 /* SDWebImageSwiftUI */,
 			);
 			productName = Comeet;
 			productReference = 4C60113124B562B6003B425A /* Comeet.app */;
@@ -318,6 +295,7 @@
 				4CDB5677292C9E6900873E65 /* XCRemoteSwiftPackageReference "SwiftUIBackports" */,
 				4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 				1F66ED832AEF54FB00E4450B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = 4C60113224B562B6003B425A /* Products */;
 			projectDirPath = "";
@@ -341,48 +319,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		65DBB80294C9ECC6DA6AC5B4 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Comeet-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9BA77ACB0F3A3349C2E0E477 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Comeet/Pods-Comeet-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Comeet/Pods-Comeet-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Comeet/Pods-Comeet-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4C60112D24B562B6003B425A /* Sources */ = {
@@ -489,6 +425,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -544,13 +481,13 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
 		4C60114624B562B8003B425A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 392139E422C0C1FB897D8F99 /* Pods-Comeet.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Comeet/Comeet.entitlements;
@@ -571,7 +508,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -580,7 +517,6 @@
 		};
 		4C60114724B562B8003B425A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ACF86EB035F318800BE47CD7 /* Pods-Comeet.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Comeet/Comeet.entitlements;
@@ -601,7 +537,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IceCreamLoaf.Comeet;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -638,6 +574,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 10.16.0;
+			};
+		};
+		4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.4;
 			};
 		};
 		4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */ = {
@@ -718,6 +662,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1F66ED832AEF54FB00E4450B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = "FirebaseStorageCombine-Community";
+		};
+		4CA7441F2AF06E90002530D7 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 		4CC50CF0292D5980004B495B /* WrappingHStack */ = {
 			isa = XCSwiftPackageProductDependency;

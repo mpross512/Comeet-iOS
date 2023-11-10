@@ -10,50 +10,43 @@ import SwiftUI
 import FirebaseFunctions
 
 struct MessageView: View {
-    
+    var messageService = MessageService()
     @State var user: User
-    lazy var functions = Functions.functions()
+    let messageList = [Message(id: "1", timeSent: "1", content: "Test Message 1", sender: "comeet"),
+                       Message(id: "2", timeSent: "1", content: "Test Message 2", sender: "comeet")]
     
     var body: some View {
-
-            VStack {
-                ScrollView {
-                    Text("You and \(user.name["first"] ?? "") both like each other!").italic().font(.caption).foregroundColor(.gray)
-                    Button {
-                        functions.httpsCallable("addMessage").call(["text": "this is a test"]) { result, error in
-                          if let error = error as NSError? {
-                            if error.domain == FunctionsErrorDomain {
-                              let code = FunctionsErrorCode(rawValue: error.code)
-                              let message = error.localizedDescription
-                              let details = error.userInfo[FunctionsErrorDetailsKey]
-                            }
-                            // ...
-                          }
-                          if let data = result?.data as? [String: Any], let text = data["text"] as? String {
-                            self.resultField.text = text
-                          }
-                        }
-                    } label: {
-                        Text("Test function")
-                    }
-
-                }
-                
-                
-            }.toolbar{
-                ToolbarItem(placement: .principal) {
-                    Text("\(user.name["first"] ?? "") \(user.name["last"] ?? "")").bold()
+        VStack {
+            List{
+                Text("You and \(user.name["first"] ?? "") both like each other!").italic().font(.caption).foregroundColor(.gray)
+                ForEach(messageList, id: \.id) { message in
+                    IndividualMessage(text: message.content)
                 }
             }
-        
-        
-        
+            Button {
+                messageService.testFunction()
+            } label: {
+                Text("Test function")
+            }
+        }.toolbar{
+            ToolbarItem(placement: .principal) {
+                Text("\(user.name["first"] ?? "") \(user.name["last"] ?? "")").bold()
+            }
+        }
     }
 }
 
 struct IndividualMessage: View {
+    var text: String
+    
     var body: some View {
-        Text("Individual Message")
+        HStack {
+            Text(text).padding(10)
+                .background {
+                    RoundedRectangle(cornerRadius: 20).foregroundColor(.blue)
+                }
+            Spacer()
+        }
     }
 }
 

@@ -8,9 +8,8 @@
 
 import Foundation
 
-class Message: Codable {
-    
-    var uid: String
+struct Message: Codable, Identifiable {
+    var id: String
     var timeSent: String
     var content: String
     var sender: String
