@@ -10,13 +10,11 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct EditView: View {
-
+    @Environment(UserService.self) var userService: UserService
     @State private var isShowPhotoLibrary = false
     @State private var imageAlertShown = false
     @State var imageCache = SDImageCache.shared
     
-    @State var bio: String = "\(UserHandler.getUserHandler().user.getBio())"
-
     var user: User
     
     var body: some View {
@@ -61,7 +59,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
     
     final class Coordinator : NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        
+        @Environment(UserService.self) var userService: UserService
         @Binding var isShown: Bool
         @Binding var alertShown: Bool
         
@@ -79,7 +77,7 @@ struct ImagePicker: UIViewControllerRepresentable {
                 
                 print("DEBUG: Image loaded")
                 
-                UserHandler.getUserHandler().uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
+                userService.uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
                 isShown = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     self.alertShown = true

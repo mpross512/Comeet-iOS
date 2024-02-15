@@ -8,8 +8,6 @@
 
 import SwiftUI
 
-import FirebaseFirestore
-
 struct QuestionsView: View {
     
     @State var currentQuestion: Double = 0
@@ -36,12 +34,10 @@ struct QuestionsView_Previews: PreviewProvider {
 }
 
 struct QuestionView: View {
-    
+    @Environment(UserService.self) var userService: UserService
+    @Environment(User.self) var currentUser: User
     @Binding var question: Double
-    
     @Binding var isPresented: Bool
-    
-    @EnvironmentObject var userService: UserService
     
     var questionSet = Constants.SetupQuestions.questions
     
@@ -53,7 +49,7 @@ struct QuestionView: View {
                 Section {
                     ForEach(questionSet[Int(question)].options, id: \.self) { option in
                         Button {
-                            userService.user.attributes[questionSet[Int(question)].category] =
+                            currentUser.attributes[questionSet[Int(question)].category] =
                             Attribute(
                                 name: questionSet[Int(question)].category,
                                 importance: 5,
@@ -63,7 +59,7 @@ struct QuestionView: View {
                             } else {
                                 isPresented = false
                                 do {
-                                    try Firestore.firestore().collection("Users").document(userService.user.id!).setData(from: userService.user)
+//                                    try Firestore.firestore().collection("Users").document(userService.user.id.uuidString).setData(from: userService.user)
                                 } catch let error {
                                     print(error)
                                 }
@@ -75,7 +71,7 @@ struct QuestionView: View {
                 }
                 
                 Button {
-                    userService.user.attributes[questionSet[Int(question)].category] =
+                    currentUser.attributes[questionSet[Int(question)].category] =
                         Attribute(
                             name: questionSet[Int(question)].category,
                             importance: 5,
@@ -85,7 +81,7 @@ struct QuestionView: View {
                     } else {
                         isPresented = false
                         do {
-                            try Firestore.firestore().collection("Users").document(userService.user.id!).setData(from: userService.user)
+//                            try Firestore.firestore().collection("Users").document(userService.user.id.uuidString).setData(from: userService.user)
                         } catch let error {
                             print(error)
                         }

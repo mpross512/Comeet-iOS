@@ -13,22 +13,12 @@ struct InitialView: View {
     @State var isSignInSheet: Bool = false
     @State var isSignUpSheet: Bool = false
     
-
-    
     var body: some View {
         ZStack{
-            
-            
             LinearGradient(gradient: Gradient(
                 colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
                 startPoint: .leading, endPoint: .trailing)
                 .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-            
-            
-            /*
-            Color(.white)
-                .edgesIgnoringSafeArea(.all)
-            */
             
             VStack{
                 Text("👌 Comeet")
@@ -69,10 +59,8 @@ struct AccountButton: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 25)
             .fill(Color.white)
-            //.stroke(Constants.Colors.orangeColor, lineWidth: 3)
             .frame(height: 50, alignment: .center)
             .padding(.horizontal)
-            //.padding(.bottom)
             .overlay(
                 Text(text)
                     .fontWeight(.bold)

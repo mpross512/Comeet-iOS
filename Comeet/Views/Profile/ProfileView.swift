@@ -7,14 +7,11 @@
 //
 
 import SwiftUI
-import FirebaseAuth
-import FirebaseStorage
-import FirebaseFirestore
 import SDWebImageSwiftUI
 
 struct ProfileView: View {
     
-    @EnvironmentObject var userService: UserService
+    @Environment(User.self) var currentUser: User
     
     @State var isInEditMode: Bool = false
     @State var profilePicURL: URL?
@@ -22,31 +19,24 @@ struct ProfileView: View {
     @State var settingsPageShown: Bool = false
     
     var user: User = User()
-        
-    init() {
-    }
     
     var body: some View {
         
-        NavigationView {
+        NavigationStack {
         
             VStack {
-                NavigationLink(destination: EditView(user: userService.user), isActive: $isInEditMode) { EmptyView() }
-                
-                NavigationLink(destination: SettingsView(), isActive: $settingsPageShown) { EmptyView() }
-                
                 ScrollView {
                 
-                    ProfilePicture(profileURL: userService.user.pictureRef, width: 175, height: 175)
+                    ProfilePicture(userID: currentUser.id, width: 175, height: 175)
                         .padding()
                     
-                    UserBio(user: userService.user)
+                    UserBio(user: currentUser)
                     
-                    UserInterests(attributes: userService.user.attributes)
+                    UserInterests(attributes: currentUser.attributes)
                     
-                    Button(action: {
+                    Button {
                         self.isInEditMode.toggle();
-                    }) {
+                    } label: {
                         RoundedRectangle(cornerRadius: 25)
                             .fill(Constants.Colors.greenColor)
                             .frame(width: 150, height: 50, alignment: .center)
@@ -60,16 +50,26 @@ struct ProfileView: View {
                 }
                     
             }
-            .navigationBarTitle("Profile", displayMode: .inline)
-            .navigationBarItems(trailing:
-                Button(action: {
-                    self.settingsPageShown.toggle()
-                }) {
-                    Image(systemName: "gearshape.fill")
-                        .font(.title)
-                        .accentColor(Constants.Colors.greenColor)
+            .navigationDestination(isPresented: $settingsPageShown) {
+                SettingsView()
+            }
+            .navigationDestination(isPresented: $isInEditMode) {
+                EditView(user: currentUser)
+            }
+            .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        settingsPageShown.toggle()
+                        print("DEBUG: settingsPageShown: \(settingsPageShown)")
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title)
+                            .accentColor(Constants.Colors.greenColor)
+                    }
                 }
-            )
+            }
         }
     }
 }
@@ -81,17 +81,18 @@ struct ProfileView_Previews: PreviewProvider {
 }
 
 struct SignOutButton: View {
-    
-    @EnvironmentObject var userService: UserService
-    
+    @Environment(Supabase.self) var supabase
+        
     var body: some View {
-        Button(action: {
-            do {
-                try Auth.auth().signOut()
-            } catch {
-                print(error)
+        Button {
+            Task {
+                do {
+                    try await supabase.auth.signOut()
+                } catch {
+                    print(error)
+                }
             }
-        }) {
+        } label: {
             RoundedRectangle(cornerRadius: 25)
                 .fill(Constants.Colors.greenColor)
                 .frame(width: 150, height: 50, alignment: .center)
@@ -106,15 +107,28 @@ struct SignOutButton: View {
 }
 
 struct ProfilePicture: View {
-    
-    var profileURL: URL?
-    
+    let profileURL: URL
     let width: CGFloat
     let height: CGFloat
     
+    init(userID: UUID, width: CGFloat, height: CGFloat) {
+        self.width = width
+        self.height = height
+        
+        do {
+            self.profileURL = try Supabase.shared.storage
+                .from("profile-pictures")
+                .getPublicURL(path: "\(userID.uuidString.lowercased()).jpeg")
+        } catch {
+            print("ERROR: \(error)")
+            self.profileURL = URL(string: "")!
+        }
+    }
+    
     var body: some View {
-        WebImage(url: profileURL ?? UserHandler.getUserHandler().getImageURL())
+        WebImage(url: profileURL)
             .resizable()
+            .indicator(.activity)
             .aspectRatio(contentMode: .fill)
             .frame(width: width, height: height)
             .clipShape(Circle())
@@ -123,14 +137,14 @@ struct ProfilePicture: View {
 
 struct UserBio: View {
     
-    @State var user: User = User()
+    @State var user: any Person = User()
     
     var body: some View {
         Group {
             
-            Text("\(user.name["first"] ?? "") \(user.name["last"] ?? ""), \(user.getAge())")
+            Text("\(user.fullName), \(user.age)")
                 .font(.title)
-            Text("Class of \(String(user.getYear()))")
+            Text("Class of \(String(user.graduationYear))")
             
             HStack {
                 Text("About")
@@ -142,7 +156,7 @@ struct UserBio: View {
             .padding(.top)
             
             HStack {
-                Text("\(user.getBio())")
+                Text("\(user.bio)")
                 Spacer()
             }
             .padding(.horizontal)
@@ -158,7 +172,7 @@ struct UserBio: View {
             .padding(.top)
             
             HStack {
-                Text("\(user.getMajor())")
+                Text("\(user.major)")
                 Spacer()
             }
             .padding(.horizontal)

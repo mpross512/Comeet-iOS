@@ -11,19 +11,20 @@ import WrappingHStack
 
 struct UserView: View {
     
-    var user: User
-    @EnvironmentObject var userService: UserService
+    var user: any Person
+    @Environment(UserService.self) var userService: UserService
+    @Environment(User.self) var currentUser: User
     @State private var isPresentingConfirm: Bool = false
     
     var body: some View {
         ScrollView {
             VStack {
-                ProfilePicture(profileURL: user.pictureRef, width: 175, height: 175)
+                ProfilePicture(userID: user.id, width: 175, height: 175)
                 UserBio(user: user)
                 
                 UserInterests(attributes: user.attributes)
                 
-                if (userService.user.likes.contains(user.id!)) {
+                if (currentUser.likes.contains(user.id.uuidString)) {
                     HStack {
                         Spacer()
                         VStack {
@@ -32,7 +33,7 @@ struct UserView: View {
                             } label: {
                                 Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50).foregroundColor(Constants.Colors.greenColor)
                             }
-                            Text("You liked \(user.name["first"] ?? "")!").italic().font(.caption).foregroundColor(.gray)
+                            Text("You liked \(user.firstName)!").italic().font(.caption).foregroundColor(.gray)
                         }
                         Spacer()
                     }
@@ -40,7 +41,7 @@ struct UserView: View {
                     HStack {
                         Spacer()
                         Button {
-                            userService.likeUser(uid: user.id!)
+                            userService.likeUser(uid: user.id.uuidString)
                         } label: {
                             Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50)
                         }

@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
 struct SignUpView: View {
 
@@ -19,9 +18,7 @@ struct SignUpView: View {
     
     var body: some View {
         NavigationStack {
-        
             ZStack {
-                
                 LinearGradient(gradient: Gradient(
                     colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
                 startPoint: .leading, endPoint: .trailing)
@@ -59,22 +56,28 @@ struct SignUpView: View {
                     
                     Button(action: {
                         createAccount = true
-//                        if(self.netID.count != 9) {
-//                            self.showErrorText = true
-//                            self.errorText = "Please enter a valid 9 character NetID"
-//                        }
-//                        else {
-//                            self.showErrorText = false
-//                            Auth.auth().createUser(withEmail: "\(self.netID)@utdallas.edu", password: self.password) { authResult, error in
-//                                if let e = error {
-//                                    self.showErrorText = true
-//                                    self.errorText = e.localizedDescription
-//                                } else if let user = authResult?.user {
-//                                    createAccount = true
-//                                    print(user)
-//                                }
-//                            }
-//                        }
+                        #if DEBUG
+                        Task {
+                            try await Supabase.shared.auth.signUp(
+                                email: "\(self.netID)@utdallas.edu",
+                                password: self.password
+                            )
+                        }
+                        #else
+                        if(self.netID.count != 9) {
+                            self.showErrorText = true
+                            self.errorText = "Please enter a valid 9 character NetID"
+                        }
+                        else {
+                            self.showErrorText = false
+                            Task {
+                                try await Supabase.shared.auth.signUp(
+                                    email: "\(self.netID)@utdallas.edu",
+                                    password: self.password
+                                )
+                            }
+                        }
+                        #endif
                     }) {
                         RoundedRectangle(cornerRadius: 25)
                             .fill(Color.white)

@@ -8,15 +8,14 @@
 
 import Foundation
 import SwiftUI
-import FirebaseStorage
 
 struct Constants {
     
     struct Database {
         
         let users = "users"
-        
-        static let profilePicsRef = Storage.storage().reference().child("profilePictures")
+                
+        static let supabaseStorageURL = "https://bikoswjhsmcbwricdpyv.supabase.co/storage/v1/object/public/"
         
     }
     
@@ -121,6 +120,8 @@ struct Constants {
             "socialmedia": "📱",
             "diet": "🍴"
         ]
+        
+        static let comeetUID = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
     }
     
     struct SetupQuestions {

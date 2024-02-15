@@ -7,11 +7,10 @@
 //
 
 import SwiftUI
-import FirebaseAuth
+import Supabase
 
 struct SignInView: View {
-    
-    @EnvironmentObject var userService: UserService
+    @Environment(Supabase.self) var supabase: Supabase
     
     @State var email: String = ""
     @State var password: String = ""
@@ -59,13 +58,23 @@ struct SignInView: View {
                 
                 
                 Button(action: {
-                    Auth.auth().signIn(withEmail: "\(self.email)@utdallas.edu", password: self.password) { authResult, error in
-                        Task {
-                            await userService.getUser(uid: Auth.auth().currentUser!.uid)
-                        }
-                        if let e = error {
-                            self.showErrorText = true
-                            self.errorText = e.localizedDescription
+                    Task {
+                        do {
+                            #if DEBUG
+                            let response = try await supabase.auth.signIn(
+                                email: "\(self.email)",
+                                password: "\(self.password)"
+                            )
+                            #else
+                            let response = try await supabase.auth.signIn(
+                                email: "\(self.email)@utdallas.edu",
+                                password: "\(self.password)"
+                            )
+                            #endif
+                            print("DEBUG: Supabase Auth: \(response)")
+                        } catch {
+                            print("ERROR: \(error)")
+                            errorText = error.localizedDescription
                         }
                     }
                 }) {
@@ -89,5 +98,6 @@ struct SignInView: View {
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         SignInView()
+            .environment(Supabase())
     }
 }

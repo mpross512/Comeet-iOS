@@ -7,11 +7,10 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
-import FirebaseFirestoreSwift
 import SDWebImageSwiftUI
 
 struct ProfileEditView: View {
+    
     
     @State var user = User()
     @State var firstName: String
@@ -27,53 +26,43 @@ struct ProfileEditView: View {
 
     
     init(user: User) {
-        print("Edit view initialized with user")
-        print(user)
         _user = State(initialValue: user)
-        _firstName = State(initialValue: user.name["first"] ?? "")
-        _lastName = State(initialValue: user.name["last"] ?? "")
-        print("User object first name: ", user.name["first"] ?? "")
-        //print("First name: ", self.firstName)
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY-MM-dd"
-        _birthdate = State(initialValue: dateFormatter.date(from: user.birthdate) ?? Date())
-        _year = State(initialValue: String(user.year))
+        _firstName = State(initialValue: user.firstName)
+        _lastName = State(initialValue: user.lastName)
+        _birthdate = State(initialValue: user.birthdate)
+        _year = State(initialValue: String(user.graduationYear))
     }
     
     var body: some View {
         Form {
-            
-            Section (header: Text("EDIT PROFILE PICTURE")) {
-                Button(action: {
+            Section {
+                Button {
                     self.isShowPhotoLibrary = true
-                }) {
+                } label: {
                     HStack {
                         Spacer()
-                        
                         ZStack {
-                            WebImage(url: user.pictureRef)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 125, height: 125)
-                                .clipShape(Circle())
-                            
+                            ProfilePicture(userID: user.id, width: 125, height: 125)
                             Image(systemName: "pencil.circle.fill").font(.system(size: 40))
                                 .foregroundColor(Constants.Colors.greenColor)
                                 .offset(x: 50, y: -50)
                         }
-                        
                         Spacer()
                     }
                 }
+            } header: {
+                Text("EDIT PROFILE PICTURE")
             }
             
-            Section(header: Text("PERSONAL")) {
+            Section {
                 TextField("First Name", text: $firstName)
                 TextField("Last Name", text: $lastName)
                 DatePicker("Birthdate", selection: $birthdate, displayedComponents: .date)
+            } header: {
+                Text("PERSONAL")
             }
             
-            Section(header: Text("SCHOOL")) {
+            Section {
                 Picker("Major", selection: $user.major) {
                     ForEach(Constants.Values.degrees, id: \.self) { major in
                         Text(major)
@@ -85,45 +74,49 @@ struct ProfileEditView: View {
                     TextField("", text: $year)
                         .keyboardType(.decimalPad)
                 }
+            } header: {
+                Text("SCHOOL")
             }
             
-            Section(header: Text("BIO")) {
+            Section {
                 TextField("", text: $user.bio, axis: .vertical)
                     .frame(minHeight: 40, alignment: .leading)
                     .multilineTextAlignment(.leading)
                     .lineLimit(5, reservesSpace: true)
+            } header: {
+                Text("BIO")
             }
             
-            Section(header: Text("MORE")) {
+            Section {
                 Button {
                     isShowingQuestionsView = true
                 } label: {
                     Text("Personal Attributes")
                 }
+            } header: {
+                Text("MORE")
             }
-
+            
             Section {
                 Button {
                     showingAlert = true
-                    user.name["first"] = firstName
-                    user.name["last"] = lastName
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd"
-                    let newDate = dateFormatter.string(from: birthdate)
-                    user.birthdate = newDate
-                    user.year = Int(year) ?? 0
-                    do {
-                        try Firestore.firestore().collection("Users").document(user.id!).setData(from: user)
-                    } catch let error {
-                        print(error)
-                    }
+                    user.firstName = firstName
+                    user.lastName = lastName
+                    user.birthdate = birthdate
+                    user.graduationYear = Int(year) ?? 0
+//                    do {
+//                        try Firestore.firestore().collection("Users").document(user.id.uuidString).setData(from: user)
+//                    } catch let error {
+//                        print(error)
+//                    }
                 } label: {
                     Text("Save Changes")
                 }.alert(isPresented: $showingAlert) {
                     Alert(title: Text("Changes Saved"),
                           message: Text("You may need to reload the app for your changes to take effect"))
                 }
-
+            } header: {
+                EmptyView()
             }
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)

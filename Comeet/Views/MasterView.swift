@@ -7,32 +7,37 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
 struct MasterView: View {
-        
-    @EnvironmentObject var userService: UserService
-    @ObservedObject var authenticator = UserHandler.getUserHandler()
+    @Environment(Supabase.self) var supabase: Supabase
+    @State var authenticated: Bool = false
     
     var body: some View {
         
         ZStack {
-            if userService.isAuthenticated  {
+            if authenticated  {
                 HomeView()
             } else {
                 InitialView()
             }
         }.onAppear {
             Task {
-                if userService.isAuthenticated {
-                    await userService.getUser(uid: Auth.auth().currentUser!.uid)
+                for await (event, session) in await supabase.auth.authStateChanges {
+                    switch event.rawValue {
+                        case "INITIAL_SESSION":
+                            self.authenticated = session != nil
+                        case "SIGNED_IN":
+                            self.authenticated = true
+                        case "SIGNED_OUT":
+                            self.authenticated = false
+                        default:
+                            print("Default case")
+                            break
+                    }
                 }
             }
         }.accentColor(Constants.Colors.orangeColor)
-
     }
-    
-    
 }
 
 #Preview {

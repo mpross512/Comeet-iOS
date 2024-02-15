@@ -9,43 +9,43 @@
 import SwiftUI
 
 struct ChatView: View {
-    
-    @EnvironmentObject var userService: UserService
+    @Environment(User.self) var currentUser: User
+    var messageService = MessageService()
+    @State var conversations = [Conversation]()
+    @State var loading = true
     
     var body: some View {
-        
-        NavigationView {
-            List(userService.matches) { match in
-                if match.likes.contains(userService.user.id!) && userService.user.likes.contains(match.id!) {
+        ZStack {
+            NavigationStack {
+                List(conversations) { conversation in
                     HStack {
-                        NavigationLink(destination: MessageView(user: match)) {
-                            
-                            ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
-                            
-                            Text("\(match.name["first"] ?? ""), \(match.getAge())")
-                                .padding(.leading)
+                        if let match = currentUser.matches.first(where: { match in
+                            match.id == conversation.recipientID
+                        }) {
+                            NavigationLink{
+                                MessageView(conversation: conversation)
+                                    .navigationTitle("\(match.fullName)")
+                                    .navigationBarTitleDisplayMode(.inline)
+                            } label: {
+                                ProfilePicture(userID: match.id, width: 50, height: 50)
+                                Text("\(match.firstName), \(match.age)")
+                                    .padding(.leading)
+                            }
                         }
                     }
                 }
+                .navigationTitle("Chats")
+                .navigationBarTitleDisplayMode(.large)
             }
-            .navigationBarTitle("Chat", displayMode: .large)
-            //.listStyle(GroupedListStyle())
+            if(loading) {
+                ProgressView()
+                    .controlSize(.extraLarge)
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    .background(Color.white)
+            }
+        }.task {
+            conversations = await Conversation.all(userID: currentUser.id)
+            loading = false
         }
     }
 }
-
-struct ChatView_Previews: PreviewProvider {
-    static var previews: some View {
-        ChatView()
-    }
-}
-
-struct ChatRoom : Identifiable{
-    let id: String
-    let name: String
-    let uid: String
-}
-
-let chats = [
-    ChatRoom(id: "1", name: "Isabelle", uid: "")
-]

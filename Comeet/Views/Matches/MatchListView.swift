@@ -7,68 +7,79 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
-import FirebaseAuth
 
 struct MatchView: View {
-    
-    @EnvironmentObject var userService: UserService
-    
-    init() {
-        //print("DEBUG: Matches: ")
-        //print(userService.user.matches)
-    }
+    @Environment(User.self) var currentUser: User
+    @Environment(Supabase.self) var supabase: Supabase
+    var user = User()
+    @State var emailConfirmed = false
+    @State var loading = true
     
     var body: some View {
-        if(userService.isAuthenticated && !Auth.auth().currentUser!.isEmailVerified) {
-            VerifyEmailView()
-        } else {
-            NavigationView {
-                if !userService.isLoading {
-                    List(userService.matches) { match in
+        ZStack {
+            if(!emailConfirmed) {
+                VerifyEmailView()
+            } else {
+                NavigationView {
+                    //                if currentUser.matches.isEmpty {
+                    //                    Text("No matches right now, check back on Monday!").italic()
+                    //                }
+                    List(currentUser.matches) { match in
                         HStack {
                             NavigationLink {
                                 UserView(user: match)
                             } label: {
                                 HStack {
-                                    ProfilePicture(profileURL: match.pictureRef, width: 50, height: 50)
+                                    ProfilePicture(userID: match.id, width: 50, height: 50)
                                     VStack (alignment: .leading) {
-                                        Text("\(match.name["first"] ?? ""), \(match.getAge())")
+                                        Text("\(match.firstName), \(match.age)")
+                                            .padding(.leading)
                                     }
                                 }
                             }
-                        }
-                        if userService.matches.isEmpty {
-                            Text("No matches right now, check back on Monday!").italic()
                         }
                     }
                     .transition(.opacity.animation(.easeIn(duration: 5)))
                     .navigationBarTitle("Matches", displayMode: .large)
                 }
             }
+            
+            if(loading) {
+                ProgressView()
+                    .controlSize(.extraLarge)
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    .background(Color.white)
+            }
+        }.task {
+            do {
+                emailConfirmed = try await supabase.auth.user().emailConfirmedAt != nil
+                loading = false
+            } catch {
+                print(error)
+            }
         }
     }
 }
 
 struct VerifyEmailView: View {
-    @State private var responseText: String = ""
+    @State private var emailSent = false
     
     var body: some View {
         VStack {
             Text("You can't receive matches until you have verified your email.").padding()
             Text("Didn't receive a verification email? Make sure to check your spam.").padding()
-            Button (action:{
-                Auth.auth().currentUser?.sendEmailVerification() { error in
-                    if let error {
-                        responseText = error.localizedDescription
-                    } else {
-                        responseText = "Verification email sent"
+            if(!emailSent) {
+                Button {
+                    Task {
+                        let email = try await Supabase.shared.auth.user().email
+                        try await Supabase.shared.auth.resend(email: email!, type: .signup)
+                        emailSent = true
                     }
+                } label: {
+                    Text("Resend verification email").italic().padding()
                 }
-            }) {
-                Text("Resend verification email").italic().padding()
             }
-            Text(responseText).padding()
+            Text("Verification email sent").padding()
             
             
         }

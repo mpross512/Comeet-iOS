@@ -7,19 +7,21 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
 struct SettingsView: View {
+    @Environment(Supabase.self) var supabase: Supabase
     
     
     var body: some View {
         Form {
             Section {
                 Button {
-                    do {
-                        try Auth.auth().signOut()
-                    } catch {
-                        print(error)
+                    Task {
+                        do {
+                            try await supabase.auth.signOut()
+                        } catch {
+                            print(error)
+                        }
                     }
                 } label: {
                     Text("Sign Out")
