@@ -23,7 +23,7 @@ struct SignInView: View {
             LinearGradient(gradient: Gradient(
                 colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
             startPoint: .leading, endPoint: .trailing)
-            .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+            .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Text("Welcome Back")

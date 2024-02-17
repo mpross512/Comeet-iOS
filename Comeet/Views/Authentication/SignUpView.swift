@@ -20,9 +20,10 @@ struct SignUpView: View {
         NavigationStack {
             ZStack {
                 LinearGradient(gradient: Gradient(
-                    colors: [Constants.Colors.orangeColor, Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
-                startPoint: .leading, endPoint: .trailing)
-                .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+                    colors: [Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
+                    startPoint: .bottomLeading,
+                    endPoint: .topTrailing)
+                .edgesIgnoringSafeArea(.all)
                 
                 VStack {
                     Text("Let's Get You Started")
@@ -36,7 +37,7 @@ struct SignUpView: View {
                     
                     TextField("Enter your NetID", text: $netID)
                         .disableAutocorrection(true)
-                        .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
+                        .autocapitalization(.none)
                         .foregroundColor(.black)
                         .padding(.leading)
                         .frame(height: 50)
@@ -55,13 +56,19 @@ struct SignUpView: View {
                         .padding(.horizontal)
                     
                     Button(action: {
-                        createAccount = true
                         #if DEBUG
                         Task {
-                            try await Supabase.shared.auth.signUp(
-                                email: "\(self.netID)@utdallas.edu",
-                                password: self.password
-                            )
+                            do {
+                                try await Supabase.shared.auth.signUp(
+                                    email: "\(self.netID)",
+                                    password: self.password
+                                )
+                                createAccount = true
+                            } catch {
+                                print(error)
+                                self.errorText = error.localizedDescription
+                                self.showErrorText = true
+                            }
                         }
                         #else
                         if(self.netID.count != 9) {
@@ -75,6 +82,7 @@ struct SignUpView: View {
                                     email: "\(self.netID)@utdallas.edu",
                                     password: self.password
                                 )
+                                createAccount = true
                             }
                         }
                         #endif

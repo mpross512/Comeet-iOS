@@ -80,8 +80,6 @@ struct VerifyEmailView: View {
                 }
             }
             Text("Verification email sent").padding()
-            
-            
         }
     }
 }

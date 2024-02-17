@@ -10,12 +10,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(Supabase.self) var supabase: Supabase
+    @State var confirmDelete = false
     
     
     var body: some View {
         Form {
             Section {
-                Button {
+                Button("Sign Out") {
                     Task {
                         do {
                             try await supabase.auth.signOut()
@@ -23,8 +24,25 @@ struct SettingsView: View {
                             print(error)
                         }
                     }
-                } label: {
-                    Text("Sign Out")
+                }
+            }
+            
+            Section {
+                Button("Delete Account", role: .destructive) {
+                    confirmDelete = true
+                }.confirmationDialog("Confirm Delete", isPresented: $confirmDelete) {
+                    Button("Yes, Delete", role: .destructive) {
+                        Task {
+                            do {
+                                try await supabase.auth.admin.deleteUser(id: supabase.auth.user().id.uuidString)
+                            } catch {
+                                print(error)
+                            }
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("Are you sure you want to delete your account? This cannot be undone.").font(.title)
                 }
 
             }
@@ -32,8 +50,7 @@ struct SettingsView: View {
     }
 }
 
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-    }
+#Preview {
+    SettingsView(confirmDelete: false)
+        .environment(Supabase())
 }
