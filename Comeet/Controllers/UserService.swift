@@ -7,40 +7,41 @@
 //
 
 import Foundation
+import Storage
 
 @Observable
 class UserService {
     
-    func likeUser(uid: String) {
-//        print("DEBUG: Calling function with user \(user.id) and target \(uid)")
-//        Functions.functions().httpsCallable("likeUser").call(["user": user.id, "target": uid]) { result, error in
-//            if let error = error as NSError? {
-//                print("ERROR: \(error.code) \(error.localizedDescription) \(error.description) \(error.userInfo[FunctionsErrorDetailsKey]!)")
-//            } else {
-//                print("DEBUG: \(result!)")
-//            }
-//        }
-    }
-    
-    func uploadNewImage(path: String) {
-//        let localURL = URL(string: path)!
-//        let profilePicReference = Constants.Database.profilePicsRef.child("\(user.id).jpeg")
-//            
-//        profilePicReference.putFile(from: localURL, metadata: nil) { metadata, error in
-//            if let error = error {
-//                print(error)
-//            }
-//        }
+    func likeUser(userID: UUID, matchID: UUID) async -> Bool {
+        let supabase = Supabase.shared
+        
+        do {
+            try await supabase.database
+                .rpc("like_user", params: ["userid": userID, "match": matchID])
+                .execute()
+            return true
+        } catch {
+            print(error)
+        }
+        
+        return false
     }
         
-    func uploadNewImage(data: Data) {
-//        let profilePicReference = Constants.Database.profilePicsRef.child("\(user.id).jpeg")
-//        
-//        print("DEBUG: Profile picture reference is \(profilePicReference)")
-//        profilePicReference.putData(data, metadata: nil) { metadata, error in
-//            if let error = error {
-//                print("DEBUG: \(error)")
-//            }
-//        }
+    func uploadNewImage(data: Data) async {
+        let supabase = Supabase.shared
+        
+        do {
+            try await supabase.storage
+                .from("profile-pictures")
+                .update(
+                    path: supabase.auth.user().id.uuidString.lowercased(),
+                    file: data,
+                    options: FileOptions(
+                        upsert: true
+                    )
+                )
+        } catch {
+            print(error)
+        }
     }
 }

@@ -77,10 +77,12 @@ struct ImagePicker: UIViewControllerRepresentable {
                 
                 print("DEBUG: Image loaded")
                 
-                userService.uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
-                isShown = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    self.alertShown = true
+                Task {
+                    await userService.uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
+                    isShown = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        self.alertShown = true
+                    }
                 }
                 
                 print("DEBUG: Alert shown? \(alertShown)")

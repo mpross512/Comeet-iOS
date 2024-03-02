@@ -26,11 +26,10 @@ struct QuestionsView: View {
     }
 }
 
-struct QuestionsView_Previews: PreviewProvider {
-    static var previews: some View {
-        //QuestionsView(isPresented: false)
-        Text("No Preview")
-    }
+#Preview {
+    QuestionsView(isPresented: .constant(false))
+        .environment(UserService())
+        .environment(User())
 }
 
 struct QuestionView: View {
@@ -38,6 +37,7 @@ struct QuestionView: View {
     @Environment(User.self) var currentUser: User
     @Binding var question: Double
     @Binding var isPresented: Bool
+    @State var importance: Double = 3
     
     var questionSet = Constants.SetupQuestions.questions
     
@@ -49,11 +49,21 @@ struct QuestionView: View {
                 Section {
                     ForEach(questionSet[Int(question)].options, id: \.self) { option in
                         Button {
-                            currentUser.attributes[questionSet[Int(question)].category] =
-                            Attribute(
-                                name: questionSet[Int(question)].category,
-                                importance: 5,
-                                value: option)
+                            DispatchQueue.main.async {
+                                if let index = currentUser.attributes.firstIndex(where: {$0.name == questionSet[Int(question)].category}) {
+                                    currentUser.attributes[index] = Attribute(
+                                        name: questionSet[Int(question)].category,
+                                        importance: Int(importance),
+                                        value: option)
+                                } else {
+                                    currentUser.attributes.append(
+                                        Attribute(
+                                            name: questionSet[Int(question)].category,
+                                            importance: Int(importance),
+                                            value: option)
+                                    )
+                                }
+                            }
                             if(Int(question) < questionSet.count - 1) {
                                 question = question + 1
                             } else {
@@ -70,12 +80,17 @@ struct QuestionView: View {
                     }
                 }
                 
+                Section {
+                    Text("How imortant is it that your partner share this value?")
+                    Slider(value: $importance, in: 1...5, step: 1)
+                    HStack {
+                        Text("Not Important")
+                        Spacer()
+                        Text("Very Important")
+                    }
+                }
+                
                 Button {
-                    currentUser.attributes[questionSet[Int(question)].category] =
-                        Attribute(
-                            name: questionSet[Int(question)].category,
-                            importance: 5,
-                            value: "")
                     if(Int(question) < questionSet.count - 1) {
                         question = question + 1
                     } else {

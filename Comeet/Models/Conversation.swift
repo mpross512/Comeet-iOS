@@ -11,7 +11,7 @@ import Realtime
 
 @Observable
 class Conversation: Identifiable, Decodable, Hashable {
-    var id: String? = ""
+    var id: Int
     var recipientID: UUID = UUID()
     var messages = [Message]()
     
@@ -25,37 +25,47 @@ class Conversation: Identifiable, Decodable, Hashable {
             conversations = try await supabase.database
                 .from("conversations")
                 .select("*, conversation_members(member_id), messages(*), users!inner()")
-                .eq("users.id", value: UUID(uuidString: "572a669b-19c7-49ae-bc15-b16a6052b056")!)
+                .eq("users.id", value: userID)
+                .or("public.eq.true,recipient_id.eq.\(userID),sender.eq.\(userID)", referencedTable: "messages")
                 .execute()
                 .value
                         
+            var conversationIDString = "("
             for conversation in conversations {
                 conversation.recipientID = conversation._members.first(where: {$0 != userID})!
+                conversationIDString.append("\(conversation.id),")
+            }
+            let idString = "\(conversationIDString[...conversationIDString.index(before: conversationIDString.lastIndex(of: ",")!)]))"
                 
+            Task { [conversations] in
+                let channel = await supabase.realtime.channel("public:messages")
+                let messageInsertions =  await channel.postgresChange(InsertAction.self, schema: "public", table: "messages", filter: "conversation_id=in.\(idString)")
+                //let updates = await channel.postgresChange(AnyAction.self, schema: "public", table: "messages", filter: nil)
                 
+                await channel.subscribe()
+                                
                 Task {
-                    let channel = await supabase.realtime.channel("public:messages")
-                    let messageInsertions =  await channel.postgresChange(InsertAction.self, schema: "public", table: "messages", filter: "conversation_id=eq.\(conversation.id!)")
-                    
-                    await channel.subscribe()
-                    
-                    Task {
-                        for await insertion in messageInsertions {
-                            print(insertion.record)
-                            do {
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSZZZZZ"
-                                let decoder = JSONDecoder()
-                                decoder.dataDecodingStrategy = .base64
-                                decoder.dateDecodingStrategy = .formatted(formatter)
-                                let message = try insertion.decodeRecord(decoder: decoder) as Message
-                                conversation.messages.append(message)
-                            } catch {
-                                print(error)
-                            }
+                    for await insertion in messageInsertions {
+                        print(insertion.record)
+                        do {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSZZZZZ"
+                            let decoder = JSONDecoder()
+                            decoder.dataDecodingStrategy = .base64
+                            decoder.dateDecodingStrategy = .formatted(formatter)
+                            let message = try insertion.decodeRecord(decoder: decoder) as Message
+                            conversations.first(where: {$0.id == message.conversationID})!.messages.append(message)
+                        } catch {
+                            print(error)
                         }
                     }
                 }
+                
+//                Task {
+//                    for await update in updates {
+//                        print(update.rawMessage)
+//                    }
+//                }
             }
             
         } catch {
@@ -73,7 +83,7 @@ class Conversation: Identifiable, Decodable, Hashable {
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = String(try container.decode(Int.self, forKey: .id))
+        self.id = try container.decode(Int.self, forKey: .id)
         self.members = []
         let members = try container.decode([[String:UUID]].self, forKey: .members)
         for member in members {

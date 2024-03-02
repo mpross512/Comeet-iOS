@@ -28,7 +28,7 @@ struct MessageView: View {
             .defaultScrollAnchor(.bottom)
             if(!conversation.messages.isEmpty && !conversation.messages.last!.responseOptions.isEmpty) {
                 WrappingHStack(conversation.messages.last!.responseOptions, alignment: .trailing) { option in
-                    ResponseOptions(userID: currentUser.id, conversationID: conversation.id!, messageID: conversation.messages.last!.id, responseOption: option)
+                    ResponseOptions(userID: currentUser.id, conversationID: conversation.id, messageID: conversation.messages.last!.id, responseOption: option)
                 }.padding(.trailing, 8)
             }
         }
@@ -41,12 +41,14 @@ struct MessageView: View {
 struct ResponseOptions: View {
     var messageService = MessageService()
     var userID: UUID
-    var conversationID: String
+    var conversationID: Int
     var messageID: Int
     var responseOption: String
     var body: some View {
         Button {
-            //messageService.addMessage(userID: userID, conversationID: conversationID, messageID: messageID, response: responseOption)
+            Task {
+                await messageService.addMessage(conversationID: conversationID, messageID: messageID, response: responseOption)
+            }
         } label: {
             Text(responseOption)
                 .foregroundStyle(Color.black)
@@ -61,21 +63,22 @@ struct ResponseOptions: View {
 struct IndividualMessage: View {
     var message: Message
     var comeetUID = Constants.Values.comeetUID
+    @Environment(User.self) var currentUser: User
     
     var body: some View {
         HStack {
-            if message.sender != comeetUID {
+            if message.sender == currentUser.id {
                 Spacer()
             }
-            VStack(alignment: message.sender == comeetUID ? .leading : .trailing) {
+            VStack(alignment: message.sender != currentUser.id ? .leading : .trailing) {
                 Text(message.text).padding(10)
-                    .foregroundStyle(message.sender == comeetUID ? Color.white : Color.black)
+                    .foregroundStyle(Color.white)
                     .background {
-                        RoundedRectangle(cornerRadius: 20).foregroundColor(message.sender == comeetUID ? Constants.Colors.greenColor : Constants.Colors.orangeColor)
+                        RoundedRectangle(cornerRadius: 20).foregroundColor(message.sender != currentUser.id ? Constants.Colors.greenColor : Constants.Colors.orangeColor)
                     }
                 Text(message.timestamp.formatted()).font(.caption2).foregroundStyle(Color.gray)
             }.padding(.horizontal, 8)
-            if message.sender == comeetUID {
+            if message.sender != currentUser.id {
                 Spacer()
             }
         }

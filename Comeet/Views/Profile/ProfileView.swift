@@ -69,8 +69,11 @@ struct ProfileView: View {
                             .accentColor(Constants.Colors.greenColor)
                     }
                 }
+                
             }
+            
         }
+        
     }
 }
 

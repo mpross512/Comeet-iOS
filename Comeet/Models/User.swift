@@ -19,11 +19,9 @@ class User : Identifiable, Codable, Person {
     var birthdate: Date
     var major: String
     var bio: String
-    var matchIDs: [String]
     var matches: [Match]
-    //var pictureRef: URL?
-    var attributes: [String: Attribute]
-    var likes: [String]
+    var attributes: [Attribute]
+    var likes: [UUID]
     var conversations: [String]
     
     var fullName: String { return "\(self.firstName) \(self.lastName)"}
@@ -40,10 +38,7 @@ class User : Identifiable, Codable, Person {
     private static var _currentUser: User? = nil
     static var currentUser: User {
         get async {
-            print("DEBUG: currentUser called")
             if(_currentUser == nil) {
-                print("DEBUG: _currentUser == nil")
-                
                 let supabase = Supabase.shared
                 
                 do {
@@ -54,10 +49,18 @@ class User : Identifiable, Codable, Person {
                                 conversations(id),
                                 user_matches!user_matches_user_id_fkey(
                                     ...users!user_matches_match_id_fkey(*)
+                                ),
+                                user_likes!public_user_likes_user_id_fkey(
+                                    ...users!public_user_likes_like_id_fkey(id)
+                                ),
+                                v_user_attributes(
+                                    name,
+                                    value,
+                                    importance
                                 )
                                 """)
                         .eq("id", value: supabase.auth.session.user.id)
-                        .eq("user_matches.user_id", value: supabase.auth.session.user.id)
+                        //.eq("user_matches.user_id", value: supabase.auth.session.user.id)
                         .single()
                         .execute()
                         .value
@@ -67,10 +70,8 @@ class User : Identifiable, Codable, Person {
                     print("ERROR: Supabase decoding error: \(error)")
                 }
             } else {
-                print("DEBUG: _currentUser already exists. ID: \(_currentUser!.id)")
                 return _currentUser!
             }
-            print("DEBUG: Empty user returned")
             return User()
         }
     }
@@ -83,9 +84,8 @@ class User : Identifiable, Codable, Person {
         birthdate = Date()
         major = ""
         bio = ""
-        matchIDs = []
         matches = []
-        attributes = [:]
+        attributes = []
         likes = []
         conversations = []
     }
@@ -101,8 +101,8 @@ class User : Identifiable, Codable, Person {
         case major
         case bio
         case matches = "user_matches"
-        //case attributes
-        //case likes
+        case attributes = "v_user_attributes"
+        case likes = "user_likes"
         case conversations = "conversations"
     }
     
@@ -117,9 +117,15 @@ class User : Identifiable, Codable, Person {
         self.birthdate = formatter.date(from: try container.decode(String.self, forKey: .birthdate)) ?? Date()
         self.major = try container.decode(String.self, forKey: .major)
         self.bio = try container.decode(String.self, forKey: .bio)
-        self.matchIDs = []//try container.decode([String].self, forKey: .matchIDs)
-        self.attributes = [:]// try container.decode([String:Attribute].self, forKey: .attributes)
-        self.likes = []//try container.decode([String].self, forKey: .likes)
+        self.attributes = try container.decode([Attribute].self, forKey: .attributes)
+        let likeResults = try container.decode([[String:UUID]].self, forKey: .likes)
+        var likeIDs: [UUID] = []
+        for dict in likeResults {
+            for value in dict.values {
+                likeIDs.append(value)
+            }
+        }
+        self.likes = likeIDs
         let conversationResults = try container.decode([[String:Int]].self, forKey: .conversations)
         var conversationIDs: [String] = []
         for dict in conversationResults {

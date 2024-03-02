@@ -16,7 +16,7 @@ struct Match: Person, Identifiable {
     public var birthdate: Date
     public var graduationYear: Int
     public var major: String
-    public var attributes: [String: Attribute]
+    public var attributes: [Attribute]
     
     var fullName: String { return "\(self.firstName) \(self.lastName)"}
         
@@ -45,7 +45,7 @@ struct Match: Person, Identifiable {
         self.birthdate = Date()
         self.graduationYear = 0
         self.major = ""
-        self.attributes = [:]
+        self.attributes = []
     }
     
     init(from decoder: Decoder) throws {
@@ -59,6 +59,6 @@ struct Match: Person, Identifiable {
         self.birthdate = formatter.date(from: try container.decode(String.self, forKey: .birthdate)) ?? Date()
         self.major = try container.decode(String.self, forKey: .major)
         self.bio = try container.decode(String.self, forKey: .bio)
-        self.attributes = [:]// try container.decode([String:Attribute].self, forKey: .attributes)
+        self.attributes = []// try container.decode([String:Attribute].self, forKey: .attributes)
     }
 }

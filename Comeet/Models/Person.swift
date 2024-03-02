@@ -18,5 +18,5 @@ protocol Person: Codable, Identifiable {
     var major: String { get set }
     var fullName: String { get }
     var age: Int { get }
-    var attributes: [String: Attribute] { get set }
+    var attributes: [Attribute] { get set }
 }

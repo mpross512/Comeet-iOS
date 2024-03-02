@@ -15,6 +15,7 @@ struct Message: Codable, Identifiable {
     var sender: UUID = UUID()
     var responseOptions: [String] = []
     var isPublic = false
+    var conversationID: Int
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -23,5 +24,6 @@ struct Message: Codable, Identifiable {
         case sender
         case responseOptions = "response_option"
         case isPublic = "public"
+        case conversationID = "conversation_id"
     }
 }

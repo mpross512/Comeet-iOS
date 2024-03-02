@@ -24,7 +24,7 @@ struct UserView: View {
                 
                 UserInterests(attributes: user.attributes)
                 
-                if (currentUser.likes.contains(user.id.uuidString)) {
+                if (currentUser.likes.contains(user.id)) {
                     HStack {
                         Spacer()
                         VStack {
@@ -41,7 +41,11 @@ struct UserView: View {
                     HStack {
                         Spacer()
                         Button {
-                            userService.likeUser(uid: user.id.uuidString)
+                            Task {
+                                if(await userService.likeUser(userID: currentUser.id, matchID: user.id)) {
+                                    currentUser.likes.append(user.id)
+                                }
+                            }
                         } label: {
                             Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50)
                         }
@@ -49,19 +53,16 @@ struct UserView: View {
                     }
                 }
             }
-                        
-            
         }
     }
 }
 
 struct UserInterests: View {
     
-    @State var attributes: [String: Attribute]
+    var attributes: [Attribute]
     
     var body: some View {
-        let values = attributes.map {$0.value}
-        WrappingHStack(values) { attribute in
+        WrappingHStack(attributes) { attribute in
             if (attribute.importance >= 3  && attribute.value != "") {
                 UserInterest(text: attribute.value, emoji: attribute.name)
                     .padding(5)
@@ -88,8 +89,6 @@ struct UserInterest: View {
     }
 }
 
-struct UserView_Previews: PreviewProvider {
-    static var previews: some View {
-        UserView(user: User())
-    }
+#Preview {
+    UserView(user: User())
 }

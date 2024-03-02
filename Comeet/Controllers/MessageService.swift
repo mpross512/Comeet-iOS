@@ -10,19 +10,29 @@ import Foundation
 
 class MessageService: ObservableObject {
     
-    func addMessage(userID: String, conversationID: String, messageID: Int, response: String) {
-//        functions.httpsCallable("sendMessage").call(["content": response, "userID": userID, "conversationID": conversationID, "messageID": messageID]) { result, error in
-//            if let error = error as NSError? {
-//                if error.domain == FunctionsErrorDomain {
-//                    let code = FunctionsErrorCode(rawValue: error.code)
-//                    let message = error.localizedDescription
-//                    let details = error.userInfo[FunctionsErrorDetailsKey]
-//                    print("DEBUG: \(String(describing: code)) \(message) \(String(describing: details))")
-//                }
-//            }
-//            if let data = result?.data as? [String: Any], let text = data["data"] as? String {
-//            print("DEBUG: " + text)
-//            }
-//        }
+    func addMessage(conversationID: Int, messageID: Int, response: String) async {
+        let supabase = Supabase.shared
+                
+        do {
+            print("Inserting message with conversation id \(conversationID) and response \(response)")
+            
+            let params = AddMessageParams(conversation_id: conversationID, sender: try await supabase.auth.user().id, text: response)
+            
+            try await supabase.database
+                .from("messages")
+                .insert(params)
+                .execute()
+        } catch {
+            print(error)
+        }
+        
     }
+}
+
+struct AddMessageParams: Codable {
+    var conversation_id: Int
+    var sender: UUID
+    var text: String
+    var response_option: [String] = []
+    var `public` = true
 }
