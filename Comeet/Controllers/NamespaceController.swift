@@ -6,4 +6,13 @@
 //  Copyright © 2024 Ice Cream Loaf. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
+
+@Observable class NamespaceController {
+    
+    internal init(matchCard: Namespace.ID = Namespace().wrappedValue) {
+        self.matchCard = matchCard
+    }
+    
+    let matchCard:Namespace.ID
+}

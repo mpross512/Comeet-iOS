@@ -49,6 +49,10 @@
 		4C90A7EC2B7D88F500FFEF9C /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C90A7EB2B7D88F500FFEF9C /* Match.swift */; };
 		4C944FB828F60A07008153EE /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944FB728F60A07008153EE /* MessageView.swift */; };
 		4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9BD5EA2925F63100C71498 /* UserView.swift */; };
+		4C9ED7C02B9A4DDA00DC135A /* Shimmer in Frameworks */ = {isa = PBXBuildFile; productRef = 4C9ED7BF2B9A4DDA00DC135A /* Shimmer */; };
+		4C9ED7C32B9A9AEC00DC135A /* DateModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9ED7C22B9A9AEC00DC135A /* DateModule.swift */; };
+		4C9ED7C62B9E072A00DC135A /* PreviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9ED7C52B9E072A00DC135A /* PreviewModels.swift */; };
+		4C9ED7C82BA0FE0400DC135A /* NamespaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9ED7C72BA0FE0400DC135A /* NamespaceController.swift */; };
 		4CA744202AF06E90002530D7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4CA7441F2AF06E90002530D7 /* SDWebImageSwiftUI */; };
 		4CC50CF1292D5980004B495B /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 4CC50CF0292D5980004B495B /* WrappingHStack */; };
 		4CC50CF5292DEB32004B495B /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC50CF4292DEB32004B495B /* ProfileEditView.swift */; };
@@ -86,6 +90,9 @@
 		4C90A7EB2B7D88F500FFEF9C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		4C944FB728F60A07008153EE /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		4C9BD5EA2925F63100C71498 /* UserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserView.swift; sourceTree = "<group>"; };
+		4C9ED7C22B9A9AEC00DC135A /* DateModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateModule.swift; sourceTree = "<group>"; };
+		4C9ED7C52B9E072A00DC135A /* PreviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewModels.swift; sourceTree = "<group>"; };
+		4C9ED7C72BA0FE0400DC135A /* NamespaceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamespaceController.swift; sourceTree = "<group>"; };
 		4CC50CF2292D7E7F004B495B /* Comeet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Comeet.entitlements; sourceTree = "<group>"; };
 		4CC50CF4292DEB32004B495B /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		4CCCB15F296F47B200232FF5 /* QuestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsView.swift; sourceTree = "<group>"; };
@@ -112,6 +119,7 @@
 				4C90A7CE2B731B6E00FFEF9C /* Realtime in Frameworks */,
 				4C90A7C82B731B6E00FFEF9C /* Auth in Frameworks */,
 				4C90A7E62B731CF100FFEF9C /* Supabase in Frameworks */,
+				4C9ED7C02B9A4DDA00DC135A /* Shimmer in Frameworks */,
 				4C90A7E42B731CF100FFEF9C /* Storage in Frameworks */,
 				4C90A7CC2B731B6E00FFEF9C /* PostgREST in Frameworks */,
 				4C90A7D42B731BF100FFEF9C /* Functions in Frameworks */,
@@ -141,6 +149,7 @@
 				4C087FD529176D2E005B39AB /* MessageService.swift */,
 				4C4DE26729232092002FC036 /* UserService.swift */,
 				4C90A7E72B7700C900FFEF9C /* Supabase.swift */,
+				4C9ED7C72BA0FE0400DC135A /* NamespaceController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -178,6 +187,7 @@
 		4C60113324B562B6003B425A /* Comeet */ = {
 			isa = PBXGroup;
 			children = (
+				4C9ED7C12B9A9AD700DC135A /* Modules */,
 				4C743BC02ADB603200C1D171 /* App.swift */,
 				4CC50CF2292D7E7F004B495B /* Comeet.entitlements */,
 				4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */,
@@ -196,8 +206,17 @@
 			isa = PBXGroup;
 			children = (
 				4C60113D24B562B8003B425A /* Preview Assets.xcassets */,
+				4C9ED7C52B9E072A00DC135A /* PreviewModels.swift */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		4C9ED7C12B9A9AD700DC135A /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				4C9ED7C22B9A9AEC00DC135A /* DateModule.swift */,
+			);
+			path = Modules;
 			sourceTree = "<group>";
 		};
 		4CC50CF3292DDBAD004B495B /* Authentication */ = {
@@ -276,6 +295,7 @@
 				4C90A7E12B731CF100FFEF9C /* Realtime */,
 				4C90A7E32B731CF100FFEF9C /* Storage */,
 				4C90A7E52B731CF100FFEF9C /* Supabase */,
+				4C9ED7BF2B9A4DDA00DC135A /* Shimmer */,
 			);
 			productName = Comeet;
 			productReference = 4C60113124B562B6003B425A /* Comeet.app */;
@@ -310,6 +330,7 @@
 				4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 				4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */,
 			);
 			productRefGroup = 4C60113224B562B6003B425A /* Products */;
 			projectDirPath = "";
@@ -341,7 +362,10 @@
 			files = (
 				4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */,
 				4C7A9FD1295E9AEE00A63CBD /* SettingsView.swift in Sources */,
+				4C9ED7C82BA0FE0400DC135A /* NamespaceController.swift in Sources */,
+				4C9ED7C32B9A9AEC00DC135A /* DateModule.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
+				4C9ED7C62B9E072A00DC135A /* PreviewModels.swift in Sources */,
 				4C087FD429176B1E005B39AB /* Message.swift in Sources */,
 				4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */,
 				4C087FD229176A98005B39AB /* Conversation.swift in Sources */,
@@ -442,7 +466,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -499,7 +523,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -528,7 +552,7 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -557,7 +581,7 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -592,6 +616,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.3.1;
+			};
+		};
+		4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/markiv/SwiftUI-Shimmer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.2;
 			};
 		};
 		4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
@@ -692,6 +724,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		4C9ED7BF2B9A4DDA00DC135A /* Shimmer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */;
+			productName = Shimmer;
 		};
 		4CA7441F2AF06E90002530D7 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;

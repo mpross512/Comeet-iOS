@@ -68,11 +68,11 @@ class User : Identifiable, Codable, Person {
                     return _currentUser!
                 } catch {
                     print("ERROR: Supabase decoding error: \(error)")
+                    return User()
                 }
             } else {
                 return _currentUser!
             }
-            return User()
         }
     }
     

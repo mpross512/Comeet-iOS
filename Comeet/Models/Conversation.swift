@@ -10,12 +10,15 @@ import Foundation
 import Realtime
 
 @Observable
-class Conversation: Identifiable, Decodable, Hashable {
+class Conversation: Identifiable, Decodable, Hashable, Sendable {
     var id: Int
     var recipientID: UUID = UUID()
     var messages = [Message]()
-    
     private var members = [UUID]()
+    
+    public init() {
+        id = 0
+    }
     
     static func all(userID: UUID) async -> [Conversation] {
         var conversations: [Conversation] = []
@@ -27,6 +30,8 @@ class Conversation: Identifiable, Decodable, Hashable {
                 .select("*, conversation_members(member_id), messages(*), users!inner()")
                 .eq("users.id", value: userID)
                 .or("public.eq.true,recipient_id.eq.\(userID),sender.eq.\(userID)", referencedTable: "messages")
+                .order("created_at", referencedTable: "messages")
+                .order("id", referencedTable: "messages")
                 .execute()
                 .value
                         
@@ -40,7 +45,6 @@ class Conversation: Identifiable, Decodable, Hashable {
             Task { [conversations] in
                 let channel = await supabase.realtime.channel("public:messages")
                 let messageInsertions =  await channel.postgresChange(InsertAction.self, schema: "public", table: "messages", filter: "conversation_id=in.\(idString)")
-                //let updates = await channel.postgresChange(AnyAction.self, schema: "public", table: "messages", filter: nil)
                 
                 await channel.subscribe()
                                 
@@ -60,12 +64,6 @@ class Conversation: Identifiable, Decodable, Hashable {
                         }
                     }
                 }
-                
-//                Task {
-//                    for await update in updates {
-//                        print(update.rawMessage)
-//                    }
-//                }
             }
             
         } catch {
@@ -74,6 +72,8 @@ class Conversation: Identifiable, Decodable, Hashable {
         
         return conversations
     }
+    
+    // MARK: - Decodable
     
     enum CodingKeys: String, CodingKey {
         case members = "conversation_members"

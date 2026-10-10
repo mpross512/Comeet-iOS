@@ -16,10 +16,13 @@ struct UserView: View {
     @Environment(User.self) var currentUser: User
     @State private var isPresentingConfirm: Bool = false
     
+    var animation: Namespace.ID?
+    
     var body: some View {
         ScrollView {
             VStack {
                 ProfilePicture(userID: user.id, width: 175, height: 175)
+                
                 UserBio(user: user)
                 
                 UserInterests(attributes: user.attributes)
@@ -90,5 +93,5 @@ struct UserInterest: View {
 }
 
 #Preview {
-    UserView(user: User())
+    UserView(user: PreviewModels.previewUser.matches.first!).environment(Supabase.shared).environment(PreviewModels.previewUser)
 }

@@ -17,7 +17,7 @@ struct ProfileView: View {
     @State var profilePicURL: URL?
     @State var imageCache = SDImageCache.shared
     @State var settingsPageShown: Bool = false
-    
+        
     var user: User = User()
     
     var body: some View {
@@ -77,11 +77,12 @@ struct ProfileView: View {
     }
 }
 
-struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileView()
-    }
-}
+//struct ProfileView_Previews: PreviewProvider {
+    //@Namespace var ns
+    //static var previews: some View {
+        //ProfileView(namespace: ns).environment(Supabase.shared).environment(PreviewModels.previewUser)
+    //}
+//}
 
 struct SignOutButton: View {
     @Environment(Supabase.self) var supabase
@@ -110,6 +111,8 @@ struct SignOutButton: View {
 }
 
 struct ProfilePicture: View {
+    @Environment(NamespaceController.self) var namespace
+    
     let profileURL: URL
     let width: CGFloat
     let height: CGFloat
@@ -131,23 +134,36 @@ struct ProfilePicture: View {
     var body: some View {
         WebImage(url: profileURL)
             .resizable()
-            .indicator(.activity)
+            .indicator(.init(content: { isAnimating, progress in
+                Image(systemName: "person.crop.circle")
+                    .resizable()
+                    .frame(width: width, height: height)
+                    .clipShape(Circle())
+                    .redacted(reason: .placeholder)
+            }))
             .aspectRatio(contentMode: .fill)
+            .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
+            .transition(.offset())
+            .transition(.scale)
             .frame(width: width, height: height)
             .clipShape(Circle())
+            
     }
 }
 
 struct UserBio: View {
+    @Environment(NamespaceController.self) var namespace
     
     @State var user: any Person = User()
     
     var body: some View {
-        Group {
+        VStack {
             
             Text("\(user.fullName), \(user.age)")
                 .font(.title)
+                .matchedGeometryEffect(id: "MatchName", in: namespace.matchCard)
             Text("Class of \(String(user.graduationYear))")
+                .matchedGeometryEffect(id: "MatchYear", in: namespace.matchCard)
             
             HStack {
                 Text("About")

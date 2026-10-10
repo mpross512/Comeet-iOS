@@ -14,7 +14,7 @@ class MessageService: ObservableObject {
         let supabase = Supabase.shared
                 
         do {
-            print("Inserting message with conversation id \(conversationID) and response \(response)")
+            //print("Inserting message with conversation id \(conversationID) and response \(response)")
             
             let params = AddMessageParams(conversation_id: conversationID, sender: try await supabase.auth.user().id, text: response)
             

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct MatchView: View {
     @Environment(User.self) var currentUser: User
@@ -14,41 +15,68 @@ struct MatchView: View {
     var user = User()
     @State var emailConfirmed = false
     @State var loading = true
+    @State var selectedUser: (any Person)? = nil
+    @State var isZoomed = false
+    
+    @Namespace var matchCardAnimation
     
     var body: some View {
         ZStack {
-            if(!emailConfirmed) {
+            if(!emailConfirmed && !loading) {
                 VerifyEmailView()
             } else {
                 NavigationView {
-                    //                if currentUser.matches.isEmpty {
-                    //                    Text("No matches right now, check back on Monday!").italic()
-                    //                }
-                    List(currentUser.matches) { match in
-                        HStack {
-                            NavigationLink {
-                                UserView(user: match)
-                            } label: {
-                                HStack {
-                                    ProfilePicture(userID: match.id, width: 50, height: 50)
-                                    VStack (alignment: .leading) {
-                                        Text("\(match.firstName), \(match.age)")
-                                            .padding(.leading)
+                    ScrollView {
+                        if currentUser.matches.isEmpty {
+                            Text("No matches right now, check back on Monday!").italic()
+                        }
+                        if(loading) {
+                            LoadingMatchView()
+                        } else {
+                            LazyVStack {
+                                ForEach(currentUser.matches) { match in
+                                    NavigationLink {
+                                        UserView(user: match)
+                                    } label: {
+                                        MatchCardView(match: match)
+                                            .onTapGesture {
+                                                withAnimation(.snappy) {
+                                                    selectedUser = match
+                                                }
+                                            }
                                     }
                                 }
                             }
+                            .navigationBarTitle("Matches", displayMode: .large)
                         }
                     }
-                    .transition(.opacity.animation(.easeIn(duration: 5)))
-                    .navigationBarTitle("Matches", displayMode: .large)
                 }
-            }
-            
-            if(loading) {
-                ProgressView()
-                    .controlSize(.extraLarge)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                    .background(Color.white)
+                .overlay {
+                    if selectedUser != nil {
+                        ZStack {
+                            ScrollView {
+                                VStack {
+                                    if selectedUser != nil {
+                                        MatchDetailView(match: selectedUser as! Match)
+                                            .onTapGesture {
+                                                withAnimation(.smooth) {
+                                                    selectedUser = nil
+                                                }
+                                            }
+                                            .transition(.scale(scale: 1))
+                                    }
+                                    if selectedUser != nil {
+                                        UserBio(user: selectedUser as! Match)
+                                            .background(RoundedRectangle(cornerRadius: 25.0).foregroundStyle(.white))
+                                            .offset(y: -40)
+                                            .transition(.move(edge: .bottom))
+                                    }
+                                }
+                            }
+                        }.ignoresSafeArea()
+                            //.transition(.move(edge: .bottom))
+                    }
+                }
             }
         }.task {
             do {
@@ -58,6 +86,88 @@ struct MatchView: View {
                 print(error)
             }
         }
+    }
+}
+
+struct MatchCardView: View {
+    @Environment(NamespaceController.self) var namespace
+    
+    var profileURL: URL
+    var match: Match
+    
+    
+    init(match: Match) {
+        self.match = match
+        do {
+            self.profileURL = try Supabase.shared.storage
+                .from("profile-pictures")
+                .getPublicURL(path: "\(match.id.uuidString.lowercased()).jpeg")
+        } catch {
+            print("ERROR: \(error)")
+            self.profileURL = URL(string: "")!
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+            WebImage(url: profileURL)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .clipShape(RoundedRectangle(cornerRadius: 25.0))
+                .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
+            LinearGradient(colors: [.clear, .clear, .clear, .black], startPoint: .top, endPoint: .bottom)
+                .opacity(0.5)
+            VStack {
+                Spacer()
+                HStack {
+                    Text("**\(match.fullName),** \(match.age)")
+                        .foregroundStyle(.white)
+                        .font(.title)
+                        .minimumScaleFactor(0.1)
+                        .matchedGeometryEffect(id: "MatchName", in: namespace.matchCard)
+                        //.padding(.leading)
+                    Spacer()
+                }
+                HStack {
+                    Text("Class of \(String(match.graduationYear))")
+                        .foregroundStyle(.white)
+                        .matchedGeometryEffect(id: "MatchYear", in: namespace.matchCard)
+                    Spacer()
+                    Text(match.major)
+                        .foregroundStyle(.white)
+                }
+            }.padding()
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 25.0))
+        .padding()
+    }
+}
+
+struct MatchDetailView: View {
+    @Environment(NamespaceController.self) var namespace
+    @State var scrollPosition: Int?
+    
+    var profileURL: URL
+    var match: Match
+    
+    init(match: Match) {
+        self.match = match
+        do {
+            self.profileURL = try Supabase.shared.storage
+                .from("profile-pictures")
+                .getPublicURL(path: "\(match.id.uuidString.lowercased()).jpeg")
+        } catch {
+            print("ERROR: \(error)")
+            self.profileURL = URL(string: "")!
+        }
+    }
+    
+    var body: some View {
+        WebImage(url: profileURL)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(maxWidth: .infinity)
+            .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
     }
 }
 
@@ -84,6 +194,34 @@ struct VerifyEmailView: View {
     }
 }
 
+struct LoadingMatchView: View {
+    var body: some View {
+        List {
+            HStack {
+                Image(systemName: "person.crop.circle")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .clipShape(Circle())
+                Text("First Name, Age")
+                    .padding(.leading)
+            }
+            HStack {
+                Image(systemName: "person.crop.circle")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .clipShape(Circle())
+                Text("First Name, Age")
+                    .padding(.leading)
+            }
+        }
+        .redacted(reason: .placeholder)
+        .navigationTitle("Matches")
+        .navigationBarTitleDisplayMode(.large)
+    }
+}
+
 #Preview {
-    MatchView()
+    MatchView(emailConfirmed: true, loading: false)
+        .environment(Supabase.shared)
+        .environment(PreviewModels.previewUser)
 }
