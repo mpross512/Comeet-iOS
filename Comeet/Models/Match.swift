@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ComeetData
 
 struct Match: Person, Identifiable {
     public var id: UUID
@@ -35,6 +36,7 @@ struct Match: Person, Identifiable {
         case birthdate
         case major
         case bio
+        case attributes
     }
     
     init() {
@@ -48,17 +50,34 @@ struct Match: Person, Identifiable {
         self.attributes = []
     }
     
+    init(record: PersonRecord) throws {
+        id = record.id; firstName = record.firstName; lastName = record.lastName
+        birthdate = try WireDates.birthday(record.birthdate)
+        graduationYear = record.graduationYear; major = record.major; bio = record.bio
+        attributes = record.attributes.map { Attribute(name: $0.name, importance: $0.importance, value: $0.value) }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(firstName, forKey: .firstName)
+        try container.encode(lastName, forKey: .lastName)
+        try container.encode(WireDates.birthday(birthdate), forKey: .birthdate)
+        try container.encode(graduationYear, forKey: .graduationYear)
+        try container.encode(major, forKey: .major)
+        try container.encode(bio, forKey: .bio)
+        try container.encode(attributes, forKey: .attributes)
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(UUID.self, forKey: .id)
         self.graduationYear = try container.decode(Int.self, forKey: .graduationYear)
         self.firstName = try container.decode(String.self, forKey: .firstName)
         self.lastName = try container.decode(String.self, forKey: .lastName)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        self.birthdate = formatter.date(from: try container.decode(String.self, forKey: .birthdate)) ?? Date()
+        self.birthdate = try WireDates.birthday(container.decode(String.self, forKey: .birthdate))
         self.major = try container.decode(String.self, forKey: .major)
         self.bio = try container.decode(String.self, forKey: .bio)
-        self.attributes = []// try container.decode([String:Attribute].self, forKey: .attributes)
+        self.attributes = try container.decodeIfPresent([Attribute].self, forKey: .attributes) ?? []
     }
 }

@@ -80,18 +80,18 @@ struct ProfileView: View {
 //struct ProfileView_Previews: PreviewProvider {
     //@Namespace var ns
     //static var previews: some View {
-        //ProfileView(namespace: ns).environment(Supabase.shared).environment(PreviewModels.previewUser)
+        //ProfileView(namespace: ns).environment(SessionStore.shared).environment(PreviewModels.previewUser)
     //}
 //}
 
 struct SignOutButton: View {
-    @Environment(Supabase.self) var supabase
+    @Environment(SessionStore.self) var session
         
     var body: some View {
         Button {
             Task {
                 do {
-                    try await supabase.auth.signOut()
+                    try await session.signOut()
                 } catch {
                     print(error)
                 }
@@ -121,14 +121,7 @@ struct ProfilePicture: View {
         self.width = width
         self.height = height
         
-        do {
-            self.profileURL = try Supabase.shared.storage
-                .from("profile-pictures")
-                .getPublicURL(path: "\(userID.uuidString.lowercased()).jpeg")
-        } catch {
-            print("ERROR: \(error)")
-            self.profileURL = URL(string: "")!
-        }
+        self.profileURL = APIConfiguration.photoURL(userID: userID)
     }
     
     var body: some View {

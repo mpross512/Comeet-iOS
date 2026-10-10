@@ -11,10 +11,12 @@ import SDWebImageSwiftUI
 
 struct MatchView: View {
     @Environment(User.self) var currentUser: User
-    @Environment(Supabase.self) var supabase: Supabase
+    @Environment(SessionStore.self) var session
     var user = User()
     @State var emailConfirmed = false
     @State var loading = true
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var loadError: String?
     @State var selectedUser: (any Person)? = nil
     @State var isZoomed = false
     
@@ -78,14 +80,16 @@ struct MatchView: View {
                     }
                 }
             }
-        }.task {
+        }.task(id: scenePhase) {
+            guard scenePhase == .active else { return }
             do {
-                emailConfirmed = try await supabase.auth.user().emailConfirmedAt != nil
+                emailConfirmed = try await session.repository.account().emailConfirmed
+                try await session.reloadProfile()
                 loading = false
-            } catch {
-                print(error)
-            }
-        }
+            } catch { SessionStore.shared.handle(error); loading = false; loadError = error.localizedDescription }
+        }.alert("Could not load matches", isPresented: Binding(get: { loadError != nil }, set: { if !$0 { loadError = nil } })) {
+            Button("OK") { loadError = nil }
+        } message: { Text(loadError ?? "") }
     }
 }
 
@@ -98,14 +102,7 @@ struct MatchCardView: View {
     
     init(match: Match) {
         self.match = match
-        do {
-            self.profileURL = try Supabase.shared.storage
-                .from("profile-pictures")
-                .getPublicURL(path: "\(match.id.uuidString.lowercased()).jpeg")
-        } catch {
-            print("ERROR: \(error)")
-            self.profileURL = URL(string: "")!
-        }
+        self.profileURL = APIConfiguration.photoURL(userID: match.id)
     }
     
     var body: some View {
@@ -152,14 +149,7 @@ struct MatchDetailView: View {
     
     init(match: Match) {
         self.match = match
-        do {
-            self.profileURL = try Supabase.shared.storage
-                .from("profile-pictures")
-                .getPublicURL(path: "\(match.id.uuidString.lowercased()).jpeg")
-        } catch {
-            print("ERROR: \(error)")
-            self.profileURL = URL(string: "")!
-        }
+        self.profileURL = APIConfiguration.photoURL(userID: match.id)
     }
     
     var body: some View {
@@ -173,6 +163,7 @@ struct MatchDetailView: View {
 
 struct VerifyEmailView: View {
     @State private var emailSent = false
+    @State private var sendError: String?
     
     var body: some View {
         VStack {
@@ -181,16 +172,20 @@ struct VerifyEmailView: View {
             if(!emailSent) {
                 Button {
                     Task {
-                        let email = try await Supabase.shared.auth.user().email
-                        try await Supabase.shared.auth.resend(email: email!, type: .signup)
-                        emailSent = true
+                        do {
+                            let email = try await SessionStore.shared.repository.account().email
+                            try await SessionStore.shared.repository.resendConfirmation(email: email)
+                            emailSent = true
+                        } catch { SessionStore.shared.handle(error); sendError = error.localizedDescription }
                     }
                 } label: {
                     Text("Resend verification email").italic().padding()
                 }
             }
             Text("Verification email sent").padding()
-        }
+        }.alert("Could not send verification email", isPresented: Binding(get: { sendError != nil }, set: { if !$0 { sendError = nil } })) {
+            Button("OK") { sendError = nil }
+        } message: { Text(sendError ?? "") }
     }
 }
 
@@ -222,6 +217,6 @@ struct LoadingMatchView: View {
 
 #Preview {
     MatchView(emailConfirmed: true, loading: false)
-        .environment(Supabase.shared)
+        .environment(SessionStore.shared)
         .environment(PreviewModels.previewUser)
 }

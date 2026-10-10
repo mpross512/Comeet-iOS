@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct MasterView: View {
-    @Environment(Supabase.self) var supabase: Supabase
+    @Environment(SessionStore.self) var session
     var authenticated: Bool
     
     var body: some View {

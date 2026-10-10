@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ComeetData
 
 @Observable
 class User : Identifiable, Codable, Person {
@@ -35,47 +36,25 @@ class User : Identifiable, Codable, Person {
     
     // MARK: - Methods
     
-    private static var _currentUser: User? = nil
+    @MainActor
     static var currentUser: User {
-        get async {
-            if(_currentUser == nil) {
-                let supabase = Supabase.shared
-                
-                do {
-                    _currentUser = try await supabase.database
-                        .from("users")
-                        .select("""
-                                *,
-                                conversations(id),
-                                user_matches!user_matches_user_id_fkey(
-                                    ...users!user_matches_match_id_fkey(*)
-                                ),
-                                user_likes!public_user_likes_user_id_fkey(
-                                    ...users!public_user_likes_like_id_fkey(id)
-                                ),
-                                v_user_attributes(
-                                    name,
-                                    value,
-                                    importance
-                                )
-                                """)
-                        .eq("id", value: supabase.auth.session.user.id)
-                        //.eq("user_matches.user_id", value: supabase.auth.session.user.id)
-                        .single()
-                        .execute()
-                        .value
-                    
-                    return _currentUser!
-                } catch {
-                    print("ERROR: Supabase decoding error: \(error)")
-                    return User()
-                }
-            } else {
-                return _currentUser!
-            }
-        }
+        get async throws { try User(record: await APIConfiguration.client.profile()) }
     }
-    
+
+    init(record: ProfileRecord) throws {
+        id = record.id
+        graduationYear = record.graduationYear
+        firstName = record.firstName
+        lastName = record.lastName
+        birthdate = try WireDates.birthday(record.birthdate)
+        major = record.major
+        bio = record.bio
+        matches = try record.matches.map { try Match(record: $0) }
+        attributes = record.attributes.map { Attribute(name: $0.name, importance: $0.importance, value: $0.value) }
+        likes = record.likes.map(\.id)
+        conversations = record.conversations.map { String($0.id) }
+    }
+
     init() {
         id = UUID()
         graduationYear = 0
@@ -112,9 +91,7 @@ class User : Identifiable, Codable, Person {
         self.graduationYear = try container.decode(Int.self, forKey: .graduationYear)
         self.firstName = try container.decode(String.self, forKey: .firstName)
         self.lastName = try container.decode(String.self, forKey: .lastName)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        self.birthdate = formatter.date(from: try container.decode(String.self, forKey: .birthdate)) ?? Date()
+        self.birthdate = try WireDates.birthday(container.decode(String.self, forKey: .birthdate))
         self.major = try container.decode(String.self, forKey: .major)
         self.bio = try container.decode(String.self, forKey: .bio)
         self.attributes = try container.decode([Attribute].self, forKey: .attributes)
@@ -142,7 +119,7 @@ class User : Identifiable, Codable, Person {
         try container.encode(graduationYear, forKey: .graduationYear)
         try container.encode(firstName, forKey: .firstName)
         try container.encode(lastName, forKey: .lastName)
-        try container.encode(birthdate, forKey: .birthdate)
+        try container.encode(WireDates.birthday(birthdate), forKey: .birthdate)
         try container.encode(major, forKey: .major)
         try container.encode(bio, forKey: .bio)
         //try container.encode(matchIDs, forKey: .matchIDs)

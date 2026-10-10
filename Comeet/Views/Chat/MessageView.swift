@@ -13,6 +13,8 @@ struct MessageView: View {
     @Environment(User.self) var currentUser: User
     var conversation: Conversation
     @State var recipient = Match()
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var loadError: String?
     
     var body: some View {
         VStack {
@@ -20,9 +22,8 @@ struct MessageView: View {
 //                Text("You and \(recipient.name["first"] ?? "") both liked each other!")
 //                    .font(.caption).italic().foregroundStyle(Color.gray)
                 ForEach(conversation.messages) { message in
-                    if(message.sender == currentUser.id || message.isPublic) {
-                        IndividualMessage(message: message, match: recipient)
-                    }
+                    // The API returns only messages this participant is allowed to see.
+                    IndividualMessage(message: message, match: recipient)
                 }
             }
             .defaultScrollAnchor(.bottom)
@@ -34,9 +35,20 @@ struct MessageView: View {
             }
             
         }
-        .task {
-            self.recipient = currentUser.matches.first(where: {$0.id == conversation.recipientID})!
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            if let match = currentUser.matches.first(where: { $0.id == conversation.recipientID }) { recipient = match }
+            do {
+                while !Task.isCancelled {
+                    try await conversation.refresh()
+                    try await Task.sleep(for: .seconds(2))
+                }
+            } catch is CancellationError { }
+            catch { SessionStore.shared.handle(error); loadError = error.localizedDescription }
         }
+        .alert("Could not load messages", isPresented: Binding(get: { loadError != nil }, set: { if !$0 { loadError = nil } })) {
+            Button("OK") { loadError = nil }
+        } message: { Text(loadError ?? "") }
     }
 }
 
@@ -48,6 +60,8 @@ struct ResponseOptions: View {
     var responseOptions: [String]
     @State var selectedResponse = ""
     @State var sendingResponse = false
+    @State private var sendError: String?
+    @State private var pendingClientID = UUID()
     @State var dates = [
         Date(),
         Calendar.current.date(byAdding: .hour, value: 1, to: Date())!,
@@ -63,12 +77,14 @@ struct ResponseOptions: View {
                         if(response == "{datetime_3}") {
                             response = "\(dates[0])|\(dates[1])|\(dates[2])"
                         }
-                        await messageService.addMessage(
-                            conversationID: conversationID,
-                            messageID: messageID,
-                            response: response)
+                        do {
+                            try await messageService.addMessage(
+                                conversationID: conversationID, messageID: messageID,
+                                response: response, clientID: pendingClientID)
+                            pendingClientID = UUID()
+                            selectedResponse = ""
+                        } catch { SessionStore.shared.handle(error); sendError = error.localizedDescription }
                         sendingResponse = false
-                        selectedResponse = ""
                     }
                 } label: {
                     if sendingResponse {
@@ -86,7 +102,7 @@ struct ResponseOptions: View {
                                 Circle()
                             }
                     }
-                }.disabled(selectedResponse == "")
+                }.disabled(selectedResponse == "" || sendingResponse)
             }
             .padding(.horizontal)
             .padding(.vertical, 5)
@@ -99,6 +115,9 @@ struct ResponseOptions: View {
             }
             .padding()
             .background(.bar)
+            .alert("Could not send message", isPresented: Binding(get: { sendError != nil }, set: { if !$0 { sendError = nil } })) {
+                Button("OK") { sendError = nil }
+            } message: { Text(sendError ?? "") }
     }
 }
 
@@ -119,8 +138,6 @@ struct ResponseOptionsList: View {
                 print("DEBUG: selected response: \(option)")
                 if(selectedResponse == "{datetime_3}") {
                     var transaction = Transaction()
-                    //transaction.disablesAnimations = true
-                    
                     transaction.animation = .easeInOut(duration: 5)
                     withTransaction(transaction) {
                         popoverPresented = true
@@ -170,9 +187,7 @@ struct DateTimePopover: View {
                 .labelsHidden()
             
             Button {
-                var transaction = Transaction()
-                //transaction.disablesAnimations = true
-                
+                let transaction = Transaction()
                 withTransaction(transaction) {
                     dismiss()
                 }

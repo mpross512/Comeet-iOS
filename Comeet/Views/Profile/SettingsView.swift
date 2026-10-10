@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(Supabase.self) var supabase: Supabase
+    @Environment(SessionStore.self) var session
     @State var confirmDelete = false
     
     
@@ -19,7 +19,7 @@ struct SettingsView: View {
                 Button("Sign Out") {
                     Task {
                         do {
-                            try await supabase.auth.signOut()
+                            try await session.signOut()
                         } catch {
                             print(error)
                         }
@@ -34,7 +34,7 @@ struct SettingsView: View {
                     Button("Yes, Delete", role: .destructive) {
                         Task {
                             do {
-                                try await supabase.auth.admin.deleteUser(id: supabase.auth.user().id.uuidString)
+                                try await session.deleteAccount()
                             } catch {
                                 print(error)
                             }
@@ -52,5 +52,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView(confirmDelete: false)
-        .environment(Supabase())
+        .environment(SessionStore.shared)
 }

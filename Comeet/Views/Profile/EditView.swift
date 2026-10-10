@@ -36,6 +36,7 @@ struct EditView_Previews: PreviewProvider {
 }
 
 struct ImagePicker: UIViewControllerRepresentable {
+    @Environment(UserService.self) private var userService
     
     @Binding var isShown: Bool
     
@@ -53,17 +54,18 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(isShown: $isShown, alertShown: $alertShown)
+        Coordinator(userService: userService, isShown: $isShown, alertShown: $alertShown)
     }
 
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
     
     final class Coordinator : NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        @Environment(UserService.self) var userService: UserService
+        let userService: UserService
         @Binding var isShown: Bool
         @Binding var alertShown: Bool
         
-        init(isShown: Binding<Bool>, alertShown: Binding<Bool>) {
+        init(userService: UserService, isShown: Binding<Bool>, alertShown: Binding<Bool>) {
+            self.userService = userService
             _isShown = isShown
             _alertShown = alertShown
         }
@@ -77,14 +79,24 @@ struct ImagePicker: UIViewControllerRepresentable {
                 
                 print("DEBUG: Image loaded")
                 
-                Task {
-                    await userService.uploadNewImage(data: image.jpegData(compressionQuality: 1.0)!)
-                    isShown = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        self.alertShown = true
+                Task { @MainActor in
+                    guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+                    do {
+                        try await userService.uploadNewImage(data: data)
+                        SDImageCache.shared.clearMemory()
+                        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                            SDImageCache.shared.clearDisk(onCompletion: { continuation.resume() })
+                        }
+                        isShown = false
+                        alertShown = true
+                    } catch {
+                        SessionStore.shared.handle(error)
+                        let alert = UIAlertController(title: "Could not upload photo", message: error.localizedDescription, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .default))
+                        picker.present(alert, animated: true)
                     }
                 }
-                
+
                 print("DEBUG: Alert shown? \(alertShown)")
             }
                        

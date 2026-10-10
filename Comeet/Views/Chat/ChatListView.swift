@@ -14,6 +14,8 @@ struct ChatView: View {
     var messageService = MessageService()
     @State var conversations: [Conversation] = [Conversation(), Conversation()]
     @State var loading = true
+    @State private var loadError: String?
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         NavigationStack {
@@ -54,10 +56,21 @@ struct ChatView: View {
                 .navigationBarTitleDisplayMode(.large)
             }
         }
-        .task {
-            conversations = await Conversation.all(userID: currentUser.id)
-            loading = false
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            do {
+                conversations = try await Conversation.all(userID: currentUser.id)
+                loading = false
+                while !Task.isCancelled {
+                    for conversation in conversations { try await conversation.refresh() }
+                    try await Task.sleep(for: .seconds(2))
+                }
+            } catch is CancellationError { }
+            catch { SessionStore.shared.handle(error); loading = false; loadError = error.localizedDescription }
         }
+        .alert("Could not load chats", isPresented: Binding(get: { loadError != nil }, set: { if !$0 { loadError = nil } })) {
+            Button("OK") { loadError = nil }
+        } message: { Text(loadError ?? "") }
     }
 }
 
