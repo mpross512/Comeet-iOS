@@ -25,7 +25,7 @@ Comeet is a dating app where users receive one potential match each week. This r
 - Keep shared product, architecture, status, and decisions in the API repository's `docs/` and link to them rather than duplicating them here.
 - Update relevant docs when behavior, integration, priorities, or blockers change.
 - Use placeholders for credentials and synthetic examples for user data. Do not copy credential values or personal data into documentation, fixtures, or tool output.
-- Identity auth JSON is camelCase; domain controller JSON is snake_case. Verify wire contracts against both repositories; birthdays are date-only strings.
+- Identity and domain JSON use camelCase. Verify contracts against both repositories; birthdays are date-only strings and message timestamps are Unix milliseconds.
 
 ## Verification
 

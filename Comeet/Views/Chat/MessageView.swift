@@ -7,12 +7,12 @@
 //
 
 import SwiftUI
+import ComeetData
 import WrappingHStack
 
 struct MessageView: View {
     @Environment(User.self) var currentUser: User
     var conversation: Conversation
-    @State var recipient = Match()
     @Environment(\.scenePhase) private var scenePhase
     @State private var loadError: String?
     
@@ -23,7 +23,7 @@ struct MessageView: View {
 //                    .font(.caption).italic().foregroundStyle(Color.gray)
                 ForEach(conversation.messages) { message in
                     // The API returns only messages this participant is allowed to see.
-                    IndividualMessage(message: message, match: recipient)
+                    IndividualMessage(message: message, peer: conversation.peer)
                 }
             }
             .defaultScrollAnchor(.bottom)
@@ -37,7 +37,6 @@ struct MessageView: View {
         }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
-            if let match = currentUser.matches.first(where: { $0.id == conversation.recipientID }) { recipient = match }
             do {
                 while !Task.isCancelled {
                     try await conversation.refresh()
@@ -213,10 +212,10 @@ struct DateTimePopover: View {
 }
     
 struct IndividualMessage: View {
-    var message: Message
+    var message: MessageRecord
     var comeetUID = Constants.Values.comeetUID
     @Environment(User.self) var currentUser: User
-    var match: Match
+    var peer: ConversationPeer
     
     var body: some View {
         HStack {
@@ -239,7 +238,7 @@ struct IndividualMessage: View {
     
     func formatText(text: String) -> LocalizedStringKey {
         var result = text
-        result = result.replacingOccurrences(of: "{user}", with: match.firstName)
+        result = result.replacingOccurrences(of: "{user}", with: peer.firstName)
         
         return LocalizedStringKey(result)
     }

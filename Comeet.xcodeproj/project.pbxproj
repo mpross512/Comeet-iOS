@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		4C087FD229176A98005B39AB /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C087FD129176A98005B39AB /* Conversation.swift */; };
-		4C087FD429176B1E005B39AB /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C087FD329176B1E005B39AB /* Message.swift */; };
 		4C087FD629176D2E005B39AB /* MessageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C087FD529176D2E005B39AB /* MessageService.swift */; };
 		4C163A4924B9087000523D05 /* MasterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4824B9087000523D05 /* MasterView.swift */; };
 		4C163A4D24B90A4000523D05 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4C24B90A4000523D05 /* User.swift */; };
@@ -50,7 +49,6 @@
 
 /* Begin PBXFileReference section */
 		4C087FD129176A98005B39AB /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
-		4C087FD329176B1E005B39AB /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		4C087FD529176D2E005B39AB /* MessageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageService.swift; sourceTree = "<group>"; };
 		4C163A4824B9087000523D05 /* MasterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterView.swift; sourceTree = "<group>"; };
 		4C163A4C24B90A4000523D05 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -135,7 +133,6 @@
 				4C163A4C24B90A4000523D05 /* User.swift */,
 				4C3108E424BBC9AE003679D7 /* Constants.swift */,
 				4C087FD129176A98005B39AB /* Conversation.swift */,
-				4C087FD329176B1E005B39AB /* Message.swift */,
 				4C37355E295D658C005709B9 /* Attribute.swift */,
 				4C90A7E92B7960B200FFEF9C /* Person.swift */,
 				4C90A7EB2B7D88F500FFEF9C /* Match.swift */,
@@ -331,7 +328,6 @@
 				4C9ED7C32B9A9AEC00DC135A /* DateModule.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C9ED7C62B9E072A00DC135A /* PreviewModels.swift in Sources */,
-				4C087FD429176B1E005B39AB /* Message.swift in Sources */,
 				4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */,
 				4C087FD229176A98005B39AB /* Conversation.swift in Sources */,
 				4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */,

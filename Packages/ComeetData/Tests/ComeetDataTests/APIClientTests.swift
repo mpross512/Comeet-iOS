@@ -24,10 +24,10 @@ private actor TestTransport: HTTPTransport {
 }
 
 private let base = URL(string: "https://comeet.example.test")!
-private let accountJSON = #"{"id":"11111111-1111-1111-1111-111111111111","email":"alex@example.test","email_confirmed":true}"#
+private let accountJSON = #"{"id":"11111111-1111-1111-1111-111111111111","email":"alex@example.test","emailConfirmed":true}"#
 private let tokenJSON = #"{"accessToken":"renewed","refreshToken":"refresh-new","expiresIn":900}"#
-private let profileJSON = #"{"id":"11111111-1111-1111-1111-111111111111","first_name":"Alex","last_name":"Example","birthdate":"2000-02-29","graduation_year":2026,"major":"Computing","bio":"Synthetic profile","user_matches":[],"v_user_attributes":[],"user_likes":[],"conversations":[]}"#
-private let messageJSON = #"{"id":3,"conversation_id":1,"sender":"11111111-1111-1111-1111-111111111111","text":"Hello","created_at":"2026-10-09T18:00:00.1234567+00:00","response_option":[],"public":true}"#
+private let profileJSON = #"{"id":"11111111-1111-1111-1111-111111111111","firstName":"Alex","lastName":"Example","birthdate":"2000-02-29","graduationYear":2026,"major":"Computing","bio":"Synthetic profile","matches":[],"attributes":[],"likedUserIds":[]}"#
+private let messageJSON = #"{"id":3,"conversationId":1,"sender":"11111111-1111-1111-1111-111111111111","text":"Hello","createdAtUnixMilliseconds":1791568800123,"responseOptions":[]}"#
 private func signedInStore() -> MemoryPersistence {
     MemoryPersistence(AuthSession(accessToken: "original", refreshToken: "refresh", expiresAt: .now.addingTimeInterval(900)))
 }
@@ -50,7 +50,7 @@ private func signedInStore() -> MemoryPersistence {
     #expect(store.load()?.accessToken == "renewed")
 }
 
-@Test func profileRoundTripPreservesSnakeCaseAndRelationships() async throws {
+@Test func profileRoundTripUsesCamelCaseAndFlatIds() async throws {
     let transport = TestTransport { request in request.url!.path.hasSuffix("auth/me") ? (200, accountJSON) : (200, profileJSON) }
     let client = APIClient(baseURL: base, transport: transport, persistence: signedInStore())
     #expect(try await client.restoreSession())
@@ -58,13 +58,13 @@ private func signedInStore() -> MemoryPersistence {
     let result = try await client.saveProfile(fields)
     #expect(result.firstName == "Alex")
     #expect(result.birthdate == "2000-02-29")
-    #expect(result.matches.isEmpty && result.likes.isEmpty && result.conversations.isEmpty)
+    #expect(result.matches.isEmpty && result.likedUserIds.isEmpty)
     let request = try #require(await transport.history().last)
     #expect(request.url!.path == "/api/users/me" && request.httpMethod == "PUT")
     #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer original")
     let body = try #require(request.httpBody)
     let json = try #require(JSONSerialization.jsonObject(with: body) as? [String: Any])
-    #expect(json["first_name"] as? String == "Alex")
+    #expect(json["firstName"] as? String == "Alex")
     #expect(json["birthdate"] as? String == "2000-02-29")
     #expect(json["id"] == nil)
 }
@@ -73,14 +73,14 @@ private func signedInStore() -> MemoryPersistence {
     let transport = TestTransport { request in
         if request.url!.path.hasSuffix("auth/me") { return (200, accountJSON) }
         if request.url!.path.hasSuffix("attributes") { return (200, String(data: request.httpBody!, encoding: .utf8)!) }
-        return (200, #"{"conversation_id":1}"#)
+        return (200, #"{"conversationId":1}"#)
     }
     let client = APIClient(baseURL: base, transport: transport, persistence: signedInStore())
     _ = try await client.restoreSession()
     let values = [AttributeRecord(name: "Interests", importance: 3, value: "Reading")]
     #expect(try await client.saveAttributes(values) == values)
     let result = try await client.like(matchID: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!)
-    #expect(result.conversationID == 1)
+    #expect(result.conversationId == 1)
     let request = try #require(await transport.history().last)
     #expect(request.url!.path.hasSuffix("likes/22222222-2222-2222-2222-222222222222"))
     #expect(request.httpMethod == "POST" && request.httpBody == nil)
@@ -96,7 +96,7 @@ private func signedInStore() -> MemoryPersistence {
     _ = try await client.restoreSession()
     #expect(try await client.conversations().isEmpty)
     let messages = try await client.messages(conversationID: 1, afterID: 2)
-    #expect(messages.count == 1 && messages[0].isPublic)
+    #expect(messages.count == 1 && messages[0].text == "Hello")
     #expect(messages[0].timestamp.timeIntervalSince1970 > 0)
     let request = try #require(await transport.history().last)
     #expect(request.url!.query == "afterId=2")
@@ -111,9 +111,9 @@ private func signedInStore() -> MemoryPersistence {
     let request = try #require(await transport.history().last)
     let body = try #require(request.httpBody)
     let json = try #require(JSONSerialization.jsonObject(with: body) as? [String: Any])
-    #expect(json["client_message_id"] as? String == clientID.uuidString)
-    #expect(json["reply_to_id"] as? Int == 2)
-    #expect(json["sender"] == nil && json["public"] == nil && json["response_option"] == nil)
+    #expect(json["clientMessageId"] as? String == clientID.uuidString)
+    #expect(json["replyToId"] as? Int == 2)
+    #expect(json["sender"] == nil && json["public"] == nil && json["responseOptions"] == nil)
 }
 
 @Test func uploadUsesRawBytesAndStablePhotoURL() async throws {
@@ -195,7 +195,7 @@ func realAPIDataOperationsRoundTrip() async throws {
     #expect(try await alex.saveAttributes(attributes) == attributes)
     _ = try await alex.like(matchID: second.id)
     let mutual = try await jordan.like(matchID: first.id)
-    let conversationID = try #require(mutual.conversationID)
+    let conversationID = try #require(mutual.conversationId)
     #expect(try await alex.conversations().contains { $0.id == conversationID })
     let sent = try await alex.sendMessage(conversationID: conversationID, replyToID: nil, text: "Hello", clientID: UUID())
     let messages = try await jordan.messages(conversationID: conversationID, afterID: 0)

@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol Person: Codable, Identifiable {
+protocol Person: Identifiable {
     var id: UUID { get set }
     var firstName: String { get set }
     var lastName: String { get set }

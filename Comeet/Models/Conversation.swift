@@ -4,18 +4,17 @@ import ComeetData
 
 @Observable
 final class Conversation: Identifiable, Hashable {
-    var id: Int
-    var recipientID: UUID = UUID()
-    var messages: [Message] = []
-    init() { id = 0 }
-    init(record: ConversationRecord, userID: UUID) {
+    let id: Int
+    let peer: ConversationPeer
+    var messages: [MessageRecord]
+    init(record: ConversationRecord) {
         id = record.id
-        recipientID = record.members.first { $0.id != userID }?.id ?? userID
-        messages = record.messages.map(Message.init(record:))
+        peer = record.peer
+        messages = record.messages
     }
     @MainActor
-    static func all(userID: UUID, repository: any ComeetRepository = APIConfiguration.client) async throws -> [Conversation] {
-        let conversations = try await repository.conversations().map { Conversation(record: $0, userID: userID) }
+    static func all(repository: any ComeetRepository = APIConfiguration.client) async throws -> [Conversation] {
+        let conversations = try await repository.conversations().map(Conversation.init(record:))
         for conversation in conversations {
             // Drain the paginated history so the existing screen still has all prior messages.
             conversation.messages = []
@@ -30,7 +29,7 @@ final class Conversation: Identifiable, Hashable {
         while true {
             let page = try await repository.messages(conversationID: id, afterID: cursor)
             let existing = Set(messages.map(\.id))
-            messages.append(contentsOf: page.filter { !existing.contains($0.id) }.map(Message.init(record:)))
+            messages.append(contentsOf: page.filter { !existing.contains($0.id) })
             messages.sort { $0.id < $1.id }
             guard page.count == 100, let next = page.last?.id else { return }
             cursor = next

@@ -10,9 +10,7 @@ import SwiftUI
 import Shimmer
 
 struct ChatView: View {
-    @Environment(User.self) var currentUser: User
-    var messageService = MessageService()
-    @State var conversations: [Conversation] = [Conversation(), Conversation()]
+    @State var conversations: [Conversation] = []
     @State var loading = true
     @State private var loadError: String?
     @Environment(\.scenePhase) private var scenePhase
@@ -23,32 +21,21 @@ struct ChatView: View {
                 LoadingChatView()
             } else {
                 List(conversations) { conversation in
-                    HStack {
-                        if let match = currentUser.matches.first(where: { match in
-                            match.id == conversation.recipientID
-                        }) {
-                            NavigationLink{
-                                MessageView(conversation: conversation)
-                                    .navigationTitle("\(match.fullName)")
-                                    .navigationBarTitleDisplayMode(.inline)
-                            } label: {
-                                ProfilePicture(userID: match.id, width: 50, height: 50)
-                                VStack(alignment: .leading) {
-                                    HStack {
-                                        Text(match.firstName)
-                                            .padding(.leading)
-                                            .font(.headline)
-                                        Spacer()
-                                        Text(conversation.messages.last?.timestamp.formatted(.relative) ?? "")
-                                            .font(.subheadline)
-                                            .fontWeight(.thin)
-                                    }
-                                    Text(conversation.messages.last?.text ?? "")
-                                        .padding(.leading)
-                                        .font(.subheadline)
-                                        .lineLimit(2)
-                                }
+                    NavigationLink {
+                        MessageView(conversation: conversation)
+                            .navigationTitle(conversation.peer.fullName)
+                            .navigationBarTitleDisplayMode(.inline)
+                    } label: {
+                        ProfilePicture(userID: conversation.peer.id, width: 50, height: 50)
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text(conversation.peer.firstName).padding(.leading).font(.headline)
+                                Spacer()
+                                Text(conversation.messages.last?.timestamp.formatted(.relative) ?? "")
+                                    .font(.subheadline).fontWeight(.thin)
                             }
+                            Text(conversation.messages.last?.text ?? "")
+                                .padding(.leading).font(.subheadline).lineLimit(2)
                         }
                     }
                 }
@@ -59,7 +46,7 @@ struct ChatView: View {
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             do {
-                conversations = try await Conversation.all(userID: currentUser.id)
+                conversations = try await Conversation.all()
                 loading = false
                 while !Task.isCancelled {
                     for conversation in conversations { try await conversation.refresh() }

@@ -60,7 +60,7 @@ public actor APIClient: ComeetRepository {
     }
     public func sendMessage(conversationID: Int, replyToID: Int?, text: String, clientID: UUID = UUID()) async throws -> MessageRecord {
         try decode(await request("api/conversations/\(conversationID)/messages", method: "POST",
-            body: encode(MessageRequest(text: text, clientMessageID: clientID, replyToID: replyToID))))
+            body: encode(MessageRequest(text: text, clientMessageId: clientID, replyToId: replyToID))))
     }
     public func uploadPhoto(_ data: Data, contentType: String = "image/jpeg") async throws {
         _ = try await request("api/users/me/photo", method: "PUT", body: data, contentType: contentType)
@@ -74,7 +74,7 @@ public actor APIClient: ComeetRepository {
         try decode(await request(path, query: query))
     }
     private func encode<T: Encodable>(_ value: T) throws -> Data { try JSONEncoder().encode(value) }
-    private func decode<T: Decodable>(_ data: Data) throws -> T { try WireDates.decoder().decode(T.self, from: data) }
+    private func decode<T: Decodable>(_ data: Data) throws -> T { try JSONDecoder().decode(T.self, from: data) }
     private func setSession(_ value: AuthSession) throws { try persistence.save(value); session = value }
     private func clearSession() throws {
         generation += 1; refreshTask?.cancel(); refreshTask = nil; session = nil
@@ -153,7 +153,6 @@ private struct TokenResponse: Decodable {
     var session: AuthSession { AuthSession(accessToken: accessToken, refreshToken: refreshToken, expiresAt: .now.addingTimeInterval(Double(expiresIn))) }
 }
 private struct MessageRequest: Encodable {
-    let text: String; let clientMessageID: UUID; let replyToID: Int?
-    enum CodingKeys: String, CodingKey { case text; case clientMessageID = "client_message_id", replyToID = "reply_to_id" }
+    let text: String; let clientMessageId: UUID; let replyToId: Int?
 }
 private struct Problem: Decodable { let title: String?; let detail: String?; let errors: [String: [String]]? }
