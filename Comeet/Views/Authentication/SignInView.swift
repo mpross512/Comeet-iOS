@@ -7,10 +7,9 @@
 //
 
 import SwiftUI
-import Supabase
 
 struct SignInView: View {
-    @Environment(Supabase.self) var supabase: Supabase
+    @Environment(SessionStore.self) var session
     
     @State var email: String = ""
     @State var password: String = ""
@@ -61,20 +60,20 @@ struct SignInView: View {
                     Task {
                         do {
                             #if DEBUG
-                            let response = try await supabase.auth.signIn(
+                            try await session.signIn(
                                 email: "\(self.email)",
                                 password: "\(self.password)"
                             )
                             #else
-                            let response = try await supabase.auth.signIn(
+                            try await session.signIn(
                                 email: "\(self.email)@utdallas.edu",
                                 password: "\(self.password)"
                             )
                             #endif
-                            print("DEBUG: Supabase Auth: \(response)")
                         } catch {
                             print("ERROR: \(error)")
                             errorText = error.localizedDescription
+                            showErrorText = true
                         }
                     }
                 }) {
@@ -98,6 +97,6 @@ struct SignInView: View {
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         SignInView()
-            .environment(Supabase())
+            .environment(SessionStore.shared)
     }
 }

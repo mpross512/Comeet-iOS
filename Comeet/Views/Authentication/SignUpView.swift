@@ -59,7 +59,7 @@ struct SignUpView: View {
                         #if DEBUG
                         Task {
                             do {
-                                try await Supabase.shared.auth.signUp(
+                                try await SessionStore.shared.signUp(
                                     email: "\(self.netID)",
                                     password: self.password
                                 )
@@ -78,11 +78,13 @@ struct SignUpView: View {
                         else {
                             self.showErrorText = false
                             Task {
-                                try await Supabase.shared.auth.signUp(
-                                    email: "\(self.netID)@utdallas.edu",
-                                    password: self.password
-                                )
-                                createAccount = true
+                                do {
+                                    try await SessionStore.shared.signUp(email: "\(self.netID)@utdallas.edu", password: self.password)
+                                    createAccount = true
+                                } catch {
+                                    errorText = error.localizedDescription
+                                    showErrorText = true
+                                }
                             }
                         }
                         #endif

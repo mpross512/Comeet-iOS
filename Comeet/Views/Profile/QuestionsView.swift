@@ -38,6 +38,8 @@ struct QuestionView: View {
     @Binding var question: Double
     @Binding var isPresented: Bool
     @State var importance: Double = 3
+    @State private var saving = false
+    @State private var saveError: String?
     
     var questionSet = Constants.SetupQuestions.questions
     
@@ -49,30 +51,19 @@ struct QuestionView: View {
                 Section {
                     ForEach(questionSet[Int(question)].options, id: \.self) { option in
                         Button {
-                            DispatchQueue.main.async {
-                                if let index = currentUser.attributes.firstIndex(where: {$0.name == questionSet[Int(question)].category}) {
-                                    currentUser.attributes[index] = Attribute(
-                                        name: questionSet[Int(question)].category,
-                                        importance: Int(importance),
-                                        value: option)
-                                } else {
-                                    currentUser.attributes.append(
-                                        Attribute(
-                                            name: questionSet[Int(question)].category,
-                                            importance: Int(importance),
-                                            value: option)
-                                    )
-                                }
-                            }
-                            if(Int(question) < questionSet.count - 1) {
-                                question = question + 1
-                            } else {
-                                isPresented = false
+                            Task {
+                                saving = true
+                                defer { saving = false }
+                                var attributes = currentUser.attributes
+                                let answer = Attribute(name: questionSet[Int(question)].category, importance: Int(importance), value: option)
+                                if let index = attributes.firstIndex(where: { $0.name == answer.name }) {
+                                    attributes[index] = answer
+                                } else { attributes.append(answer) }
                                 do {
-//                                    try Firestore.firestore().collection("Users").document(userService.user.id.uuidString).setData(from: userService.user)
-                                } catch let error {
-                                    print(error)
-                                }
+                                    try await userService.saveAttributes(attributes)
+                                    currentUser.attributes = attributes
+                                    advance()
+                                } catch { SessionStore.shared.handle(error); saveError = error.localizedDescription }
                             }
                         } label: {
                             Text(option)
@@ -91,16 +82,7 @@ struct QuestionView: View {
                 }
                 
                 Button {
-                    if(Int(question) < questionSet.count - 1) {
-                        question = question + 1
-                    } else {
-                        isPresented = false
-                        do {
-//                            try Firestore.firestore().collection("Users").document(userService.user.id.uuidString).setData(from: userService.user)
-                        } catch let error {
-                            print(error)
-                        }
-                    }
+                    advance()
                 } label: {
                     if(Int(question) != questionSet.count - 1) {
                         Text("Skip")
@@ -109,6 +91,12 @@ struct QuestionView: View {
                     }
                 }
             }
-        }
+        }.disabled(saving)
+        .alert("Could not save answer", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK") { saveError = nil }
+        } message: { Text(saveError ?? "") }
+    }
+    private func advance() {
+        if Int(question) < questionSet.count - 1 { question += 1 } else { isPresented = false }
     }
 }

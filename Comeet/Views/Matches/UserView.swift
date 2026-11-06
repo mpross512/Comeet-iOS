@@ -14,6 +14,7 @@ struct UserView: View {
     var user: any Person
     @Environment(UserService.self) var userService: UserService
     @Environment(User.self) var currentUser: User
+    @State private var likeError: String?
     @State private var isPresentingConfirm: Bool = false
     
     var animation: Namespace.ID?
@@ -46,8 +47,8 @@ struct UserView: View {
                         Button {
                             Task {
                                 if(await userService.likeUser(userID: currentUser.id, matchID: user.id)) {
-                                    currentUser.likes.append(user.id)
-                                }
+                                    if !currentUser.likes.contains(user.id) { currentUser.likes.append(user.id) }
+                                } else { likeError = userService.errorMessage }
                             }
                         } label: {
                             Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50)
@@ -56,7 +57,9 @@ struct UserView: View {
                     }
                 }
             }
-        }
+        }.alert("Could not like profile", isPresented: Binding(get: { likeError != nil }, set: { if !$0 { likeError = nil } })) {
+            Button("OK") { likeError = nil }
+        } message: { Text(likeError ?? "") }
     }
 }
 
@@ -93,5 +96,5 @@ struct UserInterest: View {
 }
 
 #Preview {
-    UserView(user: PreviewModels.previewUser.matches.first!).environment(Supabase.shared).environment(PreviewModels.previewUser)
+    UserView(user: PreviewModels.previewUser.matches.first!).environment(SessionStore.shared).environment(PreviewModels.previewUser)
 }

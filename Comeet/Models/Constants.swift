@@ -11,14 +11,6 @@ import SwiftUI
 
 struct Constants {
     
-    struct Database {
-        
-        let users = "users"
-                
-        static let supabaseStorageURL = "https://bikoswjhsmcbwricdpyv.supabase.co/storage/v1/object/public/"
-        
-    }
-    
     struct Colors {
         
         static let yellowOrangeColor = Color(red: 0.95, green: 0.61, blue: 0.07, opacity: 1.00)

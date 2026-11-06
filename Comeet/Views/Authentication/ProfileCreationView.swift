@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import ComeetData
 import SDWebImageSwiftUI
 
 struct ProfileCreationView: View {
@@ -15,28 +16,26 @@ struct ProfileCreationView: View {
     
     var body: some View {
         NavigationStack {
-            ProfileCreationStep1()
+            ProfileCreationStep1(user: newUser)
         }
     }
 }
 
 struct ProfileCreationStep1: View {
-    @State var firstName: String = ""
-    @State var lastName: String = ""
-    @State var birthDate: Date = Date()
+    @Bindable var user: User
     
     var body: some View {
         VStack {
             Text("Let's get your info!").font(.title).padding()
             Form {
                 Section() {
-                    TextField("First Name", text: $firstName)
-                    TextField("Last Name", text: $lastName)
-                    DatePicker("Birthdate", selection: $birthDate, displayedComponents: .date)
+                    TextField("First Name", text: $user.firstName)
+                    TextField("Last Name", text: $user.lastName)
+                    DatePicker("Birthdate", selection: $user.birthdate, displayedComponents: .date)
                 }
             }.padding()
             NavigationLink {
-                ProfileCreationStep2()
+                ProfileCreationStep2(user: user)
             } label: {
                 RoundedRectangle(cornerRadius: 25)
                     .fill(Constants.Colors.greenColor)
@@ -53,7 +52,7 @@ struct ProfileCreationStep1: View {
 }
 
 struct ProfileCreationStep2: View {
-    @State var major: String = ""
+    @Bindable var user: User
     @State var year: String = ""
     
     var body: some View {
@@ -61,7 +60,7 @@ struct ProfileCreationStep2: View {
             Text("Just a few more things!").font(.title).padding()
             Form {
                 Section() {
-                    Picker("Major", selection: $major) {
+                    Picker("Major", selection: $user.major) {
                         ForEach(Constants.Values.degrees, id: \.self) { major in
                             Text(major)
                         }
@@ -75,27 +74,23 @@ struct ProfileCreationStep2: View {
                 }
             }.padding()
             NavigationLink {
-                ProfileCreationStep3()
+                ProfileCreationStep3(user: user)
+                    .onAppear { user.graduationYear = Int(year) ?? 0 }
             } label: {
-                Button {
-                    print("DEBUG: Button pressed!")
-                } label: {
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(Constants.Colors.greenColor)
-                        .frame(width: 150, height: 50, alignment: .center)
-                        .padding(.horizontal)
-                        .overlay(
-                            Text("Next")
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                        )
-                }
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(Constants.Colors.greenColor)
+                    .frame(width: 150, height: 50, alignment: .center)
+                    .padding(.horizontal)
+                    .overlay(Text("Next").fontWeight(.bold).foregroundColor(.white))
             }
         }
     }
 }
 
 struct ProfileCreationStep3: View {
+    var user: User
+    @State private var saveError: String?
+    @State private var saving = false
     @State private var isShowPhotoLibrary = false
     @State private var imageAlertShown = false
     
@@ -123,8 +118,17 @@ struct ProfileCreationStep3: View {
                     Spacer()
                 }
             }
-            NavigationLink {
-                HomeView()
+            Button {
+                Task {
+                    saving = true
+                    defer { saving = false }
+                    do {
+                        try await SessionStore.shared.saveProfile(ProfileFields(
+                            firstName: user.firstName, lastName: user.lastName,
+                            birthdate: WireDates.birthday(user.birthdate), graduationYear: user.graduationYear,
+                            major: user.major, bio: user.bio))
+                    } catch { SessionStore.shared.handle(error); saveError = error.localizedDescription }
+                }
             } label: {
                 RoundedRectangle(cornerRadius: 25)
                     .fill(Constants.Colors.greenColor)
@@ -136,7 +140,11 @@ struct ProfileCreationStep3: View {
                             .foregroundColor(.white)
                     )
             }
-        }.sheet(isPresented: $isShowPhotoLibrary) {
+        }.disabled(saving)
+        .alert("Could not save profile", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK") { saveError = nil }
+        } message: { Text(saveError ?? "") }
+        .sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
         }
     }

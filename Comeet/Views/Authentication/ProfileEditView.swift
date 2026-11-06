@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import ComeetData
 import SDWebImageSwiftUI
 
 struct ProfileEditView: View {
@@ -19,6 +20,7 @@ struct ProfileEditView: View {
     @State var major: String = ""
     @State var year: String = ""
     @State var bio: String = ""
+    @State private var saveError: String?
     @State var showingAlert: Bool = false
     @State private var isShowPhotoLibrary = false
     @State private var imageAlertShown = false
@@ -31,6 +33,8 @@ struct ProfileEditView: View {
         _lastName = State(initialValue: user.lastName)
         _birthdate = State(initialValue: user.birthdate)
         _year = State(initialValue: String(user.graduationYear))
+        _major = State(initialValue: user.major)
+        _bio = State(initialValue: user.bio)
     }
     
     var body: some View {
@@ -63,7 +67,7 @@ struct ProfileEditView: View {
             }
             
             Section {
-                Picker("Major", selection: $user.major) {
+                Picker("Major", selection: $major) {
                     ForEach(Constants.Values.degrees, id: \.self) { major in
                         Text(major)
                     }
@@ -79,7 +83,7 @@ struct ProfileEditView: View {
             }
             
             Section {
-                TextField("", text: $user.bio, axis: .vertical)
+                TextField("", text: $bio, axis: .vertical)
                     .frame(minHeight: 40, alignment: .leading)
                     .multilineTextAlignment(.leading)
                     .lineLimit(5, reservesSpace: true)
@@ -99,16 +103,15 @@ struct ProfileEditView: View {
             
             Section {
                 Button {
-                    showingAlert = true
-                    user.firstName = firstName
-                    user.lastName = lastName
-                    user.birthdate = birthdate
-                    user.graduationYear = Int(year) ?? 0
-//                    do {
-//                        try Firestore.firestore().collection("Users").document(user.id.uuidString).setData(from: user)
-//                    } catch let error {
-//                        print(error)
-//                    }
+                    Task {
+                        do {
+                            try await SessionStore.shared.saveProfile(ProfileFields(
+                                firstName: firstName, lastName: lastName,
+                                birthdate: WireDates.birthday(birthdate),
+                                graduationYear: Int(year) ?? 0, major: major, bio: bio))
+                            showingAlert = true
+                        } catch { SessionStore.shared.handle(error); saveError = error.localizedDescription }
+                    }
                 } label: {
                     Text("Save Changes")
                 }.alert(isPresented: $showingAlert) {
@@ -125,7 +128,10 @@ struct ProfileEditView: View {
         }.alert(isPresented: $imageAlertShown) {
             Alert(title: Text("Image Saved"),
             message: Text("You may need to close the app for the new image to take effect"))
-        }.scrollDismissesKeyboard(.automatic)
+        }.alert("Could not save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK") { saveError = nil }
+        } message: { Text(saveError ?? "") }
+        .scrollDismissesKeyboard(.automatic)
     }
 }
 

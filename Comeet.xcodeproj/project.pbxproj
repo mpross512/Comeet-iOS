@@ -8,11 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		4C087FD229176A98005B39AB /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C087FD129176A98005B39AB /* Conversation.swift */; };
-		4C087FD429176B1E005B39AB /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C087FD329176B1E005B39AB /* Message.swift */; };
 		4C087FD629176D2E005B39AB /* MessageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C087FD529176D2E005B39AB /* MessageService.swift */; };
 		4C163A4924B9087000523D05 /* MasterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4824B9087000523D05 /* MasterView.swift */; };
 		4C163A4D24B90A4000523D05 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A4C24B90A4000523D05 /* User.swift */; };
-		4C163A4F24B913AC00523D05 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */; };
 		4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C163A5224B93BDA00523D05 /* SignInView.swift */; };
 		4C3108E524BBC9AE003679D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E424BBC9AE003679D7 /* Constants.swift */; };
 		4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3108E624BBCDC6003679D7 /* HomeView.swift */; };
@@ -28,23 +26,6 @@
 		4C743BBF2ADB2BE700C1D171 /* ProfileCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C743BBE2ADB2BE700C1D171 /* ProfileCreationView.swift */; };
 		4C743BC12ADB603200C1D171 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C743BC02ADB603200C1D171 /* App.swift */; };
 		4C7A9FD1295E9AEE00A63CBD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7A9FD0295E9AEE00A63CBD /* SettingsView.swift */; };
-		4C90A7C82B731B6E00FFEF9C /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7C72B731B6E00FFEF9C /* Auth */; };
-		4C90A7CA2B731B6E00FFEF9C /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7C92B731B6E00FFEF9C /* Functions */; };
-		4C90A7CC2B731B6E00FFEF9C /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7CB2B731B6E00FFEF9C /* PostgREST */; };
-		4C90A7CE2B731B6E00FFEF9C /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7CD2B731B6E00FFEF9C /* Realtime */; };
-		4C90A7D02B731B6E00FFEF9C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7CF2B731B6E00FFEF9C /* Storage */; };
-		4C90A7D22B731BF100FFEF9C /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7D12B731BF100FFEF9C /* Auth */; };
-		4C90A7D42B731BF100FFEF9C /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7D32B731BF100FFEF9C /* Functions */; };
-		4C90A7D62B731BF100FFEF9C /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7D52B731BF100FFEF9C /* PostgREST */; };
-		4C90A7D82B731BF100FFEF9C /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7D72B731BF100FFEF9C /* Realtime */; };
-		4C90A7DA2B731BF100FFEF9C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7D92B731BF100FFEF9C /* Storage */; };
-		4C90A7DC2B731CF100FFEF9C /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7DB2B731CF100FFEF9C /* Auth */; };
-		4C90A7DE2B731CF100FFEF9C /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7DD2B731CF100FFEF9C /* Functions */; };
-		4C90A7E02B731CF100FFEF9C /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7DF2B731CF100FFEF9C /* PostgREST */; };
-		4C90A7E22B731CF100FFEF9C /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7E12B731CF100FFEF9C /* Realtime */; };
-		4C90A7E42B731CF100FFEF9C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7E32B731CF100FFEF9C /* Storage */; };
-		4C90A7E62B731CF100FFEF9C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 4C90A7E52B731CF100FFEF9C /* Supabase */; };
-		4C90A7E82B7700C900FFEF9C /* Supabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C90A7E72B7700C900FFEF9C /* Supabase.swift */; };
 		4C90A7EA2B7960B200FFEF9C /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C90A7E92B7960B200FFEF9C /* Person.swift */; };
 		4C90A7EC2B7D88F500FFEF9C /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C90A7EB2B7D88F500FFEF9C /* Match.swift */; };
 		4C944FB828F60A07008153EE /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C944FB728F60A07008153EE /* MessageView.swift */; };
@@ -59,15 +40,28 @@
 		4CCCB160296F47B200232FF5 /* QuestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCCB15F296F47B200232FF5 /* QuestionsView.swift */; };
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
 		4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEBEBE8262925FB0086D788 /* EditView.swift */; };
+		C0DE00000000000000000003 /* ComeetData in Frameworks */ = {isa = PBXBuildFile; productRef = C0DE00000000000000000001 /* ComeetData */; };
+		C0DE00000000000000000005 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000004 /* SessionStore.swift */; };
+		C0DE00000000000000000010 /* DataAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000011 /* DataAdapterTests.swift */; };
+		C0DE00000000000000000012 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000013 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift */; };
+		C0DE00000000000000000014 /* ComeetData in Frameworks */ = {isa = PBXBuildFile; productRef = C0DE00000000000000000001 /* ComeetData */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C0DE0000000000000000001A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C60112924B562B6003B425A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4C60113024B562B6003B425A;
+			remoteInfo = Comeet;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4C087FD129176A98005B39AB /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
-		4C087FD329176B1E005B39AB /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		4C087FD529176D2E005B39AB /* MessageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageService.swift; sourceTree = "<group>"; };
 		4C163A4824B9087000523D05 /* MasterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterView.swift; sourceTree = "<group>"; };
 		4C163A4C24B90A4000523D05 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C163A5224B93BDA00523D05 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		4C3108E424BBC9AE003679D7 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4C3108E624BBCDC6003679D7 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -85,7 +79,6 @@
 		4C743BBE2ADB2BE700C1D171 /* ProfileCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationView.swift; sourceTree = "<group>"; };
 		4C743BC02ADB603200C1D171 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		4C7A9FD0295E9AEE00A63CBD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		4C90A7E72B7700C900FFEF9C /* Supabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Supabase.swift; sourceTree = "<group>"; };
 		4C90A7E92B7960B200FFEF9C /* Person.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		4C90A7EB2B7D88F500FFEF9C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		4C944FB728F60A07008153EE /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
@@ -98,6 +91,10 @@
 		4CCCB15F296F47B200232FF5 /* QuestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsView.swift; sourceTree = "<group>"; };
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
+		C0DE00000000000000000004 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		C0DE00000000000000000011 /* DataAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataAdapterTests.swift; sourceTree = "<group>"; };
+		C0DE00000000000000000013 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift; sourceTree = SOURCE_ROOT; };
+		C0DE00000000000000000015 /* ComeetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ComeetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,25 +102,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C90A7DE2B731CF100FFEF9C /* Functions in Frameworks */,
+				C0DE00000000000000000003 /* ComeetData in Frameworks */,
 				4CA744202AF06E90002530D7 /* SDWebImageSwiftUI in Frameworks */,
-				4C90A7D02B731B6E00FFEF9C /* Storage in Frameworks */,
-				4C90A7D82B731BF100FFEF9C /* Realtime in Frameworks */,
-				4C90A7CA2B731B6E00FFEF9C /* Functions in Frameworks */,
-				4C90A7E22B731CF100FFEF9C /* Realtime in Frameworks */,
-				4C90A7D62B731BF100FFEF9C /* PostgREST in Frameworks */,
 				4CC50CF1292D5980004B495B /* WrappingHStack in Frameworks */,
-				4C90A7E02B731CF100FFEF9C /* PostgREST in Frameworks */,
-				4C90A7DA2B731BF100FFEF9C /* Storage in Frameworks */,
-				4C90A7DC2B731CF100FFEF9C /* Auth in Frameworks */,
-				4C90A7CE2B731B6E00FFEF9C /* Realtime in Frameworks */,
-				4C90A7C82B731B6E00FFEF9C /* Auth in Frameworks */,
-				4C90A7E62B731CF100FFEF9C /* Supabase in Frameworks */,
 				4C9ED7C02B9A4DDA00DC135A /* Shimmer in Frameworks */,
-				4C90A7E42B731CF100FFEF9C /* Storage in Frameworks */,
-				4C90A7CC2B731B6E00FFEF9C /* PostgREST in Frameworks */,
-				4C90A7D42B731BF100FFEF9C /* Functions in Frameworks */,
-				4C90A7D22B731BF100FFEF9C /* Auth in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DE00000000000000000018 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE00000000000000000014 /* ComeetData in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,9 +136,9 @@
 		4C163A4A24B908BC00523D05 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C0DE00000000000000000004 /* SessionStore.swift */,
 				4C087FD529176D2E005B39AB /* MessageService.swift */,
 				4C4DE26729232092002FC036 /* UserService.swift */,
-				4C90A7E72B7700C900FFEF9C /* Supabase.swift */,
 				4C9ED7C72BA0FE0400DC135A /* NamespaceController.swift */,
 			);
 			path = Controllers;
@@ -160,7 +150,6 @@
 				4C163A4C24B90A4000523D05 /* User.swift */,
 				4C3108E424BBC9AE003679D7 /* Constants.swift */,
 				4C087FD129176A98005B39AB /* Conversation.swift */,
-				4C087FD329176B1E005B39AB /* Message.swift */,
 				4C37355E295D658C005709B9 /* Attribute.swift */,
 				4C90A7E92B7960B200FFEF9C /* Person.swift */,
 				4C90A7EB2B7D88F500FFEF9C /* Match.swift */,
@@ -171,6 +160,7 @@
 		4C60112824B562B6003B425A = {
 			isa = PBXGroup;
 			children = (
+				C0DE00000000000000000016 /* ComeetTests */,
 				4C60113324B562B6003B425A /* Comeet */,
 				4C60113224B562B6003B425A /* Products */,
 			);
@@ -179,6 +169,7 @@
 		4C60113224B562B6003B425A /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				C0DE00000000000000000015 /* ComeetTests.xctest */,
 				4C60113124B562B6003B425A /* Comeet.app */,
 			);
 			name = Products;
@@ -190,7 +181,6 @@
 				4C9ED7C12B9A9AD700DC135A /* Modules */,
 				4C743BC02ADB603200C1D171 /* App.swift */,
 				4CC50CF2292D7E7F004B495B /* Comeet.entitlements */,
-				4C163A4E24B913AC00523D05 /* GoogleService-Info.plist */,
 				4C163A4B24B90A2E00523D05 /* Models */,
 				4C163A4724B9085900523D05 /* Views */,
 				4C163A4A24B908BC00523D05 /* Controllers */,
@@ -260,6 +250,15 @@
 			path = Chat;
 			sourceTree = "<group>";
 		};
+		C0DE00000000000000000016 /* ComeetTests */ = {
+			isa = PBXGroup;
+			children = (
+				C0DE00000000000000000011 /* DataAdapterTests.swift */,
+				C0DE00000000000000000013 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift */,
+			);
+			path = ComeetTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -277,29 +276,35 @@
 			);
 			name = Comeet;
 			packageProductDependencies = (
+				C0DE00000000000000000001 /* ComeetData */,
 				4CC50CF0292D5980004B495B /* WrappingHStack */,
 				4CA7441F2AF06E90002530D7 /* SDWebImageSwiftUI */,
-				4C90A7C72B731B6E00FFEF9C /* Auth */,
-				4C90A7C92B731B6E00FFEF9C /* Functions */,
-				4C90A7CB2B731B6E00FFEF9C /* PostgREST */,
-				4C90A7CD2B731B6E00FFEF9C /* Realtime */,
-				4C90A7CF2B731B6E00FFEF9C /* Storage */,
-				4C90A7D12B731BF100FFEF9C /* Auth */,
-				4C90A7D32B731BF100FFEF9C /* Functions */,
-				4C90A7D52B731BF100FFEF9C /* PostgREST */,
-				4C90A7D72B731BF100FFEF9C /* Realtime */,
-				4C90A7D92B731BF100FFEF9C /* Storage */,
-				4C90A7DB2B731CF100FFEF9C /* Auth */,
-				4C90A7DD2B731CF100FFEF9C /* Functions */,
-				4C90A7DF2B731CF100FFEF9C /* PostgREST */,
-				4C90A7E12B731CF100FFEF9C /* Realtime */,
-				4C90A7E32B731CF100FFEF9C /* Storage */,
-				4C90A7E52B731CF100FFEF9C /* Supabase */,
 				4C9ED7BF2B9A4DDA00DC135A /* Shimmer */,
 			);
 			productName = Comeet;
 			productReference = 4C60113124B562B6003B425A /* Comeet.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C0DE0000000000000000001F /* ComeetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0DE0000000000000000001E /* Build configuration list for PBXNativeTarget "ComeetTests" */;
+			buildPhases = (
+				C0DE00000000000000000017 /* Sources */,
+				C0DE00000000000000000018 /* Frameworks */,
+				C0DE00000000000000000019 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C0DE0000000000000000001B /* PBXTargetDependency */,
+			);
+			name = ComeetTests;
+			packageProductDependencies = (
+				C0DE00000000000000000001 /* ComeetData */,
+			);
+			productName = ComeetTests;
+			productReference = C0DE00000000000000000015 /* ComeetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -327,15 +332,16 @@
 			);
 			mainGroup = 4C60112824B562B6003B425A;
 			packageReferences = (
+				C0DE00000000000000000002 /* XCLocalSwiftPackageReference "Packages/ComeetData" */,
 				4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 				4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */,
 				4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */,
 			);
 			productRefGroup = 4C60113224B562B6003B425A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				C0DE0000000000000000001F /* ComeetTests */,
 				4C60113024B562B6003B425A /* Comeet */,
 			);
 		};
@@ -347,9 +353,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C60114124B562B8003B425A /* LaunchScreen.storyboard in Resources */,
-				4C163A4F24B913AC00523D05 /* GoogleService-Info.plist in Resources */,
 				4C60113E24B562B8003B425A /* Preview Assets.xcassets in Resources */,
 				4C60113B24B562B8003B425A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DE00000000000000000019 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,13 +372,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0DE00000000000000000005 /* SessionStore.swift in Sources */,
 				4C3108E724BBCDC6003679D7 /* HomeView.swift in Sources */,
 				4C7A9FD1295E9AEE00A63CBD /* SettingsView.swift in Sources */,
 				4C9ED7C82BA0FE0400DC135A /* NamespaceController.swift in Sources */,
 				4C9ED7C32B9A9AEC00DC135A /* DateModule.swift in Sources */,
 				4C163A5324B93BDA00523D05 /* SignInView.swift in Sources */,
 				4C9ED7C62B9E072A00DC135A /* PreviewModels.swift in Sources */,
-				4C087FD429176B1E005B39AB /* Message.swift in Sources */,
 				4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */,
 				4C087FD229176A98005B39AB /* Conversation.swift in Sources */,
 				4C9BD5EB2925F63100C71498 /* UserView.swift in Sources */,
@@ -377,7 +389,6 @@
 				4C3108ED24BBCF00003679D7 /* ChatListView.swift in Sources */,
 				4C743BC12ADB603200C1D171 /* App.swift in Sources */,
 				4C087FD629176D2E005B39AB /* MessageService.swift in Sources */,
-				4C90A7E82B7700C900FFEF9C /* Supabase.swift in Sources */,
 				4C3108E924BBCEF0003679D7 /* MatchListView.swift in Sources */,
 				4C944FB828F60A07008153EE /* MessageView.swift in Sources */,
 				4C4DE26829232092002FC036 /* UserService.swift in Sources */,
@@ -392,7 +403,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0DE00000000000000000017 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE00000000000000000010 /* DataAdapterTests.swift in Sources */,
+				C0DE00000000000000000012 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C0DE0000000000000000001B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4C60113024B562B6003B425A /* Comeet */;
+			targetProxy = C0DE0000000000000000001A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		4C60113F24B562B8003B425A /* LaunchScreen.storyboard */ = {
@@ -534,7 +562,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Comeet/Comeet.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content Comeet/GoogleService-Info.plist";
+				COMEET_API_BASE_URL = "http://192.168.88.5:8284";
+				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content";
 				DEVELOPMENT_TEAM = YVLLUWNZ5K;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -563,7 +592,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Comeet/Comeet.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content Comeet/GoogleService-Info.plist";
+				COMEET_API_BASE_URL = "http://192.168.88.5:8284";
+				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content";
 				DEVELOPMENT_TEAM = YVLLUWNZ5K;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -583,6 +613,38 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C0DE0000000000000000001C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Comeet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Comeet";
+			};
+			name = Debug;
+		};
+		C0DE0000000000000000001D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Comeet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Comeet";
 			};
 			name = Release;
 		};
@@ -607,17 +669,25 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		C0DE0000000000000000001E /* Build configuration list for PBXNativeTarget "ComeetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DE0000000000000000001C /* Debug */,
+				C0DE0000000000000000001D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.3.1;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		C0DE00000000000000000002 /* XCLocalSwiftPackageReference "Packages/ComeetData" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/ComeetData;
 		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
 		4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/markiv/SwiftUI-Shimmer";
@@ -645,86 +715,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4C90A7C72B731B6E00FFEF9C /* Auth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
-		};
-		4C90A7C92B731B6E00FFEF9C /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Functions;
-		};
-		4C90A7CB2B731B6E00FFEF9C /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		4C90A7CD2B731B6E00FFEF9C /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
-		};
-		4C90A7CF2B731B6E00FFEF9C /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Storage;
-		};
-		4C90A7D12B731BF100FFEF9C /* Auth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
-		};
-		4C90A7D32B731BF100FFEF9C /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Functions;
-		};
-		4C90A7D52B731BF100FFEF9C /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		4C90A7D72B731BF100FFEF9C /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
-		};
-		4C90A7D92B731BF100FFEF9C /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Storage;
-		};
-		4C90A7DB2B731CF100FFEF9C /* Auth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
-		};
-		4C90A7DD2B731CF100FFEF9C /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Functions;
-		};
-		4C90A7DF2B731CF100FFEF9C /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		4C90A7E12B731CF100FFEF9C /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
-		};
-		4C90A7E32B731CF100FFEF9C /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Storage;
-		};
-		4C90A7E52B731CF100FFEF9C /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4C90A7C62B731B6E00FFEF9C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
 		4C9ED7BF2B9A4DDA00DC135A /* Shimmer */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */;
@@ -739,6 +729,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */;
 			productName = WrappingHStack;
+		};
+		C0DE00000000000000000001 /* ComeetData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0DE00000000000000000002 /* XCLocalSwiftPackageReference "Packages/ComeetData" */;
+			productName = ComeetData;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
