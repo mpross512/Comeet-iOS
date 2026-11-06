@@ -214,3 +214,134 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
         imageCache.clearDisk { continuation.resume() }
     }
 }
+
+@Test @MainActor func questionnaireSelectionWaitsForContinueAndResetsOnlyNewQuestions() async throws {
+    let repository = AdapterRepository()
+    let session = SessionStore(repository: repository)
+    await session.restore()
+    let flow = AttributeQuestionnaire()
+    flow.load(session.currentUser.attributes)
+    #expect(flow.selectedOption == nil && flow.importance == 3)
+    #expect(try await !flow.saveAnswer(in: session))
+    flow.selectedOption = "Atheist"
+    flow.importance = 5
+    #expect(await repository.savedAttributes.isEmpty)
+    #expect(flow.index == 0)
+    #expect(try await flow.saveAnswer(in: session))
+    #expect(session.currentUser.attributes.first?.value == "Atheist")
+    #expect(session.currentUser.attributes.first?.importance == 5)
+    #expect(!flow.advance())
+    #expect(flow.selectedOption == nil && flow.importance == 3)
+    flow.selectedOption = "Want"
+    flow.importance = 1
+    flow.back()
+    #expect(flow.selectedOption == "Atheist" && flow.importance == 5)
+    #expect(!flow.advance())
+    #expect(flow.selectedOption == "Want" && flow.importance == 1)
+    #expect(try await flow.saveAnswer(in: session))
+    #expect(session.currentUser.attributes.count == 2)
+}
+
+@Test @MainActor func questionnaireSaveFailureKeepsSelectionAndCanRetryBeforeFinishing() async throws {
+    let repository = AdapterRepository()
+    let session = SessionStore(repository: repository)
+    await session.restore()
+    let flow = AttributeQuestionnaire()
+    flow.load([])
+    flow.selectedOption = "Spiritual"
+    flow.importance = 4
+    await repository.configure(fail: true)
+    await #expect(throws: APIError.http(503, "Unavailable")) {
+        _ = try await flow.saveAnswer(in: session)
+    }
+    #expect(flow.index == 0 && flow.selectedOption == "Spiritual" && flow.importance == 4)
+    #expect(!flow.saving && session.currentUser.attributes.isEmpty)
+    await repository.configure()
+    #expect(try await flow.saveAnswer(in: session))
+    for _ in 0..<(flow.questions.count - 1) { #expect(!flow.advance()) }
+    #expect(flow.isLastQuestion && flow.importance == 3 && flow.selectedOption == nil)
+    #expect(flow.advance())
+    #expect(session.currentUser.attributes.count == 1)
+}
+
+@Test @MainActor func questionnaireLoadsSavedAnswersAndSkipPreservesServerValues() async throws {
+    let repository = AdapterRepository()
+    let saved = Attribute(name: "children", importance: 2, value: "Not sure yet")
+    _ = try await repository.saveAttributes([AttributeRecord(name: saved.name, importance: saved.importance, value: saved.value)])
+    let session = SessionStore(repository: repository)
+    await session.restore()
+    let flow = AttributeQuestionnaire()
+    flow.load(session.currentUser.attributes)
+    #expect(!flow.advance())
+    #expect(flow.selectedOption == saved.value && flow.importance == saved.importance)
+    flow.selectedOption = "Want"
+    flow.importance = 5
+    flow.load(session.currentUser.attributes)
+    #expect(flow.selectedOption == "Want" && flow.importance == 5)
+    #expect(!flow.advance()) // Skip doesn't persist the changed draft.
+    #expect(session.currentUser.attributes.first?.value == saved.value)
+    #expect(session.currentUser.attributes.first?.importance == saved.importance)
+    #expect(flow.importance == 3)
+    flow.back()
+    #expect(flow.selectedOption == "Want" && flow.importance == 5)
+}
+
+@Test @MainActor func attributesOverviewCountsKnownAnswersAndIdentifiesMissingTopics() {
+    let summary = PersonalAttributesSummary(attributes: [
+        Attribute(name: "religion", importance: 4, value: "Spiritual"),
+        Attribute(name: "children", importance: 2, value: "Not sure yet"),
+        Attribute(name: "religion", importance: 3, value: "Other"),
+        Attribute(name: "diet", importance: 3, value: "  "),
+        Attribute(name: "legacy", importance: 5, value: "Synthetic legacy value")
+    ])
+    #expect(summary.hasSavedAnswers && summary.answeredCount == 2)
+    #expect(summary.answer(for: "religion")?.value == "Spiritual")
+    #expect(summary.answer(for: "diet") == nil)
+    #expect(summary.answer(for: "exercise") == nil)
+    #expect(!PersonalAttributesSummary(attributes: []).hasSavedAnswers)
+    #expect(!PersonalAttributesSummary(attributes: [Attribute(name: "legacy", importance: 3, value: "Other")]).hasSavedAnswers)
+}
+
+@Test @MainActor func directAttributeEditSavesOnlySelectedTopicAndCanCancelOrRetry() async throws {
+    let repository = AdapterRepository()
+    _ = try await repository.saveAttributes([
+        AttributeRecord(name: "religion", importance: 4, value: "Spiritual"),
+        AttributeRecord(name: "diet", importance: 2, value: "Vegetarian")
+    ])
+    let session = SessionStore(repository: repository)
+    await session.restore()
+    let flow = AttributeQuestionnaire(category: "children")
+    flow.load(session.currentUser.attributes)
+    #expect(flow.isSingleQuestion && flow.question.category == "children")
+    #expect(flow.selectedOption == nil && flow.importance == 3)
+    flow.selectedOption = "Want"
+    #expect(try await flow.saveAnswer(in: session))
+    #expect(flow.advance() && flow.question.category == "children")
+    let summary = PersonalAttributesSummary(attributes: session.currentUser.attributes)
+    #expect(summary.answeredCount == 3)
+    #expect(summary.answer(for: "children")?.value == "Want")
+    #expect(summary.answer(for: "religion")?.importance == 4)
+    #expect(summary.answer(for: "diet")?.value == "Vegetarian")
+
+    let discarded = AttributeQuestionnaire(category: "children")
+    discarded.load(session.currentUser.attributes)
+    discarded.selectedOption = "Don't want"
+    discarded.importance = 1 // Cancel discards this draft without calling saveAnswer.
+    let reopened = AttributeQuestionnaire(category: "children")
+    reopened.load(session.currentUser.attributes)
+    #expect(reopened.selectedOption == "Want" && reopened.importance == 3)
+    reopened.selectedOption = "Don't want"
+    reopened.importance = 1
+    await repository.configure(fail: true)
+    await #expect(throws: APIError.http(503, "Unavailable")) { _ = try await reopened.saveAnswer(in: session) }
+    #expect(reopened.question.category == "children" && !reopened.saving)
+    #expect(PersonalAttributesSummary(attributes: session.currentUser.attributes).answer(for: "children")?.value == "Want")
+    await repository.configure()
+    #expect(try await reopened.saveAnswer(in: session))
+    try await session.reloadProfile()
+    let updated = PersonalAttributesSummary(attributes: session.currentUser.attributes)
+    #expect(updated.answeredCount == 3)
+    #expect(updated.answer(for: "children")?.value == "Don't want")
+    #expect(updated.answer(for: "children")?.importance == 1)
+    #expect(updated.answer(for: "religion")?.value == "Spiritual")
+}

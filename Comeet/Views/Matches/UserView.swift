@@ -68,19 +68,17 @@ struct UserInterests: View {
     var attributes: [Attribute]
     
     var body: some View {
-        WrappingHStack(attributes) { attribute in
-            if (attribute.importance >= 3  && attribute.value != "") {
-                UserInterest(text: attribute.value, emoji: attribute.name)
-                    .padding(5)
-            }
+        WrappingHStack(attributes.filter { $0.importance >= 3 && !$0.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) { attribute in
+            UserInterest(text: attribute.value, emoji: attribute.name)
+                .padding(5)
         }.padding(10)
     }
 }
 
 struct UserInterest: View {
     
-    @State var text: String
-    @State var emoji: String
+    let text: String
+    let emoji: String
     
     var body: some View {
         

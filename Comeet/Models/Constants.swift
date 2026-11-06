@@ -155,7 +155,38 @@ struct Constants {
             var category: String
             var question: String
             var options: [String]
-            
+
+            var title: String {
+                switch category {
+                case "religion": "Religion"
+                case "children": "Children"
+                case "politics": "Politics"
+                case "alcohol": "Drinking"
+                case "smoking": "Smoking"
+                case "marriage": "Marriage"
+                case "exercise": "Exercise"
+                case "lovelanguage": "Love language"
+                case "socialmedia": "Social media"
+                case "diet": "Diet"
+                default: category.capitalized
+                }
+            }
+
+            var importancePrompt: String {
+                switch category {
+                case "religion": "How important is sharing your religion?"
+                case "children": "How important is having similar plans for children?"
+                case "politics": "How important is sharing your political views?"
+                case "alcohol": "How important are similar drinking habits?"
+                case "smoking": "How important are similar smoking habits?"
+                case "marriage": "How important is having similar plans for marriage?"
+                case "exercise": "How important is a similar exercise routine?"
+                case "lovelanguage": "How important is sharing your love language?"
+                case "socialmedia": "How important are similar social media habits?"
+                case "diet": "How important is sharing your diet?"
+                default: "How important is sharing this value?"
+                }
+            }
         }
     }
     

@@ -96,7 +96,7 @@ struct ProfileEditView: View {
                 Button {
                     isShowingQuestionsView = true
                 } label: {
-                    Text("Personal Attributes")
+                    Text("Values & Lifestyle")
                 }
             } header: {
                 Text("MORE")
@@ -126,7 +126,7 @@ struct ProfileEditView: View {
         }.sheet(isPresented: $isShowPhotoLibrary) {
             ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
         }.sheet(isPresented: $isShowingQuestionsView){
-            QuestionsView(currentQuestion: 0, isPresented: $isShowingQuestionsView)
+            PersonalAttributesView(isPresented: $isShowingQuestionsView, attributes: session.currentUser.attributes)
         }.alert(isPresented: $imageAlertShown) {
             Alert(title: Text("Image Saved"))
         }.alert("Could not save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
