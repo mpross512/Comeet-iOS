@@ -108,7 +108,6 @@ struct SignOutButton: View {
 }
 
 struct ProfilePicture: View {
-    @Environment(NamespaceController.self) var namespace
     
     @Environment(SessionStore.self) private var session
     let userID: UUID
@@ -136,7 +135,6 @@ struct ProfilePicture: View {
             }))
             .id(photoRefreshID)
             .aspectRatio(contentMode: .fill)
-            .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
             .transition(.offset())
             .transition(.scale)
             .frame(width: width, height: height)
@@ -146,18 +144,16 @@ struct ProfilePicture: View {
 }
 
 struct UserBio: View {
-    @Environment(NamespaceController.self) var namespace
     
     let user: any Person
+    var matchAnimation: Namespace.ID? = nil
     
     var body: some View {
         VStack {
             
-            Text("\(user.fullName), \(user.age)")
+            profileText("\(user.fullName), \(user.age)", element: "name")
                 .font(.title)
-                .matchedGeometryEffect(id: "MatchName", in: namespace.matchCard)
-            Text("Class of \(String(user.graduationYear))")
-                .matchedGeometryEffect(id: "MatchYear", in: namespace.matchCard)
+            profileText("Class of \(String(user.graduationYear))", element: "year")
             
             HStack {
                 Text("About")
@@ -193,6 +189,18 @@ struct UserBio: View {
             
             
             
+        }
+    }
+}
+
+private extension UserBio {
+    @ViewBuilder
+    func profileText(_ text: String, element: String) -> some View {
+        if let matchAnimation {
+            Text(text)
+                .matchedGeometryEffect(id: "\(user.id)-\(element)", in: matchAnimation)
+        } else {
+            Text(text)
         }
     }
 }

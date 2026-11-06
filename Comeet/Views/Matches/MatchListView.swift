@@ -40,7 +40,8 @@ struct MatchView: View {
                                     NavigationLink {
                                         UserView(user: match)
                                     } label: {
-                                        MatchCardView(match: match)
+                                        MatchCardView(match: match, animation: matchCardAnimation,
+                                                      isSource: selectedUser?.id != match.id)
                                             .onTapGesture {
                                                 withAnimation(.snappy) {
                                                     selectedUser = match
@@ -59,7 +60,7 @@ struct MatchView: View {
                             ScrollView {
                                 VStack {
                                     if selectedUser != nil {
-                                        MatchDetailView(match: selectedUser as! Match)
+                                        MatchDetailView(match: selectedUser as! Match, animation: matchCardAnimation)
                                             .onTapGesture {
                                                 withAnimation(.smooth) {
                                                     selectedUser = nil
@@ -68,7 +69,7 @@ struct MatchView: View {
                                             .transition(.scale(scale: 1))
                                     }
                                     if selectedUser != nil {
-                                        UserBio(user: selectedUser as! Match)
+                                        UserBio(user: selectedUser as! Match, matchAnimation: matchCardAnimation)
                                             .background(RoundedRectangle(cornerRadius: 25.0).foregroundStyle(.white))
                                             .offset(y: -40)
                                             .transition(.move(edge: .bottom))
@@ -94,13 +95,16 @@ struct MatchView: View {
 }
 
 struct MatchCardView: View {
-    @Environment(NamespaceController.self) var namespace
+    let animation: Namespace.ID
+    let isSource: Bool
     
     var profileURL: URL
     var match: Match
     
     
-    init(match: Match) {
+    init(match: Match, animation: Namespace.ID, isSource: Bool) {
+        self.animation = animation
+        self.isSource = isSource
         self.match = match
         self.profileURL = APIConfiguration.photoURL(userID: match.id)
     }
@@ -111,7 +115,7 @@ struct MatchCardView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .clipShape(RoundedRectangle(cornerRadius: 25.0))
-                .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
+                .matchedGeometryEffect(id: "\(match.id)-image", in: animation, isSource: isSource)
             LinearGradient(colors: [.clear, .clear, .clear, .black], startPoint: .top, endPoint: .bottom)
                 .opacity(0.5)
             VStack {
@@ -121,14 +125,14 @@ struct MatchCardView: View {
                         .foregroundStyle(.white)
                         .font(.title)
                         .minimumScaleFactor(0.1)
-                        .matchedGeometryEffect(id: "MatchName", in: namespace.matchCard)
+                        .matchedGeometryEffect(id: "\(match.id)-name", in: animation, isSource: isSource)
                         //.padding(.leading)
                     Spacer()
                 }
                 HStack {
                     Text("Class of \(String(match.graduationYear))")
                         .foregroundStyle(.white)
-                        .matchedGeometryEffect(id: "MatchYear", in: namespace.matchCard)
+                        .matchedGeometryEffect(id: "\(match.id)-year", in: animation, isSource: isSource)
                     Spacer()
                     Text(match.major)
                         .foregroundStyle(.white)
@@ -141,13 +145,14 @@ struct MatchCardView: View {
 }
 
 struct MatchDetailView: View {
-    @Environment(NamespaceController.self) var namespace
+    let animation: Namespace.ID
     @State var scrollPosition: Int?
     
     var profileURL: URL
     var match: Match
     
-    init(match: Match) {
+    init(match: Match, animation: Namespace.ID) {
+        self.animation = animation
         self.match = match
         self.profileURL = APIConfiguration.photoURL(userID: match.id)
     }
@@ -157,7 +162,7 @@ struct MatchDetailView: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(maxWidth: .infinity)
-            .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
+            .matchedGeometryEffect(id: "\(match.id)-image", in: animation)
     }
 }
 
