@@ -7,25 +7,12 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
 struct EditView: View {
-    @Environment(UserService.self) var userService: UserService
-    @State private var isShowPhotoLibrary = false
-    @State private var imageAlertShown = false
-    @State var imageCache = SDImageCache.shared
-    
-    var user: User
-    
+    let user: User
+
     var body: some View {
-        VStack {
-                ProfileEditView(user: user)
-        }.sheet(isPresented: $isShowPhotoLibrary) {
-            ImagePicker(isShown: $isShowPhotoLibrary, alertShown: $imageAlertShown)
-        }.alert(isPresented: $imageAlertShown) {
-            Alert(title: Text("Image Saved"),
-            message: Text("You may need to close the app for the new image to take effect"))
-        }
+        ProfileEditView(user: user)
     }
 }
 
@@ -36,7 +23,7 @@ struct EditView_Previews: PreviewProvider {
 }
 
 struct ImagePicker: UIViewControllerRepresentable {
-    @Environment(UserService.self) private var userService
+    @Environment(SessionStore.self) private var session
     
     @Binding var isShown: Bool
     
@@ -54,18 +41,18 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(userService: userService, isShown: $isShown, alertShown: $alertShown)
+        Coordinator(session: session, isShown: $isShown, alertShown: $alertShown)
     }
 
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
     
     final class Coordinator : NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let userService: UserService
+        let session: SessionStore
         @Binding var isShown: Bool
         @Binding var alertShown: Bool
         
-        init(userService: UserService, isShown: Binding<Bool>, alertShown: Binding<Bool>) {
-            self.userService = userService
+        init(session: SessionStore, isShown: Binding<Bool>, alertShown: Binding<Bool>) {
+            self.session = session
             _isShown = isShown
             _alertShown = alertShown
         }
@@ -82,15 +69,11 @@ struct ImagePicker: UIViewControllerRepresentable {
                 Task { @MainActor in
                     guard let data = image.jpegData(compressionQuality: 0.8) else { return }
                     do {
-                        try await userService.uploadNewImage(data: data)
-                        SDImageCache.shared.clearMemory()
-                        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-                            SDImageCache.shared.clearDisk(onCompletion: { continuation.resume() })
-                        }
+                        try await session.uploadPhoto(data)
                         isShown = false
                         alertShown = true
                     } catch {
-                        SessionStore.shared.handle(error)
+                        session.handle(error)
                         let alert = UIAlertController(title: "Could not upload photo", message: error.localizedDescription, preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .default))
                         picker.present(alert, animated: true)

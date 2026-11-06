@@ -33,7 +33,7 @@ struct QuestionsView: View {
 }
 
 struct QuestionView: View {
-    @Environment(UserService.self) var userService: UserService
+    @Environment(SessionStore.self) var session
     @Environment(User.self) var currentUser: User
     @Binding var question: Double
     @Binding var isPresented: Bool
@@ -60,10 +60,9 @@ struct QuestionView: View {
                                     attributes[index] = answer
                                 } else { attributes.append(answer) }
                                 do {
-                                    try await userService.saveAttributes(attributes)
-                                    currentUser.attributes = attributes
+                                    try await session.saveAttributes(attributes)
                                     advance()
-                                } catch { SessionStore.shared.handle(error); saveError = error.localizedDescription }
+                                } catch { session.handle(error); saveError = error.localizedDescription }
                             }
                         } label: {
                             Text(option)

@@ -1,9 +1,13 @@
 import Foundation
 import Testing
 import ComeetData
+import UIKit
+import SDWebImage
 @testable import Comeet
 
 private actor AdapterRepository: ComeetRepository {
+    var savedFields: ProfileFields?
+    var savedAttributes: [AttributeRecord] = []
     var missingProfile = false
     var restoredSession = true
     var failWrites = false
@@ -21,15 +25,23 @@ private actor AdapterRepository: ComeetRepository {
     func resendConfirmation(email: String) { }
     func profile() throws -> ProfileRecord {
         if missingProfile { throw APIError.http(404, "Not found") }
-        return try JSONDecoder().decode(ProfileRecord.self, from: Data(adapterProfile.utf8))
+        var json = try #require(JSONSerialization.jsonObject(with: Data(adapterProfile.utf8)) as? [String: Any])
+        if let savedFields {
+            let fields = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(savedFields)) as? [String: Any])
+            json.merge(fields) { _, saved in saved }
+        }
+        json["attributes"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(savedAttributes))
+        return try JSONDecoder().decode(ProfileRecord.self, from: JSONSerialization.data(withJSONObject: json))
     }
     func saveProfile(_ fields: ProfileFields) throws -> ProfileRecord {
         if failWrites { throw APIError.http(503, "Unavailable") }
         missingProfile = false
+        savedFields = fields
         return try profile()
     }
     func saveAttributes(_ attributes: [AttributeRecord]) throws -> [AttributeRecord] {
         if failWrites { throw APIError.http(503, "Unavailable") }
+        savedAttributes = attributes
         return attributes
     }
     func like(matchID: UUID) throws -> LikeRecord {
@@ -128,4 +140,77 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     #expect(try store.load()?.refreshToken == "synthetic-new-refresh")
     try store.save(nil)
     #expect(try store.load() == nil)
+}
+
+@Test @MainActor func profileEditsAndAttributesRemainCurrentAfterReload() async throws {
+    let repository = AdapterRepository()
+    let session = SessionStore(repository: repository)
+    await session.restore()
+    let oldUser = session.currentUser
+    let fields = ProfileFields(firstName: "Taylor", lastName: "Example", birthdate: "2001-03-04",
+                               graduationYear: 2028, major: "Arts", bio: "Updated bio")
+    try await session.saveProfile(fields)
+    // Display views must consume the replacement input rather than retain oldUser in @State.
+    let bio = UserBio(user: session.currentUser)
+    #expect(bio.user.fullName == "Taylor Example")
+    #expect(bio.user.bio == "Updated bio" && bio.user.major == "Arts")
+    #expect(bio.user.graduationYear == 2028 && WireDates.birthday(bio.user.birthdate) == "2001-03-04")
+    #expect(session.currentUser !== oldUser)
+    try await session.saveAttributes([Attribute(name: "Interests", importance: 4, value: "Music")])
+    #expect(session.currentUser.attributes.first?.value == "Music")
+    try await session.reloadProfile()
+    #expect(session.currentUser.bio == "Updated bio")
+    #expect(session.currentUser.attributes.first?.value == "Music")
+    #expect(session.currentUser.matches.count == 1 && session.currentUser.likes.count == 1)
+
+    await repository.configure(fail: true)
+    await #expect(throws: APIError.http(503, "Unavailable")) { try await session.saveProfile(fields) }
+    await #expect(throws: APIError.http(503, "Unavailable")) { try await session.saveAttributes([]) }
+    #expect(session.currentUser.bio == "Updated bio" && session.currentUser.attributes.count == 1)
+}
+
+@Test @MainActor func photoUploadReplacesOnlyOwnerCachesWithStableURL() async throws {
+    let repository = AdapterRepository()
+    let imageCache = SDImageCache(namespace: "photo-tests-\(UUID().uuidString)")
+    let httpCache = URLCache(memoryCapacity: 1024 * 1024, diskCapacity: 0)
+    let session = SessionStore(repository: repository,
+                               photoCache: ProfilePhotoCache(imageCache: imageCache, httpCache: httpCache))
+    await session.restore()
+    let ownerURL = APIConfiguration.photoURL(userID: session.currentUser.id)
+    let peerURL = APIConfiguration.photoURL(userID: try #require(session.currentUser.matches.first?.id))
+    let renderer = UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2))
+    let oldImage = renderer.image { context in
+        UIColor.red.setFill(); context.fill(CGRect(x: 0, y: 0, width: 2, height: 2))
+    }
+    let newImage = renderer.image { context in
+        UIColor.blue.setFill(); context.fill(CGRect(x: 0, y: 0, width: 2, height: 2))
+    }
+    let data = try #require(newImage.jpegData(compressionQuality: 0.8))
+    for url in [ownerURL, peerURL] {
+        imageCache.storeImage(toMemory: oldImage, forKey: url.absoluteString)
+        let response = try #require(HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil,
+                                                  headerFields: ["Cache-Control": "max-age=60"]))
+        httpCache.storeCachedResponse(CachedURLResponse(response: response, data: Data([1])), for: URLRequest(url: url))
+    }
+    let originalRevision = session.profilePhotoRevision
+    try await session.uploadPhoto(data)
+    #expect(APIConfiguration.photoURL(userID: session.currentUser.id) == ownerURL)
+    #expect(ownerURL.query == nil)
+    #expect(session.profilePhotoRevision != originalRevision)
+    #expect(imageCache.imageFromMemoryCache(forKey: ownerURL.absoluteString)?.jpegData(compressionQuality: 0.8) != oldImage.jpegData(compressionQuality: 0.8))
+    #expect(imageCache.diskImageData(forKey: ownerURL.absoluteString) == data)
+    #expect(httpCache.cachedResponse(for: URLRequest(url: ownerURL)) == nil)
+    #expect(imageCache.imageFromMemoryCache(forKey: peerURL.absoluteString) === oldImage)
+    #expect(httpCache.cachedResponse(for: URLRequest(url: peerURL))?.data == Data([1]))
+
+    let updatedRevision = session.profilePhotoRevision
+    try await session.reloadProfile()
+    #expect(session.profilePhotoRevision == updatedRevision)
+    await repository.configure(fail: true)
+    await #expect(throws: APIError.http(503, "Unavailable")) { try await session.uploadPhoto(try #require(oldImage.jpegData(compressionQuality: 0.8))) }
+    #expect(session.profilePhotoRevision == updatedRevision)
+    #expect(imageCache.diskImageData(forKey: ownerURL.absoluteString) == data)
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        imageCache.clearDisk { continuation.resume() }
+    }
 }

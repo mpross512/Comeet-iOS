@@ -14,11 +14,8 @@ struct ProfileView: View {
     @Environment(User.self) var currentUser: User
     
     @State var isInEditMode: Bool = false
-    @State var profilePicURL: URL?
-    @State var imageCache = SDImageCache.shared
     @State var settingsPageShown: Bool = false
         
-    var user: User = User()
     
     var body: some View {
         
@@ -113,7 +110,10 @@ struct SignOutButton: View {
 struct ProfilePicture: View {
     @Environment(NamespaceController.self) var namespace
     
-    let profileURL: URL
+    @Environment(SessionStore.self) private var session
+    let userID: UUID
+    var profileURL: URL { APIConfiguration.photoURL(userID: userID) }
+    var photoRefreshID: UUID? { userID == session.currentUser.id ? session.profilePhotoRevision : nil }
     let width: CGFloat
     let height: CGFloat
     
@@ -121,7 +121,7 @@ struct ProfilePicture: View {
         self.width = width
         self.height = height
         
-        self.profileURL = APIConfiguration.photoURL(userID: userID)
+        self.userID = userID
     }
     
     var body: some View {
@@ -134,6 +134,7 @@ struct ProfilePicture: View {
                     .clipShape(Circle())
                     .redacted(reason: .placeholder)
             }))
+            .id(photoRefreshID)
             .aspectRatio(contentMode: .fill)
             .matchedGeometryEffect(id: "MatchImage", in: namespace.matchCard)
             .transition(.offset())
@@ -147,7 +148,7 @@ struct ProfilePicture: View {
 struct UserBio: View {
     @Environment(NamespaceController.self) var namespace
     
-    @State var user: any Person = User()
+    let user: any Person
     
     var body: some View {
         VStack {

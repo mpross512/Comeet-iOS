@@ -1,19 +1,27 @@
 import Foundation
 import Observation
 import ComeetData
+import UIKit
+import SDWebImage
 
 // Observable UI state stays on the main actor; the repository owns transport and secure tokens.
 @MainActor @Observable
 final class SessionStore {
     static let shared = SessionStore()
     let repository: any ComeetRepository
+    private let photoCache: ProfilePhotoCache
     var currentUser = User()
     var authenticated = false
     var restored = false
     var needsProfile = false
     var errorMessage: String?
+    private(set) var profilePhotoRevision = UUID()
 
-    init(repository: any ComeetRepository = APIConfiguration.client) { self.repository = repository }
+    init(repository: any ComeetRepository = APIConfiguration.client,
+         photoCache: ProfilePhotoCache = ProfilePhotoCache()) {
+        self.repository = repository
+        self.photoCache = photoCache
+    }
 
     func restore() async {
         errorMessage = nil
@@ -57,11 +65,48 @@ final class SessionStore {
         currentUser = try User(record: await repository.saveProfile(fields))
         needsProfile = false
     }
+    func uploadPhoto(_ data: Data) async throws {
+        guard let image = UIImage(data: data) else { throw APIError.invalidResponse }
+        let userID = currentUser.id
+        try await repository.uploadPhoto(data, contentType: "image/jpeg")
+        await photoCache.replace(image, data: data, at: APIConfiguration.photoURL(userID: userID))
+        // Only recreate visible owner images after their replacement cache entry is ready.
+        if currentUser.id == userID { profilePhotoRevision = UUID() }
+    }
+    func saveAttributes(_ attributes: [Attribute]) async throws {
+        let saved = try await repository.saveAttributes(attributes.map {
+            AttributeRecord(name: $0.name, importance: $0.importance, value: $0.value)
+        })
+        currentUser.attributes = saved.map { Attribute(name: $0.name, importance: $0.importance, value: $0.value) }
+    }
     func handle(_ error: Error) {
         if error as? APIError == .signedOut { clearUser() }
     }
     private func clearUser() {
+        profilePhotoRevision = UUID()
         currentUser = User(); authenticated = false; needsProfile = false
+    }
+}
+
+// Keeps image-library and HTTP cache maintenance out of the picker and transport layer.
+@MainActor
+final class ProfilePhotoCache {
+    private let imageCache: SDImageCache
+    private let httpCache: URLCache
+
+    init(imageCache: SDImageCache = .shared, httpCache: URLCache = .shared) {
+        self.imageCache = imageCache
+        self.httpCache = httpCache
+    }
+
+    func replace(_ image: UIImage, data: Data, at url: URL) async {
+        httpCache.removeCachedResponse(for: URLRequest(url: url))
+        let key = SDWebImageManager.shared.cacheKey(for: url)
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            imageCache.store(image, imageData: data, forKey: key, toDisk: true) {
+                continuation.resume()
+            }
+        }
     }
 }
 
