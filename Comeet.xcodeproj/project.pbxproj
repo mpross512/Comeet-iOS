@@ -41,11 +41,21 @@
 		4CE3B49E24BAB07F00DD1912 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */; };
 		4CEBEBE9262925FB0086D788 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEBEBE8262925FB0086D788 /* EditView.swift */; };
 		C0DE00000000000000000003 /* ComeetData in Frameworks */ = {isa = PBXBuildFile; productRef = C0DE00000000000000000001 /* ComeetData */; };
-		C0DE00000000000000000005 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000004; };
-		C0DE00000000000000000010 = {isa = PBXBuildFile; fileRef = C0DE00000000000000000011; };
-		C0DE00000000000000000012 = {isa = PBXBuildFile; fileRef = C0DE00000000000000000013; };
-		C0DE00000000000000000014 = {isa = PBXBuildFile; productRef = C0DE00000000000000000001; };
+		C0DE00000000000000000005 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000004 /* SessionStore.swift */; };
+		C0DE00000000000000000010 /* DataAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000011 /* DataAdapterTests.swift */; };
+		C0DE00000000000000000012 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000013 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift */; };
+		C0DE00000000000000000014 /* ComeetData in Frameworks */ = {isa = PBXBuildFile; productRef = C0DE00000000000000000001 /* ComeetData */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C0DE0000000000000000001A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C60112924B562B6003B425A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4C60113024B562B6003B425A;
+			remoteInfo = Comeet;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4C087FD129176A98005B39AB /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
@@ -82,9 +92,9 @@
 		4CE3B49D24BAB07F00DD1912 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		4CEBEBE8262925FB0086D788 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		C0DE00000000000000000004 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
-		C0DE00000000000000000011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataAdapterTests.swift; sourceTree = "<group>"; };
-		C0DE00000000000000000013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift; sourceTree = SOURCE_ROOT; };
-		C0DE00000000000000000015 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ComeetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0DE00000000000000000011 /* DataAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataAdapterTests.swift; sourceTree = "<group>"; };
+		C0DE00000000000000000013 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift; sourceTree = SOURCE_ROOT; };
+		C0DE00000000000000000015 /* ComeetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ComeetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,7 +109,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C0DE00000000000000000018 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (C0DE00000000000000000014,); runOnlyForDeploymentPostprocessing = 0; };
+		C0DE00000000000000000018 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE00000000000000000014 /* ComeetData in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -233,7 +250,15 @@
 			path = Chat;
 			sourceTree = "<group>";
 		};
-		C0DE00000000000000000016 = {isa = PBXGroup; children = (C0DE00000000000000000011, C0DE00000000000000000013,); path = ComeetTests; sourceTree = "<group>"; };
+		C0DE00000000000000000016 /* ComeetTests */ = {
+			isa = PBXGroup;
+			children = (
+				C0DE00000000000000000011 /* DataAdapterTests.swift */,
+				C0DE00000000000000000013 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift */,
+			);
+			path = ComeetTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -260,7 +285,27 @@
 			productReference = 4C60113124B562B6003B425A /* Comeet.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C0DE0000000000000000001F /* ComeetTests */ = {isa = PBXNativeTarget; buildConfigurationList = C0DE0000000000000000001E; buildPhases = (C0DE00000000000000000017, C0DE00000000000000000018, C0DE00000000000000000019,); buildRules = (); dependencies = (C0DE0000000000000000001B,); name = ComeetTests; packageProductDependencies = (C0DE00000000000000000001,); productName = ComeetTests; productReference = C0DE00000000000000000015; productType = "com.apple.product-type.bundle.unit-test"; };
+		C0DE0000000000000000001F /* ComeetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0DE0000000000000000001E /* Build configuration list for PBXNativeTarget "ComeetTests" */;
+			buildPhases = (
+				C0DE00000000000000000017 /* Sources */,
+				C0DE00000000000000000018 /* Frameworks */,
+				C0DE00000000000000000019 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C0DE0000000000000000001B /* PBXTargetDependency */,
+			);
+			name = ComeetTests;
+			packageProductDependencies = (
+				C0DE00000000000000000001 /* ComeetData */,
+			);
+			productName = ComeetTests;
+			productReference = C0DE00000000000000000015 /* ComeetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -287,7 +332,7 @@
 			);
 			mainGroup = 4C60112824B562B6003B425A;
 			packageReferences = (
-				C0DE00000000000000000002 /* ComeetData */,
+				C0DE00000000000000000002 /* XCLocalSwiftPackageReference "Packages/ComeetData" */,
 				4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 				4CA7441E2AF06E90002530D7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				4C9ED7BE2B9A4DDA00DC135A /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */,
@@ -313,7 +358,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C0DE00000000000000000019 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		C0DE00000000000000000019 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -352,8 +403,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C0DE00000000000000000017 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (C0DE00000000000000000010, C0DE00000000000000000012,); runOnlyForDeploymentPostprocessing = 0; };
+		C0DE00000000000000000017 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE00000000000000000010 /* DataAdapterTests.swift in Sources */,
+				C0DE00000000000000000012 /* Packages/ComeetData/Tests/ComeetDataTests/APIClientTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C0DE0000000000000000001B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4C60113024B562B6003B425A /* Comeet */;
+			targetProxy = C0DE0000000000000000001A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		4C60113F24B562B8003B425A /* LaunchScreen.storyboard */ = {
@@ -495,6 +562,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Comeet/Comeet.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				COMEET_API_BASE_URL = "http://192.168.88.5:8284";
 				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content";
 				DEVELOPMENT_TEAM = YVLLUWNZ5K;
 				ENABLE_PREVIEWS = YES;
@@ -503,7 +571,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Comeet/Info.plist;
-				COMEET_API_BASE_URL = "http://localhost:5158";
 				INFOPLIST_KEY_CFBundleDisplayName = Comeet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -525,6 +592,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Comeet/Comeet.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				COMEET_API_BASE_URL = "http://192.168.88.5:8284";
 				DEVELOPMENT_ASSET_PATHS = "Comeet/Preview\\ Content";
 				DEVELOPMENT_TEAM = YVLLUWNZ5K;
 				ENABLE_PREVIEWS = YES;
@@ -533,7 +601,6 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Comeet/Info.plist;
-				COMEET_API_BASE_URL = "https://api.example.invalid";
 				INFOPLIST_KEY_CFBundleDisplayName = Comeet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -549,8 +616,38 @@
 			};
 			name = Release;
 		};
-		C0DE0000000000000000001C = {isa = XCBuildConfiguration; buildSettings = {GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_VERSION = 6.0; PRODUCT_BUNDLE_IDENTIFIER = com.Comeet.tests; PRODUCT_NAME = "$(TARGET_NAME)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Comeet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Comeet"; BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; TARGETED_DEVICE_FAMILY = "1,2";}; name = Debug; };
-		C0DE0000000000000000001D = {isa = XCBuildConfiguration; buildSettings = {GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_VERSION = 6.0; PRODUCT_BUNDLE_IDENTIFIER = com.Comeet.tests; PRODUCT_NAME = "$(TARGET_NAME)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Comeet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Comeet"; BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; TARGETED_DEVICE_FAMILY = "1,2";}; name = Release; };
+		C0DE0000000000000000001C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Comeet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Comeet";
+			};
+			name = Debug;
+		};
+		C0DE0000000000000000001D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Comeet.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Comeet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Comeet";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -572,11 +669,22 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C0DE0000000000000000001E = {isa = XCConfigurationList; buildConfigurations = (C0DE0000000000000000001C, C0DE0000000000000000001D,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		C0DE0000000000000000001E /* Build configuration list for PBXNativeTarget "ComeetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DE0000000000000000001C /* Debug */,
+				C0DE0000000000000000001D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		C0DE00000000000000000002 = {isa = XCLocalSwiftPackageReference; relativePath = Packages/ComeetData; };
+		C0DE00000000000000000002 /* XCLocalSwiftPackageReference "Packages/ComeetData" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/ComeetData;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -622,14 +730,12 @@
 			package = 4CC50CEF292D5980004B495B /* XCRemoteSwiftPackageReference "WrappingHStack" */;
 			productName = WrappingHStack;
 		};
-		C0DE00000000000000000001 /* ComeetData */ = {isa = XCSwiftPackageProductDependency; package = C0DE00000000000000000002; productName = ComeetData; };
+		C0DE00000000000000000001 /* ComeetData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0DE00000000000000000002 /* XCLocalSwiftPackageReference "Packages/ComeetData" */;
+			productName = ComeetData;
+		};
 /* End XCSwiftPackageProductDependency section */
-/* Begin PBXContainerItemProxy section */
-		C0DE0000000000000000001A = {isa = PBXContainerItemProxy; containerPortal = 4C60112924B562B6003B425A; proxyType = 1; remoteGlobalIDString = 4C60113024B562B6003B425A; remoteInfo = Comeet; };
-/* End PBXContainerItemProxy section */
-/* Begin PBXTargetDependency section */
-		C0DE0000000000000000001B = {isa = PBXTargetDependency; target = 4C60113024B562B6003B425A; targetProxy = C0DE0000000000000000001A; };
-/* End PBXTargetDependency section */
 	};
 	rootObject = 4C60112924B562B6003B425A /* Project object */;
 }

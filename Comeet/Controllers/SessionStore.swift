@@ -70,7 +70,7 @@ final class APIConfiguration {
     static let baseURL: URL = {
         guard let value = Bundle.main.object(forInfoDictionaryKey: "ComeetAPIBaseURL") as? String,
               let url = URL(string: value), let host = url.host,
-              url.scheme == "https" || (url.scheme == "http" && ["localhost", "127.0.0.1"].contains(host)) else {
+              url.scheme == "https" || (url.scheme == "http" && ["localhost", "127.0.0.1", "192.168.88.5"].contains(host)) else {
             preconditionFailure("Set ComeetAPIBaseURL to an HTTPS API address (or loopback HTTP for development).")
         }
         return url

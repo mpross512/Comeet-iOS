@@ -29,8 +29,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
       <Testables>
-         <TestableReference skipped="NO">
-            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="C0DE0000000000000000001F" BuildableName="ComeetTests.xctest" BlueprintName="ComeetTests" ReferencedContainer="container:Comeet.xcodeproj" />
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C0DE0000000000000000001F"
+               BuildableName = "ComeetTests.xctest"
+               BlueprintName = "ComeetTests"
+               ReferencedContainer = "container:Comeet.xcodeproj">
+            </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>
