@@ -7,6 +7,8 @@ public protocol ComeetRepository: Sendable {
     func signOut() async throws
     func account() async throws -> AccountInfo
     func resendConfirmation(email: String) async throws
+    func requestPasswordReset(email: String) async throws
+    func resetPassword(email: String, resetCode: String, newPassword: String) async throws
     func profile() async throws -> ProfileRecord
     func saveProfile(_ fields: ProfileFields) async throws -> ProfileRecord
     func saveAttributes(_ attributes: [AttributeRecord]) async throws -> [AttributeRecord]

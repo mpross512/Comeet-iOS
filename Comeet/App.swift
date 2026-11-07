@@ -11,17 +11,23 @@ struct ComeetApp: App {
             ZStack {
                 if session.restored {
                     if session.authenticated && session.needsProfile {
-                        ProfileCreationView()
+                        if session.showVerification {
+                            VerifyEmailView(allowProfileSetup: true)
+                        } else {
+                            ProfileCreationView()
+                        }
                     } else {
                         MasterView(authenticated: session.authenticated)
                     }
                 } else {
-                    Color.orange.ignoresSafeArea()
+                    Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
                     if let error = session.errorMessage {
                         VStack {
                             Text(error)
                             Button("Retry") { Task { await session.restore() } }
                         }.padding()
+                    } else {
+                        ProgressView("Opening Comeet…")
                     }
                 }
             }

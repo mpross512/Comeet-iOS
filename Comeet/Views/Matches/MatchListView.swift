@@ -13,18 +13,20 @@ struct MatchView: View {
     @Environment(User.self) var currentUser: User
     @Environment(SessionStore.self) var session
     var user = User()
-    @State var emailConfirmed = false
-    @State var loading = true
+    @State private var refresh = MatchRefreshState()
     @Environment(\.scenePhase) private var scenePhase
-    @State private var loadError: String?
     @State var selectedUser: (any Person)? = nil
     @State var isZoomed = false
     
     @Namespace var matchCardAnimation
     
+    init(loading: Bool = true) {
+        _refresh = State(initialValue: MatchRefreshState(loading: loading))
+    }
+
     var body: some View {
         ZStack {
-            if(!emailConfirmed && !loading) {
+            if(session.accountInfo?.emailConfirmed == false && !refresh.loading) {
                 VerifyEmailView()
             } else {
                 NavigationView {
@@ -32,7 +34,7 @@ struct MatchView: View {
                         if currentUser.matches.isEmpty {
                             Text("No matches right now, check back on Monday!").italic()
                         }
-                        if(loading) {
+                        if(refresh.loading) {
                             LoadingMatchView()
                         } else {
                             LazyVStack {
@@ -83,14 +85,39 @@ struct MatchView: View {
             }
         }.task(id: scenePhase) {
             guard scenePhase == .active else { return }
-            do {
-                emailConfirmed = try await session.repository.account().emailConfirmed
-                try await session.reloadProfile()
-                loading = false
-            } catch { SessionStore.shared.handle(error); loading = false; loadError = error.localizedDescription }
-        }.alert("Could not load matches", isPresented: Binding(get: { loadError != nil }, set: { if !$0 { loadError = nil } })) {
-            Button("OK") { loadError = nil }
-        } message: { Text(loadError ?? "") }
+            await refresh.load(session: session)
+        }.alert("Could not load matches", isPresented: Binding(get: { refresh.errorMessage != nil }, set: { if !$0 { refresh.errorMessage = nil } })) {
+            Button("OK") { refresh.errorMessage = nil }
+        } message: { Text(refresh.errorMessage ?? "") }
+    }
+}
+
+// Scene changes cancel SwiftUI's task. Cancellation keeps the current content/loading
+// state; the next active scene starts a fresh load.
+@MainActor @Observable
+final class MatchRefreshState {
+    private(set) var loading: Bool
+    var errorMessage: String?
+
+    init(loading: Bool = true) { self.loading = loading }
+
+    func load(session: SessionStore) async {
+        guard !Task.isCancelled else { return }
+        errorMessage = nil
+        do {
+            try await session.refreshAccount()
+            try Task.checkCancellation()
+            try await session.reloadProfile()
+            try Task.checkCancellation()
+            loading = false
+        } catch {
+            guard !Task.isCancelled,
+                  !(error is CancellationError),
+                  (error as? URLError)?.code != .cancelled else { return }
+            session.handle(error)
+            loading = false
+            errorMessage = error.localizedDescription
+        }
     }
 }
 
@@ -167,30 +194,88 @@ struct MatchDetailView: View {
 }
 
 struct VerifyEmailView: View {
+    @Environment(SessionStore.self) private var session
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
+    var allowProfileSetup = false
+    @State private var busy = false
     @State private var emailSent = false
-    @State private var sendError: String?
-    
+    @State private var feedback: String?
+    @State private var errorText: String?
+    @State private var resendAvailableAt = Date.distantPast
+
     var body: some View {
-        VStack {
-            Text("You can't receive matches until you have verified your email.").padding()
-            Text("Didn't receive a verification email? Make sure to check your spam.").padding()
-            if(!emailSent) {
-                Button {
-                    Task {
-                        do {
-                            let email = try await SessionStore.shared.repository.account().email
-                            try await SessionStore.shared.repository.resendConfirmation(email: email)
-                            emailSent = true
-                        } catch { SessionStore.shared.handle(error); sendError = error.localizedDescription }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Image(systemName: "envelope.badge").font(.system(size: 48)).foregroundStyle(Constants.Colors.orangeColor)
+                    .accessibilityHidden(true)
+                Text(session.accountInfo?.emailConfirmed == true ? "Email verified" : "Check your email")
+                    .font(.largeTitle.bold()).accessibilityAddTraits(.isHeader)
+                if session.accountInfo?.emailConfirmed == true {
+                    Text("Your email is verified. You’re ready to continue.")
+                } else {
+                    Text("Verify your email to receive matches.")
+                    if let email = session.accountInfo?.email { Text(email).font(.headline).textSelection(.enabled) }
+                    Text("Follow the link in your verification email, then return to Comeet. If you don’t see it, check your spam folder.")
+                        .foregroundStyle(.secondary)
+                    Button("Open Mail") {
+                        if let url = URL(string: "message://") {
+                            openURL(url) { accepted in
+                                if !accepted { errorText = "Couldn’t open Mail. Open your email app to find your verification email." }
+                            }
+                        }
+                    }.buttonStyle(AuthPrimaryButtonStyle())
+                    Button("I’ve verified my email") { checkVerification(manual: true) }
+                        .frame(maxWidth: .infinity, minHeight: 44).disabled(busy)
+                    TimelineView(.periodic(from: .now, by: 1)) { context in
+                        Button(context.date < resendAvailableAt ? "Resend available shortly" : "Resend email") { resend() }
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .disabled(busy || context.date < resendAvailableAt)
                     }
-                } label: {
-                    Text("Resend verification email").italic().padding()
+                    if emailSent { Label("Verification email requested. Check your inbox.", systemImage: "checkmark.circle").foregroundStyle(.secondary) }
                 }
-            }
-            Text("Verification email sent").padding()
-        }.alert("Could not send verification email", isPresented: Binding(get: { sendError != nil }, set: { if !$0 { sendError = nil } })) {
-            Button("OK") { sendError = nil }
-        } message: { Text(sendError ?? "") }
+                if busy { ProgressView("Checking…") }
+                if let feedback { Text(feedback).font(.callout).foregroundStyle(.secondary) }
+                if let errorText { AuthError(message: errorText) }
+                if allowProfileSetup {
+                    Button(session.accountInfo?.emailConfirmed == true ? "Continue to profile setup" : "Continue setting up my profile") {
+                        session.showVerification = false
+                    }.frame(maxWidth: .infinity, minHeight: 44).disabled(busy)
+                }
+            }.padding(24)
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .tint(AuthAppearance.tint)
+        .task { checkVerification(manual: false) }
+        .onChange(of: scenePhase) { _, phase in if phase == .active { checkVerification(manual: false) } }
+    }
+
+    private func checkVerification(manual: Bool) {
+        guard !busy else { return }
+        busy = true; errorText = nil; feedback = nil
+        Task {
+            defer { busy = false }
+            do {
+                try await session.refreshAccount()
+                if session.accountInfo?.emailConfirmed == true { dismiss() }
+                else if manual { feedback = "Your email isn’t verified yet. Follow the link in your email, then try again." }
+            } catch { errorText = authenticationError(error) }
+        }
+    }
+    private func resend() {
+        guard !busy, Date() >= resendAvailableAt else { return }
+        busy = true; errorText = nil; feedback = nil; emailSent = false
+        Task {
+            defer { busy = false }
+            do {
+                try await session.refreshAccount()
+                guard session.accountInfo?.emailConfirmed != true, let email = session.accountInfo?.email else { return }
+                try await session.repository.resendConfirmation(email: email)
+                emailSent = true
+                resendAvailableAt = .now.addingTimeInterval(30)
+            } catch { session.handle(error); errorText = authenticationError(error) }
+        }
     }
 }
 
@@ -221,7 +306,7 @@ struct LoadingMatchView: View {
 }
 
 #Preview {
-    MatchView(emailConfirmed: true, loading: false)
+    MatchView(loading: false)
         .environment(SessionStore.shared)
         .environment(PreviewModels.previewUser)
 }

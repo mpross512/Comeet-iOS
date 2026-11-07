@@ -10,6 +10,12 @@ final class SessionStore {
     static let shared = SessionStore()
     let repository: any ComeetRepository
     private let photoCache: ProfilePhotoCache
+    private let draftStore: OnboardingDraftStore
+    var accountInfo: AccountInfo?
+    var showVerification = false
+    var draft = OnboardingDraft() { didSet { persistDraft() } }
+    var draftSaveError: String?
+    private var loadingDraft = false
     var currentUser = User()
     var authenticated = false
     var restored = false
@@ -18,26 +24,30 @@ final class SessionStore {
     private(set) var profilePhotoRevision = UUID()
 
     init(repository: any ComeetRepository = APIConfiguration.client,
-         photoCache: ProfilePhotoCache = ProfilePhotoCache()) {
+         photoCache: ProfilePhotoCache = ProfilePhotoCache(),
+         draftStore: OnboardingDraftStore = OnboardingDraftStore()) {
         self.repository = repository
         self.photoCache = photoCache
+        self.draftStore = draftStore
     }
 
     func restore() async {
         errorMessage = nil
         do {
             authenticated = try await repository.restoreSession()
-            if authenticated { try await reloadProfile() }
+            if authenticated { try await loadAccount(); try await reloadProfile() }
             restored = true
         } catch { errorMessage = error.localizedDescription }
     }
     func signIn(email: String, password: String) async throws {
         try await repository.signIn(email: email, password: password)
+        try await loadAccount()
         try await reloadProfile()
         authenticated = true
     }
     func signUp(email: String, password: String) async throws {
         try await repository.signUp(email: email, password: password)
+        try await loadAccount()
         try await reloadProfile()
         authenticated = true
     }
@@ -47,7 +57,8 @@ final class SessionStore {
     }
     func deleteAccount() async throws {
         try await repository.deleteAccount()
-        clearUser()
+        defer { clearUser() }
+        if let id = accountInfo?.id { try draftStore.remove(accountID: id) }
     }
     func reloadProfile() async throws {
         do {
@@ -55,11 +66,41 @@ final class SessionStore {
             needsProfile = false
         } catch APIError.http(404, _) {
             currentUser = User()
+            if let id = accountInfo?.id { currentUser.id = id }
             needsProfile = true
         } catch APIError.signedOut {
             clearUser()
             throw APIError.signedOut
-        }
+        } catch { throw error }
+    }
+    private func loadAccount() async throws {
+        let account = try await repository.account()
+        loadingDraft = true
+        defer { loadingDraft = false }
+        accountInfo = account
+        draft = try draftStore.load(accountID: account.id) ?? OnboardingDraft()
+        draftSaveError = nil
+        showVerification = !account.emailConfirmed
+    }
+    func refreshAccount() async throws {
+        do {
+            accountInfo = try await repository.account()
+            if accountInfo?.emailConfirmed == true { showVerification = false }
+        } catch { handle(error); throw error }
+    }
+    func persistDraft() {
+        guard !loadingDraft, let id = accountInfo?.id else { return }
+        do { try draftStore.save(draft, accountID: id); draftSaveError = nil }
+        catch { draftSaveError = "Your progress couldn’t be saved on this device. Please try again before leaving." }
+    }
+    func finishOnboarding() async throws {
+        // Upload first: a failed photo upload must not make a missing profile appear complete.
+        if let photo = draft.photo { try await uploadPhoto(photo) }
+        try await saveProfile(draft.fields)
+        if let id = accountInfo?.id { try draftStore.remove(accountID: id) }
+        loadingDraft = true
+        draft = OnboardingDraft()
+        loadingDraft = false
     }
     func saveProfile(_ fields: ProfileFields) async throws {
         currentUser = try User(record: await repository.saveProfile(fields))
@@ -84,6 +125,10 @@ final class SessionStore {
     }
     private func clearUser() {
         profilePhotoRevision = UUID()
+        loadingDraft = true
+        draft = OnboardingDraft()
+        loadingDraft = false
+        accountInfo = nil; showVerification = false; draftSaveError = nil
         currentUser = User(); authenticated = false; needsProfile = false
     }
 }

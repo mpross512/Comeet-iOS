@@ -1,115 +1,63 @@
-//
-//  SignUpView.swift
-//  Comeet
-//
-//  Created by Michael Ross on 7/11/20.
-//  Copyright © 2020 Ice Cream Loaf. All rights reserved.
-//
-
 import SwiftUI
 
 struct SignUpView: View {
+    @Environment(SessionStore.self) private var session
+    @Binding var submitting: Bool
+    var showSignIn: () -> Void
+    @State private var netID = ""
+    @State private var password = ""
+    @State private var errorText: String?
+    @State private var passwordFocused = false
 
-    @State var netID: String = ""
-    @State var password: String = ""
-    @State var errorText: String = "Error"
-    @State var showErrorText: Bool = false
-    @State var createAccount: Bool = false
-    
     var body: some View {
-        NavigationStack {
-            ZStack {
-                LinearGradient(gradient: Gradient(
-                    colors: [Constants.Colors.orangeColor, Constants.Colors.yellowOrangeColor]),
-                    startPoint: .bottomLeading,
-                    endPoint: .topTrailing)
-                .edgesIgnoringSafeArea(.all)
-                
-                VStack {
-                    Text("Let's Get You Started")
-                        .font(.custom("Futura", size: 40))
-                        .foregroundColor(.white)
-                        .padding(.bottom, 50)
-                    
-                    Text(errorText)
-                        .foregroundColor(.white)
-                        .opacity(showErrorText ? 1 : 0)
-                    
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Text("Create your account").font(.largeTitle.bold()).accessibilityAddTraits(.isHeader)
+                AuthField(title: "NetID") {
                     TextField("Enter your NetID", text: $netID)
-                        .disableAutocorrection(true)
-                        .autocapitalization(.none)
-                        .foregroundColor(.black)
-                        .padding(.leading)
-                        .frame(height: 50)
-                        .background(
-                            RoundedRectangle(cornerRadius: 25).fill(Color.white)
-                        )
-                        .padding(.horizontal)
-                    
-                    SecureField("Create a Password", text: $password)
-                        .foregroundColor(.black)
-                        .padding(.leading)
-                        .frame(height: 50)
-                        .background(
-                            RoundedRectangle(cornerRadius: 25).fill(Color.white)
-                        )
-                        .padding(.horizontal)
-                    
-                    Button(action: {
-                        #if DEBUG
-                        Task {
-                            do {
-                                try await SessionStore.shared.signUp(
-                                    email: "\(self.netID)",
-                                    password: self.password
-                                )
-                                createAccount = true
-                            } catch {
-                                print(error)
-                                self.errorText = error.localizedDescription
-                                self.showErrorText = true
-                            }
-                        }
-                        #else
-                        if(self.netID.count != 9) {
-                            self.showErrorText = true
-                            self.errorText = "Please enter a valid 9 character NetID"
-                        }
-                        else {
-                            self.showErrorText = false
-                            Task {
-                                do {
-                                    try await SessionStore.shared.signUp(email: "\(self.netID)@utdallas.edu", password: self.password)
-                                    createAccount = true
-                                } catch {
-                                    errorText = error.localizedDescription
-                                    showErrorText = true
-                                }
-                            }
-                        }
-                        #endif
-                    }) {
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(Color.white)
-                            .frame(height: 50, alignment: .center)
-                            .padding()
-                            .overlay(
-                                Text("Sign Up")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(Color(red: 0.15, green: 0.68, blue: 0.38, opacity: 1.00))
-                            )
-                            .padding(.top, 20)
+                        .textContentType(.username)
+                        .textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .submitLabel(.next).onSubmit { passwordFocused = true }
+                }
+                AuthField(title: "Password") {
+                    AuthPasswordField(placeholder: "Create a password", password: $password,
+                                      focused: $passwordFocused, isNewPassword: true, onSubmit: submit)
+                }
+                PasswordRequirements(password: password)
+                if let errorText { AuthError(message: errorText) }
+                Button(action: submit) {
+                    HStack {
+                        if submitting { ProgressView().tint(.white) }
+                        Text(submitting ? "Creating account…" : "Create account")
                     }
                 }
-            }.navigationDestination(isPresented: $createAccount) {
-                ProfileCreationView().navigationBarBackButtonHidden()
+                .buttonStyle(AuthPrimaryButtonStyle())
+                .disabled(submitting || netID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || password.isEmpty)
+                Button("Already have an account? Sign in", action: showSignIn)
+                    .frame(maxWidth: .infinity, minHeight: 44).disabled(submitting)
             }
+            .padding(24)
         }
+        .scrollDismissesKeyboard(.interactively)
+        .disabled(submitting)
     }
-}
 
-struct SignUpView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignUpView()
+    private func submit() {
+        guard !submitting, !netID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, !password.isEmpty else { return }
+        let identifier = netID.trimmingCharacters(in: .whitespacesAndNewlines)
+        #if !DEBUG
+        let local = identifier.lowercased().hasSuffix("@utdallas.edu") ? String(identifier.dropLast("@utdallas.edu".count)) : identifier
+        guard local.count == 9 && !local.contains("@") else { errorText = "Please enter a valid 9 character NetID."; return }
+        #endif
+        guard PasswordPolicy.accepts(password) else { errorText = "Your password must meet all the requirements below the password field."; return }
+        submitting = true
+        errorText = nil
+        passwordFocused = false
+        Task {
+            defer { submitting = false }
+            do {
+                try await session.signUp(email: AuthIdentifier.email(identifier), password: password)
+            } catch { errorText = authenticationError(error) }
+        }
     }
 }

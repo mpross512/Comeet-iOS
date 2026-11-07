@@ -50,6 +50,35 @@ private func signedInStore() -> MemoryPersistence {
     #expect(store.load()?.accessToken == "renewed")
 }
 
+@Test func passwordRecoveryUsesUnauthenticatedIdentityContractsAndPreservesSessionStorage() async throws {
+    let store = signedInStore()
+    let transport = TestTransport { _ in (200, "") }
+    let client = APIClient(baseURL: base, transport: transport, persistence: store)
+    try await client.requestPasswordReset(email: "alex@example.test")
+    try await client.resetPassword(email: "alex@example.test", resetCode: "synthetic-code_-", newPassword: "Replacement456!")
+    let requests = await transport.history()
+    #expect(requests.map { $0.url!.path } == ["/api/auth/forgotPassword", "/api/auth/resetPassword"])
+    #expect(requests.allSatisfy { $0.httpMethod == "POST" && $0.value(forHTTPHeaderField: "Authorization") == nil && $0.url?.query == nil })
+    let firstBody = try #require(requests[0].httpBody)
+    let secondBody = try #require(requests[1].httpBody)
+    let first = try #require(JSONSerialization.jsonObject(with: firstBody) as? [String: String])
+    let second = try #require(JSONSerialization.jsonObject(with: secondBody) as? [String: String])
+    #expect(first == ["email": "alex@example.test"])
+    #expect(second == ["email": "alex@example.test", "resetCode": "synthetic-code_-", "newPassword": "Replacement456!"])
+    #expect(store.load()?.accessToken == "original")
+}
+
+@Test func passwordRecoveryPropagatesInvalidCodeAndDeliveryFailures() async {
+    let transport = TestTransport { request in
+        request.url!.path.hasSuffix("forgotPassword") ? (503, #"{"detail":"Mail unavailable"}"#) : (400, #"{"errors":{"InvalidToken":["Invalid token."]}}"#)
+    }
+    let client = APIClient(baseURL: base, transport: transport, persistence: MemoryPersistence())
+    await #expect(throws: APIError.http(503, "Mail unavailable")) { try await client.requestPasswordReset(email: "alex@example.test") }
+    await #expect(throws: APIError.http(400, "Invalid token.")) {
+        try await client.resetPassword(email: "alex@example.test", resetCode: "invalid", newPassword: "Replacement456!")
+    }
+}
+
 @Test func profileRoundTripUsesCamelCaseAndFlatIds() async throws {
     let transport = TestTransport { request in request.url!.path.hasSuffix("auth/me") ? (200, accountJSON) : (200, profileJSON) }
     let client = APIClient(baseURL: base, transport: transport, persistence: signedInStore())

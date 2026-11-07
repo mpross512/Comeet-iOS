@@ -44,6 +44,13 @@ public actor APIClient: ComeetRepository {
     public func resendConfirmation(email: String) async throws {
         _ = try await request("api/auth/resendConfirmationEmail", method: "POST", body: try encode(EmailRequest(email: email)), authenticated: false)
     }
+    public func requestPasswordReset(email: String) async throws {
+        _ = try await request("api/auth/forgotPassword", method: "POST", body: try encode(EmailRequest(email: email)), authenticated: false)
+    }
+    public func resetPassword(email: String, resetCode: String, newPassword: String) async throws {
+        _ = try await request("api/auth/resetPassword", method: "POST",
+                              body: try encode(ResetPasswordRequest(email: email, resetCode: resetCode, newPassword: newPassword)), authenticated: false)
+    }
     public func profile() async throws -> ProfileRecord { try await get("api/users/me") }
     public func saveProfile(_ fields: ProfileFields) async throws -> ProfileRecord {
         try decode(await request("api/users/me", method: "PUT", body: encode(fields)))
@@ -148,6 +155,7 @@ public actor APIClient: ComeetRepository {
 private struct Credentials: Encodable { let email: String; let password: String }
 private struct RefreshRequest: Encodable { let refreshToken: String }
 private struct EmailRequest: Encodable { let email: String }
+private struct ResetPasswordRequest: Encodable { let email: String; let resetCode: String; let newPassword: String }
 private struct TokenResponse: Decodable {
     let accessToken: String; let refreshToken: String; let expiresIn: Int
     var session: AuthSession { AuthSession(accessToken: accessToken, refreshToken: refreshToken, expiresAt: .now.addingTimeInterval(Double(expiresIn))) }

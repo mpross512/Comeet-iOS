@@ -48,6 +48,8 @@
 	</array>
 	<key>ComeetAPIBaseURL</key>
 	<string>$(COMEET_API_BASE_URL)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose and crop a photo for your Comeet profile.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
