@@ -93,10 +93,33 @@ final class SessionStore {
         do { try draftStore.save(draft, accountID: id); draftSaveError = nil }
         catch { draftSaveError = "Your progress couldn’t be saved on this device. Please try again before leaving." }
     }
+    @discardableResult
+    func beginOnboardingReplay(fromBeginning: Bool = false) -> Bool {
+        guard authenticated, !needsProfile else { return false }
+        if draft.isReplay {
+            if fromBeginning { draft.step = 0; draft.attributeIndex = 0 }
+            return true
+        }
+        var replay = OnboardingDraft()
+        replay.isReplay = true
+        replay.firstName = currentUser.firstName; replay.lastName = currentUser.lastName
+        replay.birthdate = currentUser.birthdate; replay.birthdateProvided = true
+        replay.major = currentUser.major; replay.graduationYear = String(currentUser.graduationYear)
+        replay.gender = currentUser.gender ?? ""; replay.bio = currentUser.bio
+        replay.attributes = currentUser.attributes.map { AttributeRecord(name: $0.name, importance: $0.importance, value: $0.value) }
+        draft = replay
+        return true
+    }
     func finishOnboarding() async throws {
+        for step in [0, 1, 3, 4] {
+            if draft.isReplay && step == 3 { continue }
+            if let message = draft.validationMessage(for: step) { throw OnboardingValidationError(message: message) }
+        }
         // Upload first: a failed photo upload must not make a missing profile appear complete.
         if let photo = draft.photo { try await uploadPhoto(photo) }
-        try await saveProfile(draft.fields)
+        var fields = draft.fields
+        if draft.isReplay { fields.gender = nil }
+        try await saveProfile(fields)
         if let id = accountInfo?.id { try draftStore.remove(accountID: id) }
         loadingDraft = true
         draft = OnboardingDraft()
@@ -131,6 +154,11 @@ final class SessionStore {
         accountInfo = nil; showVerification = false; draftSaveError = nil
         currentUser = User(); authenticated = false; needsProfile = false
     }
+}
+
+struct OnboardingValidationError: LocalizedError {
+    let message: String
+    var errorDescription: String? { message }
 }
 
 // Keeps image-library and HTTP cache maintenance out of the picker and transport layer.

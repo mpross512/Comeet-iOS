@@ -98,6 +98,27 @@ private func signedInStore() -> MemoryPersistence {
     #expect(json["id"] == nil)
 }
 
+@Test func profileCreationIncludesGenderAndOnboardingAttributesWhileEditsOmitThem() async throws {
+    let transport = TestTransport { request in request.url!.path.hasSuffix("auth/me") ? (200, accountJSON) : (200, profileJSON) }
+    let client = APIClient(baseURL: base, transport: transport, persistence: signedInStore())
+    _ = try await client.restoreSession()
+    let fields = ProfileFields(firstName: "Alex", lastName: "Example", birthdate: "2000-02-29", graduationYear: 2026,
+                               major: "Computing", bio: "Synthetic bio", gender: "Female",
+                               attributes: [AttributeRecord(name: "raceEthnicity", importance: 3, value: "Synthetic background")])
+    _ = try await client.saveProfile(fields)
+    let firstRequest = try #require(await transport.history().last)
+    let firstBody = try #require(firstRequest.httpBody)
+    let firstJSON = try #require(JSONSerialization.jsonObject(with: firstBody) as? [String: Any])
+    #expect(firstJSON["gender"] as? String == "Female")
+    #expect((firstJSON["attributes"] as? [[String: Any]])?.first?["name"] as? String == "raceEthnicity")
+    _ = try await client.saveProfile(ProfileFields(firstName: "Alex", lastName: "Example", birthdate: "2000-02-29",
+                                                  graduationYear: 2026, major: "Computing", bio: "Edited"))
+    let editRequest = try #require(await transport.history().last)
+    let editBody = try #require(editRequest.httpBody)
+    let editJSON = try #require(JSONSerialization.jsonObject(with: editBody) as? [String: Any])
+    #expect(editJSON["gender"] == nil && editJSON["attributes"] == nil)
+}
+
 @Test func attributesAreReplacedAndLikesHaveNoClientIdentity() async throws {
     let transport = TestTransport { request in
         if request.url!.path.hasSuffix("auth/me") { return (200, accountJSON) }

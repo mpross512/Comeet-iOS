@@ -1,4 +1,22 @@
 import SwiftUI
+import ComeetData
+
+struct RaceEthnicitySelection {
+    var selected: Set<String> = []
+    var selfDescription = ""
+
+    init(value: String?) {
+        for part in (value ?? "").components(separatedBy: "; ") {
+            if Constants.SetupQuestions.raceEthnicityOptions.contains(part) { selected.insert(part) }
+            else if !part.isEmpty { selfDescription += selfDescription.isEmpty ? part : "; " + part }
+        }
+    }
+    var value: String? {
+        var parts = Constants.SetupQuestions.raceEthnicityOptions.filter { selected.contains($0) }
+        if !selfDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { parts.append(selfDescription) }
+        return parts.isEmpty ? nil : parts.joined(separator: "; ")
+    }
+}
 
 // Drafts belong to the editor; only an explicit save commits an answer to the session.
 @MainActor @Observable
@@ -6,6 +24,7 @@ final class AttributeQuestionnaire {
     struct Answer {
         var option: String?
         var importance = 3
+        var race: RaceEthnicitySelection?
     }
 
     let questions = Constants.SetupQuestions.questions
@@ -15,11 +34,12 @@ final class AttributeQuestionnaire {
     private var answers: [String: Answer] = [:]
     private var loaded = false
 
-    init(category: String? = nil) {
+    init(category: String? = nil, startIndex: Int = 0) {
         if let category, let index = questions.firstIndex(where: { $0.category == category }) {
             self.index = index
             isSingleQuestion = true
         } else {
+            index = min(max(0, startIndex), questions.count - 1)
             isSingleQuestion = false
         }
     }
@@ -27,8 +47,35 @@ final class AttributeQuestionnaire {
     var question: Constants.SetupQuestions.Question { questions[index] }
     var isLastQuestion: Bool { index == questions.count - 1 }
     var selectedOption: String? {
-        get { answers[question.category]?.option }
-        set { answers[question.category, default: Answer()].option = newValue }
+        get {
+            if question.isFreeText, let race = answers[question.category]?.race { return race.value }
+            return answers[question.category]?.option
+        }
+        set {
+            var answer = answers[question.category] ?? Answer()
+            answer.option = newValue
+            if question.isFreeText { answer.race = RaceEthnicitySelection(value: newValue) }
+            answers[question.category] = answer
+        }
+    }
+    private var raceSelection: RaceEthnicitySelection {
+        answers[question.category]?.race ?? RaceEthnicitySelection(value: answers[question.category]?.option)
+    }
+    var raceSelfDescription: String {
+        get { raceSelection.selfDescription }
+        set { var selection = raceSelection; selection.selfDescription = newValue; setRaceSelection(selection) }
+    }
+    func isRaceOptionSelected(_ option: String) -> Bool { raceSelection.selected.contains(option) }
+    func toggleRaceOption(_ option: String) {
+        var selection = raceSelection
+        if selection.selected.contains(option) { selection.selected.remove(option) }
+        else { selection.selected.insert(option) }
+        setRaceSelection(selection)
+    }
+    private func setRaceSelection(_ selection: RaceEthnicitySelection) {
+        var answer = answers[question.category] ?? Answer()
+        answer.race = selection; answer.option = selection.value
+        answers[question.category] = answer
     }
     var importance: Int {
         get { answers[question.category]?.importance ?? 3 }
@@ -40,24 +87,40 @@ final class AttributeQuestionnaire {
         loaded = true
         for question in questions {
             if let saved = attributes.first(where: { $0.name == question.category }),
-               question.options.contains(saved.value) {
+               (question.options.contains(saved.value) || (question.isFreeText && !saved.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)) {
                 answers[question.category] = Answer(option: saved.value, importance: saved.importance)
             }
         }
     }
 
-    func saveAnswer(in session: SessionStore) async throws -> Bool {
-        guard !saving, let selectedOption else { return false }
+    func loadDrafts(_ records: [AttributeRecord]) {
+        for record in records {
+            guard let question = questions.first(where: { $0.category == record.name }),
+                  question.isFreeText || question.options.contains(record.value) else { continue }
+            answers[record.name] = Answer(option: record.value, importance: min(5, max(1, record.importance)))
+        }
+    }
+
+    var canSave: Bool {
+        guard let selectedOption else { return false }
+        return !selectedOption.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedOption.count <= 500
+    }
+
+    func saveAnswer(in session: SessionStore, onboarding: Bool = false) async throws -> Bool {
+        guard !saving, canSave, let selectedOption else { return false }
         saving = true
         defer { saving = false }
-        let answer = Attribute(name: question.category, importance: importance, value: selectedOption)
-        var attributes = session.currentUser.attributes
+        let answer = Attribute(name: question.category, importance: importance, value: selectedOption.trimmingCharacters(in: .whitespacesAndNewlines))
+        var attributes = onboarding ? session.draft.attributeModels : session.currentUser.attributes
         if let existing = attributes.firstIndex(where: { $0.name == answer.name }) {
             attributes[existing] = answer
         } else {
             attributes.append(answer)
         }
-        try await session.saveAttributes(attributes)
+        if onboarding {
+            session.draft.attributes = attributes.map { AttributeRecord(name: $0.name, importance: $0.importance, value: $0.value) }
+            if session.draftSaveError != nil { throw OnboardingSaveError() }
+        } else { try await session.saveAttributes(attributes) }
         return true
     }
 
@@ -85,12 +148,14 @@ struct QuestionsView: View {
     @State private var goingBack = false
     @State private var saveError: String?
     private let onComplete: (() -> Void)?
+    private let onboarding: Bool
 
     init(isPresented: Binding<Bool>, flow: AttributeQuestionnaire = AttributeQuestionnaire(),
-         onComplete: (() -> Void)? = nil) {
+         onComplete: (() -> Void)? = nil, onboarding: Bool = false) {
         _isPresented = isPresented
         _flow = State(initialValue: flow)
         self.onComplete = onComplete
+        self.onboarding = onboarding
     }
 
     private var transition: AnyTransition {
@@ -112,7 +177,17 @@ struct QuestionsView: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .interactiveDismissDisabled(flow.saving)
-        .onAppear { flow.load(session.currentUser.attributes) }
+        .onAppear {
+            if onboarding {
+                flow = AttributeQuestionnaire(startIndex: session.draft.attributeIndex)
+                flow.load(session.draft.attributeModels)
+                flow.loadDrafts(session.draft.attributeDrafts)
+            } else { flow.load(session.currentUser.attributes) }
+        }
+        .onChange(of: flow.index) { _, index in if onboarding { session.draft.attributeIndex = index } }
+        .onChange(of: flow.selectedOption) { _, _ in persistOnboardingAnswerDraft() }
+        .onChange(of: flow.importance) { _, _ in persistOnboardingAnswerDraft() }
+        .onDisappear { persistOnboardingAnswerDraft() }
         .alert("Could not save answer", isPresented: Binding(
             get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
                 Button("OK") { saveError = nil }
@@ -128,13 +203,26 @@ struct QuestionsView: View {
                         Text(flow.question.question)
                             .font(.title2.bold())
                             .accessibilityAddTraits(.isHeader)
-                        VStack(spacing: 10) {
-                            ForEach(flow.question.options, id: \.self) { option in
-                                answerRow(option)
+                        if flow.question.isFreeText {
+                            Text("Select all that apply. You can also describe another background, or leave this question unanswered.")
+                                .font(.callout).foregroundStyle(.secondary)
+                            VStack(spacing: 10) {
+                                ForEach(flow.question.options, id: \.self) { option in answerRow(option) }
+                            }
+                            Text("Another background (optional)").font(.headline)
+                            TextField("Describe your background", text: Binding(get: { flow.raceSelfDescription }, set: { flow.raceSelfDescription = $0 }), axis: .vertical)
+                                .lineLimit(2...6).padding(16)
+                                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                            Text("\(flow.selectedOption?.count ?? 0) / 500 characters").font(.caption).foregroundStyle(.secondary)
+                        } else {
+                            VStack(spacing: 10) {
+                                ForEach(flow.question.options, id: \.self) { option in
+                                    answerRow(option)
+                                }
                             }
                         }
                         importanceControl
-                        Text(flow.isSingleQuestion ? "Save your changes, or cancel to keep your current answer." : "Continue saves your answer. Skip leaves it unchanged.")
+                        Text(onboarding ? "Continue includes this answer in your profile draft. Skip leaves it out unless you already saved an answer." : (flow.isSingleQuestion ? "Save your changes, or cancel to keep your current answer." : "Continue saves your answer. Skip leaves it unchanged."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
@@ -188,16 +276,18 @@ struct QuestionsView: View {
     }
 
     private func answerRow(_ option: String) -> some View {
-        let selected = flow.selectedOption == option
+        let selected = flow.question.isFreeText ? flow.isRaceOptionSelected(option) : flow.selectedOption == option
+        let symbol = flow.question.isFreeText ? (selected ? "checkmark.square.fill" : "square") : (selected ? "checkmark.circle.fill" : "circle")
         return Button {
-            flow.selectedOption = option
+            if flow.question.isFreeText { flow.toggleRaceOption(option) }
+            else { flow.selectedOption = option }
         } label: {
             HStack(spacing: 12) {
                 Text(option)
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
                 Spacer(minLength: 8)
-                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                Image(systemName: symbol)
                     .foregroundStyle(selected ? AttributeAppearance.accent : Color.secondary)
                     .font(.title3)
                     .accessibilityHidden(true)
@@ -271,7 +361,7 @@ struct QuestionsView: View {
                 Button {
                     Task {
                         do {
-                            if try await flow.saveAnswer(in: session) {
+                            if try await flow.saveAnswer(in: session, onboarding: onboarding) {
                                 if flow.isSingleQuestion { dismiss() }
                                 else { navigate(back: false) }
                             }
@@ -290,7 +380,7 @@ struct QuestionsView: View {
                     .foregroundStyle(Color(.systemBackground))
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(flow.selectedOption == nil || flow.saving)
+                .disabled(!flow.canSave || flow.saving)
             }
             if !flow.isSingleQuestion {
                 Button(flow.isLastQuestion ? "Skip & Finish" : "Skip") { navigate(back: false) }
@@ -310,12 +400,27 @@ struct QuestionsView: View {
             if back {
                 flow.back()
             } else if flow.advance() {
+                if onboarding { session.draft.attributeIndex = 0 }
                 if let onComplete { onComplete() }
                 else { isPresented = false }
             }
         }
     }
 
+    private func persistOnboardingAnswerDraft() {
+        guard onboarding else { return }
+        let option = flow.selectedOption ?? ""
+        let answer = AttributeRecord(name: flow.question.category, importance: flow.importance, value: option)
+        var drafts = session.draft.attributeDrafts
+        drafts.removeAll { $0.name == answer.name }
+        drafts.append(answer)
+        session.draft.attributeDrafts = drafts
+    }
+
+}
+
+struct OnboardingSaveError: LocalizedError {
+    var errorDescription: String? { "Your progress couldn’t be saved on this device. Please try again before leaving." }
 }
 
 private enum AttributeAppearance {

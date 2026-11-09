@@ -110,13 +110,19 @@ struct Constants {
             "exercise": "🏋️",
             "lovelanguage": "💑",
             "socialmedia": "📱",
-            "diet": "🍴"
+            "diet": "🍴",
+            "raceEthnicity": "🌎"
         ]
         
         static let comeetUID = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
     }
     
     struct SetupQuestions {
+        static let raceEthnicityOptions = [
+            "Asian", "Black or African American", "Hispanic or Latino",
+            "Middle Eastern or North African", "Native American or Alaska Native",
+            "Native Hawaiian or Pacific Islander", "White"
+        ]
         
         static let questions: [Question] = [
             Question(category: "religion", question: "Do you identify with a religion?", options: [
@@ -148,13 +154,15 @@ struct Constants {
             ]),
             Question(category: "diet", question: "Do you have a certain diet?", options: [
                 "Kosher", "Halal", "Vegan", "Vegetarian", "Other", "None"
-            ])
+            ]),
+            Question(category: "raceEthnicity", question: "How do you describe your race or ethnicity?", options: raceEthnicityOptions)
         ]
         
         struct Question {
             var category: String
             var question: String
             var options: [String]
+            var isFreeText: Bool { category == "raceEthnicity" }
 
             var title: String {
                 switch category {
@@ -168,6 +176,7 @@ struct Constants {
                 case "lovelanguage": "Love language"
                 case "socialmedia": "Social media"
                 case "diet": "Diet"
+                case "raceEthnicity": "Race/Ethnicity"
                 default: category.capitalized
                 }
             }
@@ -184,6 +193,7 @@ struct Constants {
                 case "lovelanguage": "How important is sharing your love language?"
                 case "socialmedia": "How important are similar social media habits?"
                 case "diet": "How important is sharing your diet?"
+                case "raceEthnicity": "How important is sharing your racial or ethnic background?"
                 default: "How important is sharing this value?"
                 }
             }

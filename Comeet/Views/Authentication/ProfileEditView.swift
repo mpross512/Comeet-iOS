@@ -63,6 +63,9 @@ struct ProfileEditView: View {
                 TextField("First Name", text: $firstName)
                 TextField("Last Name", text: $lastName)
                 DatePicker("Birthdate", selection: $birthdate, displayedComponents: .date)
+                LabeledContent("Gender", value: user.gender ?? "Not provided")
+                Text("Gender cannot be changed after your profile is created.")
+                    .font(.footnote).foregroundStyle(.secondary)
             } header: {
                 Text("PERSONAL")
             }

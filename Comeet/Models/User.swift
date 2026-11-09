@@ -20,6 +20,7 @@ class User : Identifiable, Person {
     var birthdate: Date
     var major: String
     var bio: String
+    var gender: String?
     var matches: [Match]
     var attributes: [Attribute]
     var likes: [UUID]
@@ -43,6 +44,7 @@ class User : Identifiable, Person {
     init(record: ProfileRecord) throws {
         id = record.id
         graduationYear = record.graduationYear
+        gender = record.gender
         firstName = record.firstName
         lastName = record.lastName
         birthdate = try WireDates.birthday(record.birthdate)
@@ -61,6 +63,7 @@ class User : Identifiable, Person {
         birthdate = Date()
         major = ""
         bio = ""
+        gender = nil
         matches = []
         attributes = []
         likes = []

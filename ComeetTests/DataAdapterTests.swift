@@ -17,6 +17,7 @@ private actor AdapterRepository: ComeetRepository {
     var photoWrites = 0
     func configureAccount(id: UUID, confirmed: Bool) { accountID = id; self.confirmed = confirmed }
     var savedFields: ProfileFields?
+    var storedGender: String?
     var savedAttributes: [AttributeRecord] = []
     var missingProfile = false
     var restoredSession = true
@@ -61,12 +62,15 @@ private actor AdapterRepository: ComeetRepository {
             json.merge(fields) { _, saved in saved }
         }
         json["attributes"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(savedAttributes))
+        if let storedGender { json["gender"] = storedGender }
         return try JSONDecoder().decode(ProfileRecord.self, from: JSONSerialization.data(withJSONObject: json))
     }
     func saveProfile(_ fields: ProfileFields) throws -> ProfileRecord {
         if failWrites { throw APIError.http(503, "Unavailable") }
         missingProfile = false
+        if savedFields == nil { storedGender = fields.gender }
         savedFields = fields
+        if let attributes = fields.attributes { savedAttributes = attributes }
         return try profile()
     }
     func saveAttributes(_ attributes: [AttributeRecord]) throws -> [AttributeRecord] {
@@ -392,6 +396,10 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     first.draft.firstName = "Taylor"
     first.draft.lastName = "Example"
     first.draft.birthdate = try WireDates.birthday("2000-02-29")
+    first.draft.birthdateProvided = true
+    first.draft.gender = "Female"
+    first.draft.bio = "Synthetic bio"
+    first.draft.attributes = [AttributeRecord(name: "raceEthnicity", importance: 3, value: "Synthetic background")]
     first.draft.graduationYear = "2028"
     first.draft.major = "Computing"
     first.draft.step = 2
@@ -411,6 +419,8 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     #expect(relaunched.accountInfo?.emailConfirmed == true)
     try await relaunched.finishOnboarding()
     #expect(!relaunched.needsProfile && relaunched.currentUser.firstName == "Taylor")
+    #expect(relaunched.currentUser.gender == "Female" && relaunched.currentUser.bio == "Synthetic bio")
+    #expect(relaunched.currentUser.attributes.first?.name == "raceEthnicity")
     #expect(await repository.photoWrites == 1)
     #expect(try store.load(accountID: id) == nil)
 }
@@ -452,6 +462,8 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     await session.restore()
     session.draft.firstName = "Taylor"
     session.draft.birthdate = try WireDates.birthday("2000-02-29")
+    session.draft.lastName = "Example"; session.draft.major = "Computing"; session.draft.graduationYear = "2028"
+    session.draft.birthdateProvided = true; session.draft.gender = "Male"
     session.draft.step = 2
     let id = try #require(session.accountInfo?.id)
     await #expect(throws: APIError.http(503, "Unavailable")) { try await session.finishOnboarding() }
@@ -492,6 +504,8 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     let photo = try #require(image.jpegData(compressionQuality: 0.8))
     session.draft.photo = photo
     session.draft.firstName = "Taylor"
+    session.draft.lastName = "Example"; session.draft.major = "Computing"; session.draft.graduationYear = "2028"
+    session.draft.birthdateProvided = true; session.draft.gender = "Male"
     session.draft.step = 2
     await #expect(throws: APIError.http(503, "Unavailable")) { try await session.finishOnboarding() }
     #expect(session.needsProfile && session.draft.photo != nil)
@@ -503,6 +517,8 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     var draft = OnboardingDraft()
     #expect(draft.validationMessage(for: 0) != nil)
     draft.firstName = "Taylor"; draft.lastName = "Example"
+    #expect(draft.validationMessage(for: 0) != nil)
+    draft.birthdateProvided = true
     #expect(draft.validationMessage(for: 0) == nil)
     #expect(draft.validationMessage(for: 1) != nil)
     draft.major = "Computing"; draft.graduationYear = "2028"
@@ -512,6 +528,10 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     draft.graduationYear = "2201"
     #expect(draft.validationMessage(for: 1) != nil)
     #expect(draft.validationMessage(for: 2) == nil)
+    #expect(draft.validationMessage(for: 3) != nil)
+    draft.gender = "Female"
+    #expect(draft.validationMessage(for: 3) == nil)
+    #expect(draft.validationMessage(for: 4) == nil)
 }
 
 @Test @MainActor func onboardingPhotoPickerCommitsOnlyConfirmedCropAndPreservesDraftOnCancelOrFailure() async throws {
@@ -718,4 +738,170 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     }
     #expect(AuthIdentifier.email(" alex@example.test \n") == "alex@example.test")
     #expect(AuthIdentifier.email("   ").isEmpty)
+}
+
+@Test func oldOnboardingDraftKeepsProgressAndRequiresNewMandatoryGenderAndExplicitBirthday() throws {
+    let old = Data(#"{"step":2,"firstName":"Taylor","lastName":"Example","birthdate":0,"graduationYear":"2028","major":"Computing"}"#.utf8)
+    let draft = try JSONDecoder().decode(OnboardingDraft.self, from: old)
+    #expect(draft.step == 2 && draft.firstName == "Taylor" && draft.graduationYear == "2028")
+    #expect(draft.gender.isEmpty && draft.bio.isEmpty && draft.attributes.isEmpty)
+    #expect(draft.validationMessage(for: 0) != nil && draft.validationMessage(for: 3) != nil)
+    #expect(draft.validationMessage(for: 1) == nil)
+}
+
+@Test @MainActor func onboardingQuestionnaireSavesLocallyAndRestoresUncommittedDraftsWithoutPublishingSkippedAnswers() async throws {
+    let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = OnboardingDraftStore(directory: directory)
+    let repository = AdapterRepository()
+    await repository.configure(missing: true)
+    let session = SessionStore(repository: repository, draftStore: store)
+    await session.restore()
+    let flow = AttributeQuestionnaire(category: "raceEthnicity")
+    #expect(flow.question.title == "Race/Ethnicity" && flow.question.isFreeText)
+    flow.selectedOption = "Synthetic mixed background"; flow.importance = 4
+    #expect(try await flow.saveAnswer(in: session, onboarding: true))
+    #expect(session.draft.attributes.first?.value == "Synthetic mixed background")
+    #expect(await repository.savedAttributes.isEmpty)
+    #expect(session.needsProfile && session.currentUser.attributes.isEmpty)
+    session.draft.attributeDrafts = [AttributeRecord(name: "raceEthnicity", importance: 2, value: "Uncommitted revision")]
+    session.draft.attributeIndex = Constants.SetupQuestions.questions.count - 1
+    let restored = SessionStore(repository: repository, draftStore: store)
+    await restored.restore()
+    let reopened = AttributeQuestionnaire(startIndex: restored.draft.attributeIndex)
+    reopened.load(restored.draft.attributeModels)
+    reopened.loadDrafts(restored.draft.attributeDrafts)
+    #expect(reopened.selectedOption == "Uncommitted revision" && reopened.importance == 2)
+    #expect(reopened.advance()) // Skip must leave the committed answer unchanged.
+    #expect(restored.draft.attributes.first?.value == "Synthetic mixed background")
+    #expect(await repository.savedAttributes.isEmpty)
+}
+
+@Test @MainActor func raceEthnicityEditsPersistAndPreserveOtherPersonalAttributes() async throws {
+    let repository = AdapterRepository()
+    let session = SessionStore(repository: repository)
+    await session.restore()
+    try await session.saveAttributes([Attribute(name: "religion", importance: 2, value: "Other")])
+    let flow = AttributeQuestionnaire(category: "raceEthnicity")
+    flow.load(session.currentUser.attributes)
+    flow.selectedOption = "  Synthetic background  "
+    #expect(try await flow.saveAnswer(in: session))
+    try await session.reloadProfile()
+    let reopened = AttributeQuestionnaire(category: "raceEthnicity")
+    reopened.load(session.currentUser.attributes)
+    #expect(reopened.selectedOption == "Synthetic background" && reopened.importance == 3)
+    #expect(session.currentUser.attributes.count == 2)
+    reopened.selectedOption = String(repeating: "x", count: 501)
+    #expect(!reopened.canSave)
+    reopened.selectedOption = "   "
+    #expect(!reopened.canSave)
+}
+
+@Test @MainActor func onboardingCannotCreateProfileUntilEveryRequiredFieldIsPresent() async throws {
+    let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let repository = AdapterRepository()
+    await repository.configure(missing: true)
+    let session = SessionStore(repository: repository, draftStore: OnboardingDraftStore(directory: directory))
+    await session.restore()
+    session.draft.firstName = "Taylor"; session.draft.lastName = "Example"
+    session.draft.birthdateProvided = true
+    session.draft.major = "Computing"; session.draft.graduationYear = "2028"
+    await #expect(throws: OnboardingValidationError.self) { try await session.finishOnboarding() }
+    #expect(await repository.savedFields == nil)
+    session.draft.gender = "Male"
+    session.draft.graduationYear = ""
+    await #expect(throws: OnboardingValidationError.self) { try await session.finishOnboarding() }
+    #expect(await repository.savedFields == nil)
+}
+
+@Test @MainActor func onboardingReplayPrefillsProfileAndSavesOnlyAfterExplicitCompletionWithGenderUnchanged() async throws {
+    let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let repository = AdapterRepository()
+    let session = SessionStore(repository: repository, draftStore: OnboardingDraftStore(directory: directory))
+    await session.restore()
+    try await session.saveProfile(ProfileFields(firstName: "Taylor", lastName: "Example", birthdate: "2000-02-29",
+                                               graduationYear: 2028, major: "Computing", bio: "Original bio", gender: "Male"))
+    try await session.saveAttributes([Attribute(name: "religion", importance: 2, value: "Other")])
+    let photoRevision = session.profilePhotoRevision
+    #expect(session.beginOnboardingReplay())
+    #expect(session.draft.isReplay && session.draft.step == 0 && session.draft.birthdateProvided)
+    #expect(session.draft.firstName == "Taylor" && session.draft.graduationYear == "2028")
+    #expect(session.draft.gender == "Male" && session.draft.attributes.count == 1)
+    session.draft.bio = "Updated in replay"
+    let flow = AttributeQuestionnaire(category: "raceEthnicity")
+    flow.toggleRaceOption("Asian"); flow.toggleRaceOption("White")
+    #expect(try await flow.saveAnswer(in: session, onboarding: true))
+    #expect(session.currentUser.bio == "Original bio" && session.currentUser.attributes.count == 1)
+    #expect(await repository.savedFields?.bio == "Original bio")
+    #expect(await repository.savedAttributes.count == 1)
+    session.draft.gender = "Female" // Even a manipulated replay draft cannot submit a gender change.
+    try await session.finishOnboarding()
+    #expect(!session.needsProfile && session.authenticated && !session.draft.isReplay)
+    #expect(session.currentUser.bio == "Updated in replay" && session.currentUser.gender == "Male")
+    #expect(session.currentUser.attributes.count == 2)
+    #expect(await repository.savedFields?.gender == nil)
+    #expect(await repository.photoWrites == 0)
+    #expect(session.profilePhotoRevision == photoRevision)
+    #expect(session.beginOnboardingReplay())
+    #expect(session.draft.step == 0 && session.draft.bio == "Updated in replay" && session.draft.gender == "Male")
+}
+
+@Test @MainActor func onboardingReplayResumesAcrossRelaunchAndRetriesFailuresForLegacyProfiles() async throws {
+    let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let store = OnboardingDraftStore(directory: directory)
+    let repository = AdapterRepository()
+    let first = SessionStore(repository: repository, draftStore: store)
+    await first.restore()
+    #expect(first.currentUser.gender == nil)
+    #expect(first.beginOnboardingReplay())
+    first.draft.step = 5; first.draft.bio = "Unpublished replay bio"
+    first.draft.attributeDrafts = [AttributeRecord(name: "raceEthnicity", importance: 3, value: "Asian; White")]
+    let relaunched = SessionStore(repository: repository, draftStore: store)
+    await relaunched.restore()
+    #expect(!relaunched.needsProfile && relaunched.beginOnboardingReplay())
+    #expect(relaunched.draft.step == 5 && relaunched.draft.bio == "Unpublished replay bio")
+    #expect(relaunched.draft.attributeDrafts.count == 1)
+    #expect(relaunched.beginOnboardingReplay(fromBeginning: true))
+    #expect(relaunched.draft.step == 0 && relaunched.draft.bio == "Unpublished replay bio" && relaunched.draft.attributeDrafts.count == 1)
+    await repository.configure(fail: true)
+    await #expect(throws: APIError.http(503, "Unavailable")) { try await relaunched.finishOnboarding() }
+    #expect(relaunched.draft.isReplay && relaunched.currentUser.bio != "Unpublished replay bio")
+    await repository.configure()
+    try await relaunched.finishOnboarding()
+    #expect(!relaunched.draft.isReplay && relaunched.currentUser.gender == nil)
+    #expect(await repository.savedFields?.gender == nil)
+}
+
+@Test @MainActor func raceEthnicitySupportsMultipleCommonOptionsAndKeepsCustomAndLegacyAnswers() {
+    let flow = AttributeQuestionnaire(category: "raceEthnicity")
+    flow.toggleRaceOption("Asian"); flow.toggleRaceOption("White")
+    #expect(flow.selectedOption == "Asian; White")
+    #expect(flow.isRaceOptionSelected("Asian") && flow.isRaceOptionSelected("White"))
+    flow.raceSelfDescription = "Mixed "
+    #expect(flow.raceSelfDescription == "Mixed ")
+    flow.raceSelfDescription += "background"
+    flow.toggleRaceOption("Asian")
+    #expect(flow.selectedOption == "White; Mixed background")
+    let reopened = AttributeQuestionnaire(category: "raceEthnicity")
+    reopened.load([Attribute(name: "raceEthnicity", importance: 4, value: flow.selectedOption!)])
+    #expect(reopened.isRaceOptionSelected("White") && reopened.raceSelfDescription == "Mixed background")
+    #expect(reopened.importance == 4)
+    let legacy = RaceEthnicitySelection(value: "Unlisted background")
+    #expect(legacy.selected.isEmpty && legacy.selfDescription == "Unlisted background" && legacy.value == "Unlisted background")
+    flow.raceSelfDescription = ""; flow.toggleRaceOption("White")
+    #expect(flow.selectedOption == nil && !flow.canSave)
+}
+
+@Test @MainActor func replayRequiresAnAuthenticatedCompletedProfile() async {
+    let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let repository = AdapterRepository()
+    let session = SessionStore(repository: repository, draftStore: OnboardingDraftStore(directory: directory))
+    #expect(!session.beginOnboardingReplay())
+    await repository.configure(missing: true)
+    await session.restore()
+    #expect(session.needsProfile && !session.beginOnboardingReplay() && !session.draft.isReplay)
 }

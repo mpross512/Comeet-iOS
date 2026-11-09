@@ -13,9 +13,13 @@ public struct ProfileFields: Codable, Sendable {
     public var graduationYear: Int
     public var major: String
     public var bio: String
-    public init(firstName: String, lastName: String, birthdate: String, graduationYear: Int, major: String, bio: String) {
+    public var gender: String?
+    public var attributes: [AttributeRecord]?
+    public init(firstName: String, lastName: String, birthdate: String, graduationYear: Int, major: String, bio: String,
+                gender: String? = nil, attributes: [AttributeRecord]? = nil) {
         self.firstName = firstName; self.lastName = lastName; self.birthdate = birthdate
         self.graduationYear = graduationYear; self.major = major; self.bio = bio
+        self.gender = gender; self.attributes = attributes
     }
 }
 
@@ -34,6 +38,7 @@ public struct PersonRecord: Decodable, Sendable {
     public let lastName: String
     public let birthdate: String
     public let graduationYear: Int
+    public let gender: String?
     public let major: String
     public let bio: String
     public let attributes: [AttributeRecord]
@@ -45,6 +50,7 @@ public struct ProfileRecord: Decodable, Sendable {
     public let lastName: String
     public let birthdate: String
     public let graduationYear: Int
+    public let gender: String?
     public let major: String
     public let bio: String
     public let matches: [PersonRecord]

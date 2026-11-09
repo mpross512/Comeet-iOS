@@ -9,25 +9,62 @@ struct OnboardingDraft: Codable, Equatable {
     var graduationYear = ""
     var major = ""
     var photo: Data?
+    var gender = ""
+    var bio = ""
+    var birthdateProvided = false
+    var attributes: [AttributeRecord] = []
+    var attributeDrafts: [AttributeRecord] = []
+    var attributeIndex = 0
+    var isReplay = false
+
+    init() { }
+    private enum CodingKeys: String, CodingKey {
+        case step, firstName, lastName, birthdate, graduationYear, major, photo
+        case gender, bio, birthdateProvided, attributes, attributeDrafts, attributeIndex, isReplay
+    }
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        step = try values.decodeIfPresent(Int.self, forKey: .step) ?? 0
+        firstName = try values.decodeIfPresent(String.self, forKey: .firstName) ?? ""
+        lastName = try values.decodeIfPresent(String.self, forKey: .lastName) ?? ""
+        birthdate = try values.decodeIfPresent(Date.self, forKey: .birthdate) ?? Calendar.current.startOfDay(for: Date())
+        graduationYear = try values.decodeIfPresent(String.self, forKey: .graduationYear) ?? ""
+        major = try values.decodeIfPresent(String.self, forKey: .major) ?? ""
+        photo = try values.decodeIfPresent(Data.self, forKey: .photo)
+        gender = try values.decodeIfPresent(String.self, forKey: .gender) ?? ""
+        bio = try values.decodeIfPresent(String.self, forKey: .bio) ?? ""
+        birthdateProvided = try values.decodeIfPresent(Bool.self, forKey: .birthdateProvided) ?? false
+        attributes = try values.decodeIfPresent([AttributeRecord].self, forKey: .attributes) ?? []
+        attributeDrafts = try values.decodeIfPresent([AttributeRecord].self, forKey: .attributeDrafts) ?? []
+        attributeIndex = try values.decodeIfPresent(Int.self, forKey: .attributeIndex) ?? 0
+        isReplay = try values.decodeIfPresent(Bool.self, forKey: .isReplay) ?? false
+    }
+
+    var attributeModels: [Attribute] {
+        attributes.map { Attribute(name: $0.name, importance: $0.importance, value: $0.value) }
+    }
 
     func validationMessage(for step: Int) -> String? {
         if step == 0 {
             if firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return "Enter your first name to continue." }
             if lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return "Enter your last name to continue." }
             if firstName.count > 100 || lastName.count > 100 { return "Names must be 100 characters or fewer." }
+            if !birthdateProvided { return "Choose and confirm your date of birth to continue." }
             if birthdate > Date() { return "Choose a birthdate that isn’t in the future." }
         } else if step == 1 {
             if major.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return "Select your major to continue." }
             guard let year = Int(graduationYear), (1900...2200).contains(year) else {
                 return "Enter a graduation year between 1900 and 2200."
             }
-        }
+        } else if step == 3 && !["Male", "Female"].contains(gender) {
+            return "Select Male or Female to continue."
+        } else if step == 4 && bio.count > 4000 { return "Your bio must be 4,000 characters or fewer." }
         return nil
     }
 
     var fields: ProfileFields {
         ProfileFields(firstName: firstName, lastName: lastName, birthdate: WireDates.birthday(birthdate),
-                      graduationYear: Int(graduationYear) ?? 0, major: major, bio: "")
+                      graduationYear: Int(graduationYear) ?? 0, major: major, bio: bio, gender: gender, attributes: attributes)
     }
 }
 
@@ -57,7 +94,9 @@ struct OnboardingDraftStore {
 }
 
 struct ProfileCreationView: View {
+    var replaying = false
     @Environment(SessionStore.self) private var session
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @State private var choosingPhoto = false
     @State private var saving = false
@@ -65,9 +104,12 @@ struct ProfileCreationView: View {
     @State private var showingVerification = false
     @State private var choosingMajor = false
     @State private var majorSearch = ""
+    @State private var choosingBirthdate = false
+    @State private var showingAttributes = false
+    @State private var confirmingCreation = false
 
-    private var step: Int { min(max(session.draft.step, 0), 2) }
-    private var title: String { ["About you", "Your studies", "Your photo"][step] }
+    private var step: Int { min(max(session.draft.step, 0), 6) }
+    private var title: String { ["About you", "Your studies", "Your photo", "Your gender", "Your bio", "Values & Lifestyle", "Review your profile"][step] }
 
     var body: some View {
         @Bindable var session = session
@@ -76,18 +118,21 @@ struct ProfileCreationView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Step \(step + 1) of 3").font(.subheadline).foregroundStyle(.secondary)
-                        ProgressView(value: Double(step + 1), total: 3).tint(Constants.Colors.orangeColor)
+                        Text("Step \(step + 1) of 7").font(.subheadline).foregroundStyle(.secondary)
+                        ProgressView(value: Double(step + 1), total: 7).tint(Constants.Colors.orangeColor)
                         Text(title).font(.largeTitle.bold()).accessibilityAddTraits(.isHeader)
                         Text(session.draftSaveError == nil ? "Your progress is saved on this device." : "Keep this screen open until your progress is saved.").font(.callout).foregroundStyle(.secondary)
-                        if step < 2 { Text("All fields on this step are required.").font(.callout).foregroundStyle(.secondary) }
+                        if replaying { Text("Changes update your profile only when you tap Save changes at the end.").font(.callout).foregroundStyle(.secondary) }
+                        if step < 2 || (step == 3 && !replaying) { Text("All fields on this step are required.").font(.callout).foregroundStyle(.secondary) }
                     }
                     if step == 0 {
                         AuthField(title: "First name") { TextField("First name", text: $session.draft.firstName).textContentType(.givenName) }
                         AuthField(title: "Last name") { TextField("Last name", text: $session.draft.lastName).textContentType(.familyName) }
                         AuthField(title: "Birthdate") {
-                            DatePicker("Birthdate", selection: $session.draft.birthdate, in: ...Date(), displayedComponents: .date)
-                                .labelsHidden().frame(maxWidth: .infinity, alignment: .leading)
+                            Button { choosingBirthdate = true } label: {
+                                Text(session.draft.birthdateProvided ? session.draft.birthdate.formatted(date: .abbreviated, time: .omitted) : "Choose your date of birth")
+                                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            }
                         }
                     } else if step == 1 {
                         AuthField(title: "Major") {
@@ -103,17 +148,19 @@ struct ProfileCreationView: View {
                         AuthField(title: "Graduation year") {
                             TextField("Graduation year", text: $session.draft.graduationYear).keyboardType(.numberPad)
                         }
-                    } else {
+                    } else if step == 2 {
                         Text("Choose a photo for your profile. You can also add one later.").foregroundStyle(.secondary)
                         Button { choosingPhoto = true } label: {
                             VStack(spacing: 16) {
                                 if let data = photo, let image = UIImage(data: data) {
                                     Image(uiImage: image).resizable().scaledToFill()
                                         .frame(width: 160, height: 160).clipShape(Circle())
+                                } else if replaying {
+                                    ProfilePicture(userID: session.currentUser.id, width: 160, height: 160)
                                 } else {
                                     Image(systemName: "person.crop.circle.badge.plus").font(.system(size: 100)).foregroundStyle(Color(uiColor: .secondaryLabel)).accessibilityHidden(true)
                                 }
-                                Text(photo == nil ? "Choose photo" : "Change photo").font(.headline)
+                                Text(photo == nil ? (replaying ? "Choose a new photo" : "Choose photo") : "Change photo").font(.headline)
                             }.frame(maxWidth: .infinity).padding(.vertical)
                         }
                         .disabled(saving)
@@ -129,7 +176,51 @@ struct ProfileCreationView: View {
                             .ignoresSafeArea()
                         }
                         if session.draft.photo != nil {
-                            Button("Remove photo", role: .destructive) { session.draft.photo = nil }
+                            Button(replaying ? "Discard selected photo" : "Remove photo", role: .destructive) { session.draft.photo = nil }
+                        }
+                    } else if step == 3 {
+                        Text("Your gender cannot be changed after your profile is created.").foregroundStyle(.secondary)
+                        if replaying {
+                            LabeledContent("Gender", value: session.currentUser.gender ?? "Not provided")
+                        } else {
+                            ForEach(["Male", "Female"], id: \.self) { value in
+                                Button { session.draft.gender = value } label: {
+                                    HStack {
+                                        Text(value).foregroundStyle(.primary)
+                                        Spacer()
+                                        Image(systemName: session.draft.gender == value ? "checkmark.circle.fill" : "circle")
+                                    }.padding(16).frame(maxWidth: .infinity, minHeight: 52)
+                                        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                                }.accessibilityAddTraits(session.draft.gender == value ? .isSelected : [])
+                            }
+                        }
+                    } else if step == 4 {
+                        Text("Tell potential matches a little about yourself. You can add or edit this later.").foregroundStyle(.secondary)
+                        AuthField(title: "Bio (optional)") {
+                            TextField("What do you enjoy? What would you like someone to know?", text: $session.draft.bio, axis: .vertical)
+                                .lineLimit(5...12)
+                        }
+                        Text("\(session.draft.bio.count) / 4,000 characters").font(.caption).foregroundStyle(.secondary)
+                    } else if step == 5 {
+                        Text("Share your values, lifestyle, and background. Every question is optional, and you can change these answers later.").foregroundStyle(.secondary)
+                        Text("\(PersonalAttributesSummary(attributes: session.draft.attributeModels).answeredCount) of \(Constants.SetupQuestions.questions.count) answered")
+                        Button("Fill out personal attributes") { showingAttributes = true }
+                            .buttonStyle(AuthPrimaryButtonStyle())
+                        Text("Continue includes saved answers. Unanswered questions can be filled out from Edit Profile later.").font(.callout).foregroundStyle(.secondary)
+                    } else {
+                        LabeledContent("Name", value: "\(session.draft.firstName) \(session.draft.lastName)")
+                        LabeledContent("Date of birth", value: session.draft.birthdate.formatted(date: .abbreviated, time: .omitted))
+                        LabeledContent("Major", value: session.draft.major)
+                        LabeledContent("Graduation year", value: session.draft.graduationYear)
+                        LabeledContent("Gender", value: replaying ? (session.currentUser.gender ?? "Not provided") : session.draft.gender)
+                        Text(replaying ? "Your gender remains unchanged." : "Check your gender carefully. It cannot be changed after you create your profile.").font(.callout).foregroundStyle(.secondary)
+                        Text(session.draft.bio.isEmpty ? "Bio: Not added" : session.draft.bio).fixedSize(horizontal: false, vertical: true)
+                        Text(session.draft.photo == nil ? (replaying ? "Photo: Unchanged" : "Photo: Not added") : "Photo: Added")
+                        ForEach(session.draft.attributes, id: \.name) { answer in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(Constants.SetupQuestions.questions.first { $0.category == answer.name }?.title ?? answer.name).font(.headline)
+                                Text(answer.value)
+                            }
                         }
                     }
                     if let errorText { AuthError(message: errorText) }
@@ -137,11 +228,11 @@ struct ProfileCreationView: View {
                         AuthError(message: message)
                         Button("Retry saving progress") { session.persistDraft() }
                     }
-                    if step == 2 {
+                    if step == 6 {
                         Button(action: finish) {
                             HStack {
                                 if saving { ProgressView().tint(.white) }
-                                Text(saving ? "Saving profile…" : "Finish setup")
+                                Text(saving ? "Saving…" : (replaying ? "Save changes" : "Create profile"))
                             }
                         }.buttonStyle(AuthPrimaryButtonStyle()).disabled(saving)
                     } else {
@@ -150,6 +241,17 @@ struct ProfileCreationView: View {
                             else { session.draft.step = step + 1; errorText = nil }
                         }
                             .buttonStyle(AuthPrimaryButtonStyle())
+                        if step == 2 || step == 4 {
+                            Button(replaying ? (step == 2 ? "Keep current photo" : "Keep current bio") : "Skip for now") {
+                                if step == 2 { session.draft.photo = nil }
+                                else { session.draft.bio = replaying ? session.currentUser.bio : "" }
+                                session.draft.step = step + 1; errorText = nil
+                            }.frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        if step == 5 {
+                            Button("Finish personal attributes later") { session.draft.step = 6; errorText = nil }
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
                     }
                 }.padding(24)
             }
@@ -157,6 +259,9 @@ struct ProfileCreationView: View {
             .background(Color(uiColor: .systemGroupedBackground))
             .disabled(saving)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    if replaying { Button("Close") { dismiss() }.disabled(saving) }
+                }
                 ToolbarItem(placement: .topBarLeading) {
                     if step > 0 { Button("Back") { session.draft.step = step - 1; errorText = nil }.disabled(saving) }
                 }
@@ -169,6 +274,24 @@ struct ProfileCreationView: View {
             }
         }
         .tint(AuthAppearance.tint)
+        .interactiveDismissDisabled(saving)
+        .alert(replaying ? "Save profile changes?" : "Create profile with gender \(session.draft.gender)?", isPresented: $confirmingCreation) {
+            Button("Go back", role: .cancel) { }
+            Button(replaying ? "Save changes" : "Create profile") { createProfile() }
+        } message: { Text(replaying ? "This will update your profile with the changes you reviewed. Your gender stays unchanged." : "Your gender cannot be changed after your profile is created.") }
+        .sheet(isPresented: $choosingBirthdate) {
+            NavigationStack {
+                DatePicker("Date of birth", selection: $session.draft.birthdate, in: ...Date(), displayedComponents: .date)
+                    .datePickerStyle(.wheel).labelsHidden().padding()
+                    .navigationTitle("Date of birth")
+                    .toolbar { ToolbarItem(placement: .confirmationAction) {
+                        Button("Confirm") { session.draft.birthdateProvided = true; choosingBirthdate = false }
+                    } }
+            }.presentationDetents([.medium, .large]).tint(AuthAppearance.tint)
+        }
+        .sheet(isPresented: $showingAttributes) {
+            QuestionsView(isPresented: $showingAttributes, onboarding: true)
+        }
         .sheet(isPresented: $showingVerification) {
             NavigationStack {
                 VerifyEmailView()
@@ -201,16 +324,25 @@ struct ProfileCreationView: View {
 
     private func finish() {
         guard !saving else { return }
-        for index in 0...1 {
+        for index in [0, 1, 3, 4] {
+            if replaying && index == 3 { continue }
             if let message = session.draft.validationMessage(for: index) {
                 session.draft.step = index; errorText = message; return
             }
         }
+        confirmingCreation = true
+    }
+
+    private func createProfile() {
+        guard !saving else { return }
         saving = true
         errorText = nil
         Task {
             defer { saving = false }
-            do { try await session.finishOnboarding() }
+            do {
+                try await session.finishOnboarding()
+                if replaying { dismiss() }
+            }
             catch { session.handle(error); errorText = authenticationError(error) }
         }
     }
