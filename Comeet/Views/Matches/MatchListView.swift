@@ -132,9 +132,13 @@ final class MatchRefreshState {
     }
 }
 
+/// A 4:5 photo card with the person's name and details. The match list shows it as a
+/// rounded card, and the profile screen opens with the same card edge to edge, so the
+/// zoom transition morphs one photo into the other.
 struct MatchCardView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    let match: Match
+    let match: any Person
+    var cornerRadius: CGFloat = 25
 
     var body: some View {
         // The ZStack keeps a 4:5 photo card but grows when large text needs more room.
@@ -143,9 +147,9 @@ struct MatchCardView: View {
             details
         }
         .background { MatchPhoto(userID: match.id) }
-        .clipShape(.rect(cornerRadius: 25))
-            .contentShape(.rect(cornerRadius: 25))
-            .accessibilityElement(children: .combine)
+        .clipShape(.rect(cornerRadius: cornerRadius))
+        .contentShape(.rect(cornerRadius: cornerRadius))
+        .accessibilityElement(children: .combine)
     }
 
     private var details: some View {
@@ -178,13 +182,18 @@ struct MatchCardView: View {
 
 /// A match's profile photo, with a neutral placeholder while it loads or when there is none.
 struct MatchPhoto: View {
+    @Environment(SessionStore.self) private var session
     let userID: UUID
+
+    /// Reloads the signed-in user's own photo after they upload a new one.
+    private var photoRefreshID: UUID? { userID == session.currentUser.id ? session.profilePhotoRevision : nil }
 
     var body: some View {
         WebImage(url: APIConfiguration.photoURL(userID: userID))
             .placeholder { placeholder }
             .resizable()
             .scaledToFill()
+            .id(photoRefreshID)
             .accessibilityHidden(true)
     }
 

@@ -22,10 +22,18 @@ struct UserView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                ProfilePicture(userID: user.id, width: 175, height: 175)
-                    .accessibilityHidden(true)
+                // Same card as the match list, edge to edge, so the photo morphs between screens.
+                MatchCardView(match: user, cornerRadius: 0)
+                    .overlay(alignment: .top) {
+                        // Keeps the back button readable over light photos.
+                        LinearGradient(colors: [.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 120)
+                            .allowsHitTesting(false)
+                            .accessibilityHidden(true)
+                    }
+                    .accessibilityAddTraits(.isHeader)
 
-                UserBio(user: user)
+                UserBio(user: user, showsHeader: false)
 
                 UserInterests(attributes: user.attributes)
 
@@ -34,7 +42,7 @@ struct UserView: View {
                     .padding(.bottom)
             }
         }
-        .navigationTitle(user.firstName)
+        .ignoresSafeArea(edges: .top)
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.success, trigger: isLiked) { wasLiked, liked in !wasLiked && liked }
         .alert("Could not like profile", isPresented: Binding(get: { likeError != nil }, set: { if !$0 { likeError = nil } })) {
