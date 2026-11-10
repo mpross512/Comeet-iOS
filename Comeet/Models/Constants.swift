@@ -16,6 +16,8 @@ struct Constants {
         static let yellowOrangeColor = Color(red: 0.95, green: 0.61, blue: 0.07, opacity: 1.00)
         static let greenColor = Color(red: 0.07, green: 0.28, blue: 0.20, opacity: 1.00)
         static let orangeColor = Color(red: 0.91, green: 0.46, blue: 0, opacity: 1.00)
+        /// Darker brand orange for surfaces behind white text (about 4.7:1 contrast; `orangeColor` is about 3:1).
+        static let orangeTextBackgroundColor = Color(red: 0.75, green: 0.33, blue: 0, opacity: 1.00)
         
     }
     

@@ -83,10 +83,25 @@ private actor AdapterRepository: ComeetRepository {
         liked = matchID
         return try JSONDecoder().decode(LikeRecord.self, from: Data(#"{"conversationId":null}"#.utf8))
     }
-    func conversations() throws -> [ConversationRecord] {
-        try JSONDecoder().decode([ConversationRecord].self, from: Data(adapterConversations.utf8))
+    var conversationsJSON = adapterConversations
+    var conversationsError: (any Error & Sendable)?
+    var messageErrors: [any Error & Sendable] = []
+    var messagesByConversation: [Int: [MessageRecord]] = [:]
+    func configureConversations(_ json: String, messages: [Int: [MessageRecord]] = [:]) {
+        conversationsJSON = json; messagesByConversation = messages
     }
-    func messages(conversationID: Int, afterID: Int) -> [MessageRecord] { pages.isEmpty ? [] : pages.removeFirst() }
+    func configureConversationsError(_ error: (any Error & Sendable)?) { conversationsError = error }
+    func configureMessageErrors(_ errors: [any Error & Sendable]) { messageErrors = errors }
+    func addMessage(_ message: MessageRecord) { messagesByConversation[message.conversationId, default: []].append(message) }
+    func conversations() throws -> [ConversationRecord] {
+        if let conversationsError { throw conversationsError }
+        return try JSONDecoder().decode([ConversationRecord].self, from: Data(conversationsJSON.utf8))
+    }
+    func messages(conversationID: Int, afterID: Int) throws -> [MessageRecord] {
+        if !messageErrors.isEmpty { throw messageErrors.removeFirst() }
+        if let stored = messagesByConversation[conversationID] { return stored.filter { $0.id > afterID } }
+        return pages.isEmpty ? [] : pages.removeFirst()
+    }
     func sendMessage(conversationID: Int, replyToID: Int?, text: String, clientID: UUID) throws -> MessageRecord {
         if failWrites { throw APIError.http(503, "Unavailable") }
         sentText = text
@@ -904,4 +919,136 @@ private let adapterMessage = #"{"id":3,"conversationId":1,"sender":"11111111-111
     await repository.configure(missing: true)
     await session.restore()
     #expect(session.needsProfile && !session.beginOnboardingReplay() && !session.draft.isReplay)
+}
+
+
+// MARK: - Chat
+
+private func chatMessage(_ id: Int, conversation: Int = 1, sender: String = "22222222-2222-2222-2222-222222222222",
+                         text: String = "Hi", minutesAgo: Double = 0, options: [String] = []) throws -> MessageRecord {
+    let json: [String: Any] = ["id": id, "conversationId": conversation, "sender": sender, "text": text,
+                               "createdAtUnixMilliseconds": Int64((Date().timeIntervalSince1970 - minutesAgo * 60) * 1000),
+                               "responseOptions": options]
+    return try JSONDecoder().decode(MessageRecord.self, from: JSONSerialization.data(withJSONObject: json))
+}
+private let twoConversations = #"[{"id":1,"peer":{"id":"22222222-2222-2222-2222-222222222222","firstName":"Jordan","lastName":"Example"},"messages":[]},{"id":2,"peer":{"id":"33333333-3333-3333-3333-333333333333","firstName":"Taylor","lastName":"Sample"},"messages":[]}]"#
+
+@Test @MainActor func chatListOrdersByActivityReusesOpenConversationsAndKeepsDataOnFailure() async throws {
+    let repository = AdapterRepository()
+    await repository.configureConversations(twoConversations, messages: [1: [try chatMessage(5)], 2: [try chatMessage(7, conversation: 2)]])
+    var handled: [any Error] = []
+    let state = ChatListState(repository: repository, handleError: { handled.append($0) })
+    await state.load()
+    #expect(!state.loading && state.errorMessage == nil)
+    #expect(state.ordered.map(\.id) == [2, 1])
+    let jordan = try #require(state.conversations.first { $0.id == 1 })
+
+    // A reply in Jordan's chat moves it to the top without reloading the list.
+    jordan.insert([try chatMessage(9)])
+    #expect(state.ordered.map(\.id) == [1, 2])
+
+    // Refreshing reuses the object an open chat holds and only adds newer messages.
+    await repository.addMessage(try chatMessage(10))
+    await state.load()
+    #expect(state.conversations.first { $0.id == 1 } === jordan)
+    #expect(jordan.messages.map(\.id) == [5, 9, 10])
+
+    // Cancellation is ignored; real failures keep the loaded list and report an error.
+    await repository.configureConversationsError(URLError(.cancelled))
+    await state.load()
+    #expect(state.errorMessage == nil && handled.isEmpty)
+    await repository.configureConversationsError(APIError.http(503, "Unavailable"))
+    await state.load()
+    #expect(state.errorMessage == "Unavailable" && state.conversations.count == 2 && handled.count == 1)
+}
+
+@Test @MainActor func chatListStartsEmptyAndReportsInitialFailure() async {
+    let repository = AdapterRepository()
+    await repository.configureConversations("[]")
+    let state = ChatListState(repository: repository, handleError: { _ in })
+    await state.load()
+    #expect(!state.loading && state.conversations.isEmpty && state.errorMessage == nil)
+    await repository.configureConversationsError(URLError(.notConnectedToInternet))
+    let failing = ChatListState(repository: repository, handleError: { _ in })
+    await failing.load()
+    #expect(!failing.loading && failing.errorMessage != nil)
+}
+
+@Test @MainActor func chatPollingRetriesWithBackoffAndStopsWhenSignedOut() async throws {
+    #expect([0, 1, 2, 3, 4, 5, 9].map(MessagePollingState.delay(afterFailures:)) == [2, 2, 4, 8, 16, 30, 30].map { Duration.seconds($0) })
+    let repository = AdapterRepository()
+    let conversation = Conversation(record: try JSONDecoder().decode([ConversationRecord].self, from: Data(adapterConversations.utf8))[0])
+    await repository.configureConversations(adapterConversations, messages: [1: [try chatMessage(4)]])
+    await repository.configureMessageErrors([URLError(.timedOut), URLError(.timedOut)])
+    let state = MessagePollingState()
+    var delays: [Duration] = []
+    var reconnectingDuringSleep: [Bool] = []
+    await state.run(conversation: conversation, repository: repository, handleError: { _ in }, sleep: { delay in
+        delays.append(delay)
+        reconnectingDuringSleep.append(state.reconnecting)
+        if delays.count == 3 { throw CancellationError() }
+    })
+    #expect(delays == [.seconds(2), .seconds(4), .seconds(2)])
+    #expect(reconnectingDuringSleep == [true, true, false])
+    #expect(conversation.messages.map(\.id) == [4])
+
+    await repository.configureMessageErrors([APIError.signedOut])
+    var signedOutSleeps = 0
+    await state.run(conversation: conversation, repository: repository, handleError: { _ in }, sleep: { _ in signedOutSleeps += 1 })
+    #expect(signedOutSleeps == 0)
+}
+
+@Test @MainActor func sentReplyHidesAnsweredPromptImmediately() async throws {
+    let conversation = Conversation(record: try JSONDecoder().decode([ConversationRecord].self, from: Data(adapterConversations.utf8))[0])
+    let prompt = try chatMessage(1, sender: Constants.Values.comeetUID.uuidString, text: "Would you like to meet?", options: ["Yes", "Not yet"])
+    conversation.insert([prompt])
+    #expect(conversation.openPrompt?.id == 1)
+    let repository = AdapterRepository()
+    let reply = try await MessageService(repository: repository).addMessage(conversationID: 1, messageID: 1, response: "Yes")
+    conversation.insert([reply, reply])
+    #expect(conversation.openPrompt == nil && conversation.messages.count == 2)
+    #expect(await repository.sentText == "Yes")
+}
+
+@Test func messageTextSubstitutesNamesLabelsSendersAndStaysLiteral() throws {
+    let peer = try JSONDecoder().decode(ConversationPeer.self, from: Data(#"{"id":"22222222-2222-2222-2222-222222222222","firstName":"Jordan","lastName":"Example"}"#.utf8))
+    let me = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+    let system = try chatMessage(1, sender: Constants.Values.comeetUID.uuidString, text: "Great, {user} wants to meet!")
+    #expect(MessageText.isSystem(system))
+    #expect(MessageText.preview(of: system, peer: peer, currentUserID: me) == "Great, Jordan wants to meet!")
+    let mine = try chatMessage(2, sender: me.uuidString, text: "*Yes* %@")
+    #expect(!MessageText.isSystem(mine))
+    #expect(MessageText.body(of: mine, peer: peer) == "*Yes* %@")
+    #expect(MessageText.preview(of: mine, peer: peer, currentUserID: me) == "You: *Yes* %@")
+    #expect(MessageText.preview(of: nil, peer: peer, currentUserID: me) == "No messages yet")
+    #expect(MessageText.optionLabel("{datetime_3}") == "Suggest 3 Times" && MessageText.optionLabel("Yes") == "Yes")
+}
+
+@Test func proposedTimesRoundTripAsISO8601AndAcceptLegacyText() throws {
+    let slots = DateSlotsSheet.defaultSlots(from: Date(timeIntervalSince1970: 1_800_000_000))
+    let encoded = MessageText.encodeDateSlots(slots)
+    #expect(!encoded.contains(" +0000"))
+    #expect(MessageText.dateSlots(in: encoded) == slots)
+    #expect(MessageText.dateSlots(in: "2026-11-10 13:54:57 +0000|2026-11-10 14:54:57 +0000|2026-11-10 15:54:57 +0000")?.count == 3)
+    #expect(MessageText.dateSlots(in: "Yes") == nil && MessageText.dateSlots(in: "a|b|c") == nil)
+    let peer = try JSONDecoder().decode(ConversationPeer.self, from: Data(#"{"id":"22222222-2222-2222-2222-222222222222","firstName":"Jordan","lastName":"Example"}"#.utf8))
+    let reply = try chatMessage(3, text: encoded)
+    #expect(MessageText.body(of: reply, peer: peer).hasPrefix("Suggested times:\n• "))
+    #expect(MessageText.preview(of: reply, peer: peer, currentUserID: UUID()) == "Suggested 3 times to meet")
+}
+
+@Test func proposedTimesStartOnTheHourAndStayAnHourApart() {
+    let now = Date(timeIntervalSince1970: 1_800_000_123)
+    let slots = DateSlotsSheet.defaultSlots(from: now)
+    #expect(slots.count == 3 && slots[0] > now && slots[0].timeIntervalSince(now) <= 3600)
+    #expect(Calendar.current.component(.minute, from: slots[0]) == 0)
+    #expect(slots[1].timeIntervalSince(slots[0]) == 3600 && slots[2].timeIntervalSince(slots[1]) == 3600)
+    let moved = DateSlotsSheet.normalized([slots[2], slots[1], slots[0]])
+    #expect(moved[1].timeIntervalSince(moved[0]) >= 3600 && moved[2].timeIntervalSince(moved[1]) >= 3600)
+}
+
+@Test func chatTimestampsGroupByDayAndGap() throws {
+    let messages = [try chatMessage(1, minutesAgo: 120), try chatMessage(2, minutesAgo: 110), try chatMessage(3, minutesAgo: 5)]
+    #expect((0..<3).map { MessageView.startsGroup(messages, at: $0) } == [true, false, true])
+    #expect(Date.now.formatted(.chatTimestamp).hasPrefix("Today"))
 }

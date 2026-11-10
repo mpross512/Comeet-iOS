@@ -126,13 +126,14 @@ struct ProfilePicture: View {
     var body: some View {
         WebImage(url: profileURL)
             .resizable()
-            .indicator(.init(content: { isAnimating, progress in
-                Image(systemName: "person.crop.circle")
+            // Shown while loading and when there is no photo or it fails to load (photos are optional).
+            .placeholder {
+                Image(systemName: "person.crop.circle.fill")
                     .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.secondary)
                     .frame(width: width, height: height)
-                    .clipShape(Circle())
-                    .redacted(reason: .placeholder)
-            }))
+            }
             .id(photoRefreshID)
             .aspectRatio(contentMode: .fill)
             .transition(.offset())
