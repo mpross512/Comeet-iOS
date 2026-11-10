@@ -63,3 +63,28 @@ extension FormatStyle where Self == RelativeDateStyle {
     return RelativeDateStyle()
   }
 }
+
+// Timestamp shown between groups of chat messages: like `RelativeDateStyle`, but always with the
+// time, e.g. "Today 7:54 AM", "Mon 7:54 AM", "Nov 3, 7:54 AM", "Nov 3, 2025, 7:54 AM".
+struct ChatTimestampStyle: FormatStyle {
+  typealias FormatInput = Date
+  typealias FormatOutput = String
+
+  func format(_ value: Date) -> String {
+    let time = value.formatted(date: .omitted, time: .shortened)
+    if value.isSameDateAs(date: .now) {
+      return String(localized: "Today \(time)")
+    }
+    if value.isInTheLast(numberOfDays: 7) {
+      return "\(value.formatted(.dateTime.weekday())) \(time)"
+    }
+    if value.isSameYearAs(date: .now) {
+      return value.formatted(.dateTime.month().day().hour().minute())
+    }
+    return value.formatted(date: .abbreviated, time: .shortened)
+  }
+}
+
+extension FormatStyle where Self == ChatTimestampStyle {
+  static var chatTimestamp: ChatTimestampStyle { ChatTimestampStyle() }
+}

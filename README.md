@@ -34,4 +34,4 @@ No account/backend configuration is required for isolated tests. An opt-in real 
 - `Comeet/Models`: domain/UI adapters for users, matches, conversations, and messages.
 - `Comeet/Views`: existing screens, now calling API-backed operations. Profile edits and attribute answers persist before showing success.
 
-Chat loads paginated history then polls while active; leaving chat or backgrounding the app cancels its structured task. Tokens are stored only in Keychain. Existing UI packages remain to keep the migration scoped to data access.
+The chat list loads paginated history when the app becomes active and on pull to refresh. An open chat polls its conversation with retry/backoff; leaving the chat or backgrounding the app cancels its structured task. Tokens are stored only in Keychain. Existing UI packages remain to keep the migration scoped to data access.
