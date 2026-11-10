@@ -144,63 +144,38 @@ struct ProfilePicture: View {
 }
 
 struct UserBio: View {
-    
-    let user: any Person
-    var matchAnimation: Namespace.ID? = nil
-    
-    var body: some View {
-        VStack {
-            
-            profileText("\(user.fullName), \(user.age)", element: "name")
-                .font(.title)
-            profileText("Class of \(String(user.graduationYear))", element: "year")
-            
-            HStack {
-                Text("About")
-                    .bold()
-                    .padding(.bottom, 5)
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.top)
-            
-            HStack {
-                Text("\(user.bio)")
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.bottom)
-            
-            HStack {
-                Text("Major")
-                .bold()
-                    .padding(.bottom, 5)
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.top)
-            
-            HStack {
-                Text("\(user.major)")
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.bottom)
-            
-            
-            
-        }
-    }
-}
 
-private extension UserBio {
-    @ViewBuilder
-    func profileText(_ text: String, element: String) -> some View {
-        if let matchAnimation {
-            Text(text)
-                .matchedGeometryEffect(id: "\(user.id)-\(element)", in: matchAnimation)
-        } else {
+    let user: any Person
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(spacing: 4) {
+                Text("\(user.fullName), \(user.age)")
+                    .font(.title)
+                    .accessibilityAddTraits(.isHeader)
+                Text("Class of \(String(user.graduationYear))")
+                    .foregroundStyle(.secondary)
+            }
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+
+            if !user.bio.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                section("About", text: user.bio)
+            }
+            if !user.major.isEmpty {
+                section("Major", text: user.major)
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private func section(_ title: String, text: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
             Text(text)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

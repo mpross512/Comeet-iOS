@@ -10,56 +10,71 @@ import SwiftUI
 import WrappingHStack
 
 struct UserView: View {
-    
+
     var user: any Person
     @Environment(UserService.self) var userService: UserService
     @Environment(User.self) var currentUser: User
     @State private var likeError: String?
-    @State private var isPresentingConfirm: Bool = false
-    
-    var animation: Namespace.ID?
-    
+    @State private var isLiking = false
+
+    private var isLiked: Bool { currentUser.likes.contains(user.id) }
+
     var body: some View {
         ScrollView {
-            VStack {
+            VStack(spacing: 16) {
                 ProfilePicture(userID: user.id, width: 175, height: 175)
-                
+                    .accessibilityHidden(true)
+
                 UserBio(user: user)
-                
+
                 UserInterests(attributes: user.attributes)
-                
-                if (currentUser.likes.contains(user.id)) {
-                    HStack {
-                        Spacer()
-                        VStack {
-                            Button {
-                                
-                            } label: {
-                                Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50).foregroundColor(Constants.Colors.greenColor)
-                            }
-                            Text("You liked \(user.firstName)!").italic().font(.caption).foregroundColor(.gray)
-                        }
-                        Spacer()
-                    }
-                } else {
-                    HStack {
-                        Spacer()
-                        Button {
-                            Task {
-                                if(await userService.likeUser(userID: currentUser.id, matchID: user.id)) {
-                                    if !currentUser.likes.contains(user.id) { currentUser.likes.append(user.id) }
-                                } else { likeError = userService.errorMessage }
-                            }
-                        } label: {
-                            Image(systemName: "heart.circle").resizable().frame(width: 50, height: 50)
-                        }
-                        Spacer()
-                    }
-                }
+
+                likeControl
+                    .padding(.horizontal)
+                    .padding(.bottom)
             }
-        }.alert("Could not like profile", isPresented: Binding(get: { likeError != nil }, set: { if !$0 { likeError = nil } })) {
+        }
+        .navigationTitle(user.firstName)
+        .navigationBarTitleDisplayMode(.inline)
+        .sensoryFeedback(.success, trigger: isLiked) { wasLiked, liked in !wasLiked && liked }
+        .alert("Could not like profile", isPresented: Binding(get: { likeError != nil }, set: { if !$0 { likeError = nil } })) {
             Button("OK") { likeError = nil }
         } message: { Text(likeError ?? "") }
+    }
+
+    @ViewBuilder
+    private var likeControl: some View {
+        if isLiked {
+            Label("You liked \(user.firstName)", systemImage: "heart.fill")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, minHeight: 50)
+        } else {
+            Button {
+                like()
+            } label: {
+                Label(isLiking ? "Liking…" : "Like \(user.firstName)", systemImage: "heart")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, minHeight: 34)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .tint(Constants.Colors.greenColor)
+            .disabled(isLiking)
+        }
+    }
+
+    private func like() {
+        guard !isLiking else { return }
+        isLiking = true
+        Task {
+            defer { isLiking = false }
+            if await userService.likeUser(userID: currentUser.id, matchID: user.id) {
+                if !currentUser.likes.contains(user.id) { currentUser.likes.append(user.id) }
+            } else {
+                likeError = userService.errorMessage
+            }
+        }
     }
 }
 
@@ -94,5 +109,10 @@ struct UserInterest: View {
 }
 
 #Preview {
-    UserView(user: PreviewModels.previewUser.matches.first!).environment(SessionStore.shared).environment(PreviewModels.previewUser)
+    NavigationStack {
+        UserView(user: PreviewModels.previewUser.matches.first!)
+    }
+    .environment(SessionStore.shared)
+    .environment(UserService())
+    .environment(PreviewModels.previewUser)
 }

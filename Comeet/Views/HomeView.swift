@@ -17,8 +17,7 @@ struct HomeView: View {
         TabView(selection: $selectedTab) {
             
             MatchView().tabItem {
-                Image(systemName: "person.2.square.stack")
-                Text("Home")
+                Label("Matches", systemImage: "person.2.square.stack")
             }.tag("home")
             
             ChatView().tabItem {

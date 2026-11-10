@@ -12,75 +12,50 @@ import SDWebImageSwiftUI
 struct MatchView: View {
     @Environment(User.self) var currentUser: User
     @Environment(SessionStore.self) var session
-    var user = User()
     @State private var refresh = MatchRefreshState()
     @Environment(\.scenePhase) private var scenePhase
-    @State var selectedUser: (any Person)? = nil
-    @State var isZoomed = false
-    
-    @Namespace var matchCardAnimation
-    
+
+    @Namespace private var matchTransition
+
     init(loading: Bool = true) {
         _refresh = State(initialValue: MatchRefreshState(loading: loading))
     }
 
     var body: some View {
         ZStack {
-            if(session.accountInfo?.emailConfirmed == false && !refresh.loading) {
+            if session.accountInfo?.emailConfirmed == false && !refresh.loading {
                 VerifyEmailView()
             } else {
-                NavigationView {
+                NavigationStack {
                     ScrollView {
-                        if currentUser.matches.isEmpty {
-                            Text("No matches right now, check back on Monday!").italic()
-                        }
-                        if(refresh.loading) {
+                        if refresh.loading {
                             LoadingMatchView()
+                                .padding()
+                        } else if currentUser.matches.isEmpty {
+                            ContentUnavailableView(
+                                "No Matches Yet",
+                                systemImage: "person.2",
+                                description: Text("Check back on Monday for your next match.")
+                            )
+                            .containerRelativeFrame([.horizontal, .vertical])
                         } else {
-                            LazyVStack {
+                            LazyVStack(spacing: 16) {
                                 ForEach(currentUser.matches) { match in
                                     NavigationLink {
                                         UserView(user: match)
+                                            .matchZoomTransition(id: match.id, in: matchTransition)
                                     } label: {
-                                        MatchCardView(match: match, animation: matchCardAnimation,
-                                                      isSource: selectedUser?.id != match.id)
-                                            .onTapGesture {
-                                                withAnimation(.snappy) {
-                                                    selectedUser = match
-                                                }
-                                            }
+                                        MatchCardView(match: match)
+                                            .matchTransitionSource(id: match.id, in: matchTransition)
                                     }
+                                    .buttonStyle(.plain)
                                 }
                             }
-                            .navigationBarTitle("Matches", displayMode: .large)
+                            .padding()
                         }
                     }
-                }
-                .overlay {
-                    if selectedUser != nil {
-                        ZStack {
-                            ScrollView {
-                                VStack {
-                                    if selectedUser != nil {
-                                        MatchDetailView(match: selectedUser as! Match, animation: matchCardAnimation)
-                                            .onTapGesture {
-                                                withAnimation(.smooth) {
-                                                    selectedUser = nil
-                                                }
-                                            }
-                                            .transition(.scale(scale: 1))
-                                    }
-                                    if selectedUser != nil {
-                                        UserBio(user: selectedUser as! Match, matchAnimation: matchCardAnimation)
-                                            .background(RoundedRectangle(cornerRadius: 25.0).foregroundStyle(.white))
-                                            .offset(y: -40)
-                                            .transition(.move(edge: .bottom))
-                                    }
-                                }
-                            }
-                        }.ignoresSafeArea()
-                            //.transition(.move(edge: .bottom))
-                    }
+                    .refreshable { await refresh.load(session: session) }
+                    .navigationTitle("Matches")
                 }
             }
         }.task(id: scenePhase) {
@@ -89,6 +64,42 @@ struct MatchView: View {
         }.alert("Could not load matches", isPresented: Binding(get: { refresh.errorMessage != nil }, set: { if !$0 { refresh.errorMessage = nil } })) {
             Button("OK") { refresh.errorMessage = nil }
         } message: { Text(refresh.errorMessage ?? "") }
+    }
+}
+
+private extension View {
+    /// Zooms from the match card into the profile on iOS 18+, unless Reduce Motion is on.
+    @ViewBuilder
+    func matchZoomTransition(id: UUID, in namespace: Namespace.ID) -> some View {
+        if #available(iOS 18.0, *) {
+            modifier(MatchZoomTransition(id: id, namespace: namespace))
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func matchTransitionSource(id: UUID, in namespace: Namespace.ID) -> some View {
+        if #available(iOS 18.0, *) {
+            matchedTransitionSource(id: id, in: namespace) { $0.clipShape(.rect(cornerRadius: 25)) }
+        } else {
+            self
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+private struct MatchZoomTransition: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let id: UUID
+    let namespace: Namespace.ID
+
+    func body(content: Content) -> some View {
+        if reduceMotion {
+            content
+        } else {
+            content.navigationTransition(.zoom(sourceID: id, in: namespace))
+        }
     }
 }
 
@@ -122,74 +133,69 @@ final class MatchRefreshState {
 }
 
 struct MatchCardView: View {
-    let animation: Namespace.ID
-    let isSource: Bool
-    
-    var profileURL: URL
-    var match: Match
-    
-    
-    init(match: Match, animation: Namespace.ID, isSource: Bool) {
-        self.animation = animation
-        self.isSource = isSource
-        self.match = match
-        self.profileURL = APIConfiguration.photoURL(userID: match.id)
-    }
-    
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    let match: Match
+
     var body: some View {
-        ZStack {
-            WebImage(url: profileURL)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .clipShape(RoundedRectangle(cornerRadius: 25.0))
-                .matchedGeometryEffect(id: "\(match.id)-image", in: animation, isSource: isSource)
-            LinearGradient(colors: [.clear, .clear, .clear, .black], startPoint: .top, endPoint: .bottom)
-                .opacity(0.5)
-            VStack {
-                Spacer()
-                HStack {
-                    Text("**\(match.fullName),** \(match.age)")
-                        .foregroundStyle(.white)
-                        .font(.title)
-                        .minimumScaleFactor(0.1)
-                        .matchedGeometryEffect(id: "\(match.id)-name", in: animation, isSource: isSource)
-                        //.padding(.leading)
-                    Spacer()
-                }
-                HStack {
+        // The ZStack keeps a 4:5 photo card but grows when large text needs more room.
+        ZStack(alignment: .bottom) {
+            Color.clear.aspectRatio(4 / 5, contentMode: .fit)
+            details
+        }
+        .background { MatchPhoto(userID: match.id) }
+        .clipShape(.rect(cornerRadius: 25))
+            .contentShape(.rect(cornerRadius: 25))
+            .accessibilityElement(children: .combine)
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("**\(match.fullName),** \(match.age)")
+                .font(.title)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 4 : 2)
+            if dynamicTypeSize.isAccessibilitySize {
+                Text("Class of \(String(match.graduationYear))")
+                Text(match.major)
+            } else {
+                HStack(alignment: .firstTextBaseline) {
                     Text("Class of \(String(match.graduationYear))")
-                        .foregroundStyle(.white)
-                        .matchedGeometryEffect(id: "\(match.id)-year", in: animation, isSource: isSource)
                     Spacer()
                     Text(match.major)
-                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.trailing)
                 }
-            }.padding()
+            }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 25.0))
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
+        .padding(.top, 32)
+        .background {
+            LinearGradient(colors: [.black.opacity(0), .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                .accessibilityHidden(true)
+        }
     }
 }
 
-struct MatchDetailView: View {
-    let animation: Namespace.ID
-    @State var scrollPosition: Int?
-    
-    var profileURL: URL
-    var match: Match
-    
-    init(match: Match, animation: Namespace.ID) {
-        self.animation = animation
-        self.match = match
-        self.profileURL = APIConfiguration.photoURL(userID: match.id)
-    }
-    
+/// A match's profile photo, with a neutral placeholder while it loads or when there is none.
+struct MatchPhoto: View {
+    let userID: UUID
+
     var body: some View {
-        WebImage(url: profileURL)
+        WebImage(url: APIConfiguration.photoURL(userID: userID))
+            .placeholder { placeholder }
             .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(maxWidth: .infinity)
-            .matchedGeometryEffect(id: "\(match.id)-image", in: animation)
+            .scaledToFill()
+            .accessibilityHidden(true)
+    }
+
+    private var placeholder: some View {
+        Rectangle()
+            .fill(Color(uiColor: .secondarySystemFill))
+            .overlay {
+                Image(systemName: "person.fill")
+                    .font(.system(size: 96))
+                    .foregroundStyle(.tertiary)
+            }
     }
 }
 
@@ -281,27 +287,19 @@ struct VerifyEmailView: View {
 
 struct LoadingMatchView: View {
     var body: some View {
-        List {
-            HStack {
-                Image(systemName: "person.crop.circle")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
-                Text("First Name, Age")
-                    .padding(.leading)
+        RoundedRectangle(cornerRadius: 25)
+            .fill(Color(uiColor: .secondarySystemFill))
+            .aspectRatio(4 / 5, contentMode: .fit)
+            .overlay(alignment: .bottomLeading) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("First Last, 20").font(.title)
+                    Text("Class of 2026")
+                }
+                .padding()
             }
-            HStack {
-                Image(systemName: "person.crop.circle")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
-                Text("First Name, Age")
-                    .padding(.leading)
-            }
-        }
-        .redacted(reason: .placeholder)
-        .navigationTitle("Matches")
-        .navigationBarTitleDisplayMode(.large)
+            .redacted(reason: .placeholder)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Loading matches")
     }
 }
 
