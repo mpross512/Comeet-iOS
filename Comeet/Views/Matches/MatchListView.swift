@@ -270,7 +270,7 @@ struct VerifyEmailView: View {
         }
     }
     private func resend() {
-        guard !busy, Date() >= resendAvailableAt else { return }
+        guard !busy, !(Date() < resendAvailableAt) else { return }
         busy = true; errorText = nil; feedback = nil; emailSent = false
         Task {
             defer { busy = false }

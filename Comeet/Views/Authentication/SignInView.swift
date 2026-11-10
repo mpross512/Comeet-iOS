@@ -95,7 +95,7 @@ final class PasswordRecoveryState {
     func requestCode(repository: any ComeetRepository) async {
         guard !busy else { return }
         guard let address = validatedEmail() else { return }
-        guard Date() >= resendAvailableAt else { return }
+        guard !(Date() < resendAvailableAt) else { return }
         busy = true; errorMessage = nil; infoMessage = nil
         defer { busy = false }
         do {
@@ -142,7 +142,7 @@ final class PasswordRecoveryState {
     }
 
     func resendVerification(repository: any ComeetRepository) async {
-        guard !busy, Date() >= resendAvailableAt, let address = requestedEmail else { return }
+        guard !busy, !(Date() < resendAvailableAt), let address = requestedEmail else { return }
         busy = true; errorMessage = nil; infoMessage = nil
         defer { busy = false }
         do {
